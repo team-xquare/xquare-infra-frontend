@@ -1,0 +1,7 @@
+config:
+  name: xquare-infra
+  service_type: fe
+  port: 3000
+  domain:
+    prod: xquare-infra.xquare.app
+    stag: xquare-infra-stag.xquare.app
