@@ -1,7 +1,11 @@
+import { RouterProvider } from 'react-router-dom';
+import { Router } from './router';
+import { StyledProvider } from './style/StyledProvider';
+
 export const App = () => {
   return (
-    <div>
-      <div>hello</div>
-    </div>
+    <StyledProvider>
+      <RouterProvider router={Router} />
+    </StyledProvider>
   );
 };
