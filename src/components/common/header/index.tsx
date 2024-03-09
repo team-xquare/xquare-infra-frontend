@@ -23,12 +23,17 @@ export const Header = () => {
   return (
     <>
       <Wrapper scroll={scroll}>
-        <img src={LogoImg} />
-        <div>
+        <Side>
+          <img src={LogoImg} />
+          <span>Xquare Infra</span>
+        </Side>
+        <Center>
           <span>소개</span>
           <span>고객 지원</span>
-        </div>
-        <Button></Button>
+        </Center>
+        <Side>
+          <Button></Button>
+        </Side>
       </Wrapper>
       <Outlet />
     </>
@@ -37,7 +42,7 @@ export const Header = () => {
 
 const Wrapper = styled.div<{ scroll: number }>`
   position: fixed;
-  transition: 0.2s linear;
+  transition: 0.25s linear;
   top: 0;
   left: 0;
   width: 100%;
@@ -49,10 +54,21 @@ const Wrapper = styled.div<{ scroll: number }>`
   color: ${({ scroll }) => (scroll === 0 ? 'white' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'black')};
   background-color: ${({ scroll }) => (scroll === 0 ? 'rgba(0,0,0,0)' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'white')};
   z-index: 999;
-  > div {
-    width: 254px;
-    display: flex;
-    justify-content: space-between;
+`;
+
+const Center = styled.div`
+  width: 254px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Side = styled.div`
+  width: 300px;
+  display: flex;
+  align-items: center;
+  font-size: 30px;
+  > span {
+    margin-left: 14px;
   }
 `;
 
@@ -61,4 +77,5 @@ const Button = styled.div`
   height: 52px;
   border-radius: 8px;
   border: 2px white solid;
+  justify-self: end;
 `;
