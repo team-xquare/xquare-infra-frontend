@@ -37,8 +37,8 @@ const Container = styled.div`
 
 const FirstContainerBox = styled.div`
   position: absolute;
-  top: 200px;
-  left: 214px;
+  top: 21.95%;
+  left: 11.1%;
   width: 922px;
   height: 690px;
   color: white;
