@@ -32,7 +32,7 @@ export const Header = () => {
           <span>고객 지원</span>
         </Center>
         <Side>
-          <Button></Button>
+          <Button scroll={scroll}></Button>
         </Side>
       </Wrapper>
       <Outlet />
@@ -46,12 +46,12 @@ const Wrapper = styled.div<{ scroll: number }>`
   top: 0;
   left: 0;
   width: 100%;
-  height: 110px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   padding: 0 90px 0 90px;
   align-items: center;
-  color: ${({ scroll }) => (scroll === 0 ? 'white' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'black')};
+  color: ${({ scroll }) => (scroll === 0 ? 'white' : 'black')};
   background-color: ${({ scroll }) => (scroll === 0 ? 'rgba(0,0,0,0)' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'white')};
   z-index: 999;
 `;
@@ -66,16 +66,18 @@ const Side = styled.div`
   width: 300px;
   display: flex;
   align-items: center;
+  justify-content: start;
   font-size: 30px;
   > span {
     margin-left: 14px;
   }
 `;
 
-const Button = styled.div`
+const Button = styled.div<{ scroll: number }>`
+  transition: 0.25s linear;
   width: 192px;
-  height: 52px;
+  height: 40px;
   border-radius: 8px;
-  border: 2px white solid;
-  justify-self: end;
+  border: 2px ${({ scroll }) => (scroll === 0 ? 'white' : 'black')} solid;
+  margin-left: 108px;
 `;
