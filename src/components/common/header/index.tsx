@@ -34,6 +34,7 @@ export const Header = () => {
         <Side>
           <Button scroll={scroll}></Button>
         </Side>
+        <WrapperBackground scroll={scroll} />
       </Wrapper>
       <Outlet />
     </>
@@ -42,7 +43,7 @@ export const Header = () => {
 
 const Wrapper = styled.div<{ scroll: number }>`
   position: fixed;
-  transition: 0.25s linear;
+  transition: 0.4s ease-in-out;
   top: 0;
   left: 0;
   width: 100%;
@@ -51,9 +52,19 @@ const Wrapper = styled.div<{ scroll: number }>`
   justify-content: space-between;
   padding: 0 90px 0 90px;
   align-items: center;
-  color: ${({ scroll }) => (scroll === 0 ? 'white' : 'black')};
-  background-color: ${({ scroll }) => (scroll === 0 ? 'rgba(0,0,0,0)' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'white')};
+  color: ${({ scroll }) => (scroll === 0 ? 'white' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'black')};
   z-index: 999;
+`;
+
+const WrapperBackground = styled.div<{ scroll: number }>`
+  height: ${({ scroll }) => (scroll < 408 ? '70px' : '0px')};
+  background-color: ${({ scroll }) => (scroll === 0 ? 'rgba(0,0,0,0)' : 'white')};
+  position: absolute;
+  transition: 0.4s ease-in-out;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  z-index: -1;
 `;
 
 const Center = styled.div`
@@ -74,7 +85,7 @@ const Side = styled.div`
 `;
 
 const Button = styled.div<{ scroll: number }>`
-  transition: 0.25s linear;
+  transition: 0.4s ease-in-out;
   width: 192px;
   height: 40px;
   border-radius: 8px;
