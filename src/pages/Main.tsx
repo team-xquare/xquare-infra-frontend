@@ -1,25 +1,14 @@
 import styled from '@emotion/styled';
-import MainImg from '@/assets/Main.svg';
+import { FirstContainer } from '@/components/Main/firstContainer';
+import { SecondContainer } from '@/components/Main/secondContainer';
+import { ThirdContainer } from '@/components/Main/thirdContainer';
 
 export const Main = () => {
   return (
     <Wrapper>
-      <Container>
-        <ImgWrapper>
-          <Img src={MainImg} />
-        </ImgWrapper>
-        <MainContainer>
-          <div>
-            프로젝트를 빠르게
-            <br />
-            배포하는 경험을 할 수 있습니다.
-          </div>
-          <div>스퀘어는 보다 쉬운 방법으로 배포할 수 있고 쉽게 모니터링 할 수 있습니다.</div>
-          <div>자세히 보기</div>
-        </MainContainer>
-      </Container>
-      <Container>b</Container>
-      <Container>c</Container>
+      <FirstContainer />
+      <SecondContainer />
+      <ThirdContainer />
       <SubFooter>
         <div>FREE TRIAL</div>
         <div>
@@ -37,80 +26,26 @@ const Wrapper = styled.div`
   flex-direction: column;
 `;
 
-const Container = styled.div`
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-`;
-
-const MainContainer = styled.div`
-  width: 1170px;
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: center;
-  position: absolute;
-  top: 250px;
-  left: auto;
-  right: auto;
-  color: white;
-  z-index: 3;
-  > div:nth-child(1) {
-    font-size: 48px;
-    font-weight: 700;
-  }
-  > div:nth-child(2) {
-    margin: 32px 0 64px 0;
-    font-size: 20px;
-  }
-  > div:nth-child(3) {
-    width: 190px;
-    height: 64px;
-    border: 1px white solid;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: 700;
-  }
-`;
-
 const SubFooter = styled.div`
   width: 100%;
-  height: 710px;
+  height: 540px;
   padding-top: 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #6fe09e;
-`;
-
-const ImgWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.3); /* 빨간색으로 변경 */
-    z-index: 2;
+  background: linear-gradient(180deg, rgba(201, 153, 209, 1) 0%, rgba(198, 0, 231, 1) 100%);
+  > div:nth-child(1) {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
   }
-`;
-
-const Img = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: relative;
-  z-index: 1;
+  > div:nth-child(2) {
+    font-size: 70px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 34px;
+    > b {
+      color: white;
+    }
+  }
 `;

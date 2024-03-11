@@ -63,7 +63,7 @@ const WrapperBackground = styled.div<{ scroll: number }>`
   position: absolute;
   transition:
     opacity 0.25s linear,
-    height 0.5s ease-in-out;
+    height 0.6s ease-out;
   top: 0px;
   left: 0px;
   width: 100vw;
