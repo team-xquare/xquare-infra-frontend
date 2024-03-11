@@ -23,7 +23,7 @@ export const Header = () => {
   return (
     <>
       <Wrapper scroll={scroll}>
-        <Side>
+        <Side scroll={scroll}>
           <img src={LogoImg} />
           <span>Xquare Infra</span>
         </Side>
@@ -31,7 +31,7 @@ export const Header = () => {
           <span>소개</span>
           <span>고객 지원</span>
         </Center>
-        <Side>
+        <Side scroll={scroll}>
           <Button scroll={scroll}></Button>
         </Side>
         <WrapperBackground scroll={scroll} />
@@ -43,11 +43,11 @@ export const Header = () => {
 
 const Wrapper = styled.div<{ scroll: number }>`
   position: fixed;
-  transition: 0.4s ease-in-out;
+  transition: 0.25s ease-in-out;
   top: 0;
   left: 0;
   width: 100%;
-  height: 70px;
+  height: 80px;
   display: flex;
   justify-content: space-between;
   padding: 0 90px 0 90px;
@@ -57,10 +57,13 @@ const Wrapper = styled.div<{ scroll: number }>`
 `;
 
 const WrapperBackground = styled.div<{ scroll: number }>`
-  height: ${({ scroll }) => (scroll < 408 ? '70px' : '0px')};
-  background-color: ${({ scroll }) => (scroll === 0 ? 'rgba(0,0,0,0)' : 'white')};
+  height: ${({ scroll }) => (scroll < 408 ? '80px' : '0px')};
+  background-color: white;
+  opacity: ${({ scroll }) => (scroll === 0 ? 0 : 1)};
   position: absolute;
-  transition: 0.4s ease-in-out;
+  transition:
+    opacity 0.25s linear,
+    height 0.5s ease-in-out;
   top: 0px;
   left: 0px;
   width: 100vw;
@@ -71,21 +74,26 @@ const Center = styled.div`
   width: 254px;
   display: flex;
   justify-content: space-between;
+  font-size: 16px;
+  font-weight: 500;
 `;
 
-const Side = styled.div`
+const Side = styled.div<{ scroll: number }>`
   width: 300px;
   display: flex;
   align-items: center;
   justify-content: start;
   font-size: 30px;
+  font-weight: 700;
   > span {
+    transition: 0.25s ease-in-out;
     margin-left: 14px;
+    color: ${({ scroll }) => (scroll === 0 ? 'white' : scroll >= 408 ? '#9650fa' : 'black')};
   }
 `;
 
 const Button = styled.div<{ scroll: number }>`
-  transition: 0.4s ease-in-out;
+  transition: 0.25s ease-in-out;
   width: 192px;
   height: 40px;
   border-radius: 8px;
