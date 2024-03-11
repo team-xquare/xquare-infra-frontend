@@ -5,17 +5,29 @@ export const Main = () => {
   return (
     <Wrapper>
       <Container>
-        <img src={MainImg} />
-        <FirstContainerBox>
+        <ImgWrapper>
+          <Img src={MainImg} />
+        </ImgWrapper>
+        <MainContainer>
           <div>
             프로젝트를 빠르게
             <br />
             배포하는 경험을 할 수 있습니다.
           </div>
           <div>스퀘어는 보다 쉬운 방법으로 배포할 수 있고 쉽게 모니터링 할 수 있습니다.</div>
-        </FirstContainerBox>
+          <div>자세히 보기</div>
+        </MainContainer>
       </Container>
       <Container>b</Container>
+      <Container>c</Container>
+      <SubFooter>
+        <div>FREE TRIAL</div>
+        <div>
+          대마고 학생이라면 <b>‘스퀘어 인프라’</b> 를<br />
+          <b>무료</b>로 사용할 수 있습니다.
+        </div>
+        <div></div>
+      </SubFooter>
     </Wrapper>
   );
 };
@@ -35,21 +47,70 @@ const Container = styled.div`
   position: relative;
 `;
 
-const FirstContainerBox = styled.div`
+const MainContainer = styled.div`
+  width: 1170px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
   position: absolute;
-  top: 200px;
-  left: 214px;
-  width: 922px;
-  height: 690px;
+  top: 250px;
+  left: auto;
+  right: auto;
   color: white;
+  z-index: 3;
   > div:nth-child(1) {
-    font-size: 64px;
-    font-weight: 800;
-    margin-top: 20px;
+    font-size: 48px;
+    font-weight: 700;
   }
   > div:nth-child(2) {
-    font-size: 30px;
-    font-weight: 500;
-    margin-top: 50px;
+    margin: 32px 0 64px 0;
+    font-size: 20px;
   }
+  > div:nth-child(3) {
+    width: 190px;
+    height: 64px;
+    border: 1px white solid;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+  }
+`;
+
+const SubFooter = styled.div`
+  width: 100%;
+  height: 710px;
+  padding-top: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #6fe09e;
+`;
+
+const ImgWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3); /* 빨간색으로 변경 */
+    z-index: 2;
+  }
+`;
+
+const Img = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  z-index: 1;
 `;
