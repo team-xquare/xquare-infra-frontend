@@ -5,7 +5,9 @@ export const Main = () => {
   return (
     <Wrapper>
       <Container>
-        <img src={MainImg} />
+        <ImgWrapper>
+          <Img src={MainImg} />
+        </ImgWrapper>
         <MainContainer>
           <div>
             프로젝트를 빠르게
@@ -43,24 +45,20 @@ const Container = styled.div`
   align-items: center;
   overflow: hidden;
   position: relative;
-  > img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 `;
 
 const MainContainer = styled.div`
-  width: 1200px;
+  width: 1170px;
   display: flex;
   flex-direction: column;
   align-items: start;
   justify-content: center;
   position: absolute;
-  top: 200px;
+  top: 250px;
   left: auto;
   right: auto;
   color: white;
+  z-index: 3;
   > div:nth-child(1) {
     font-size: 48px;
     font-weight: 700;
@@ -90,4 +88,29 @@ const SubFooter = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: #6fe09e;
+`;
+
+const ImgWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3); /* 빨간색으로 변경 */
+    z-index: 2;
+  }
+`;
+
+const Img = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  z-index: 1;
 `;
