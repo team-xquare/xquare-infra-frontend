@@ -51,7 +51,7 @@ const Container = styled.div`
 `;
 
 const MainContainer = styled.div`
-  width: 1170px;
+  width: 1200px;
   display: flex;
   flex-direction: column;
   align-items: start;
