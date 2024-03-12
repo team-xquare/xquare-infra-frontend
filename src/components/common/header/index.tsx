@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
+import { Button } from '../button';
 
 // 0 408
 
@@ -32,7 +33,17 @@ export const Header = () => {
           <span>고객 지원</span>
         </Center>
         <Side scroll={scroll}>
-          <Button scroll={scroll}></Button>
+          <Button
+            width={164}
+            height={40}
+            buttonStyle="ghost"
+            buttonColor={scroll === 0 ? 'white' : 'black'}
+            onClick={() => {
+              console.log('click!');
+            }}
+          >
+            무료로 이용하세요
+          </Button>
         </Side>
         <WrapperBackground scroll={scroll} />
       </Wrapper>
@@ -92,11 +103,4 @@ const Side = styled.div<{ scroll: number }>`
   }
 `;
 
-const Button = styled.div<{ scroll: number }>`
-  transition: 0.25s ease-in-out;
-  width: 192px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px ${({ scroll }) => (scroll === 0 ? 'white' : 'black')} solid;
-  margin-left: 108px;
-`;
+// ${({ scroll }) => (scroll === 0 ? 'white' : 'black')} solid;
