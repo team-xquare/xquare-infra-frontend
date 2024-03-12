@@ -97,6 +97,6 @@ const Button = styled.div<{ scroll: number }>`
   width: 192px;
   height: 40px;
   border-radius: 8px;
-  border: 2px ${({ scroll }) => (scroll === 0 ? 'white' : 'black')} solid;
+  border: 1px ${({ scroll }) => (scroll === 0 ? 'white' : 'black')} solid;
   margin-left: 108px;
 `;
