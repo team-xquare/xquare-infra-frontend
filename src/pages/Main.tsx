@@ -40,7 +40,7 @@ const SubFooter = styled.div`
     color: white;
   }
   > div:nth-child(2) {
-    font-size: 70px;
+    font-size: 56px;
     font-weight: 700;
     text-align: center;
     margin-top: 34px;
