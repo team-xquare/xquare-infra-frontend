@@ -1,5 +1,5 @@
 import { RouterProvider } from 'react-router-dom';
-import { Router } from './router';
+import { Router } from './router/router';
 import { StyledProvider } from './style/StyledProvider';
 
 export const App = () => {

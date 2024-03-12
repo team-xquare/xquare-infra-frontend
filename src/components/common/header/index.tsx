@@ -1,4 +1,3 @@
-import { Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
@@ -45,7 +44,6 @@ export const Header = () => {
         </RightSide>
         <WrapperBackground scroll={scroll} />
       </Wrapper>
-      <Outlet />
     </>
   );
 };
