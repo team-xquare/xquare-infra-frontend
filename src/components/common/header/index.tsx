@@ -22,15 +22,15 @@ export const Header = () => {
   return (
     <>
       <Wrapper scroll={scroll}>
-        <Side scroll={scroll}>
+        <LeftSide scroll={scroll}>
           <img src={LogoImg} />
           <span>Xquare Infra</span>
-        </Side>
+        </LeftSide>
         <Center>
           <span>소개</span>
           <span>고객 지원</span>
         </Center>
-        <Side scroll={scroll}>
+        <RightSide>
           <Button
             width={164}
             height={40}
@@ -42,7 +42,7 @@ export const Header = () => {
           >
             무료로 이용하세요
           </Button>
-        </Side>
+        </RightSide>
         <WrapperBackground scroll={scroll} />
       </Wrapper>
       <Outlet />
@@ -87,7 +87,7 @@ const Center = styled.div`
   font-weight: 500;
 `;
 
-const Side = styled.div<{ scroll: number }>`
+const LeftSide = styled.div<{ scroll: number }>`
   width: 300px;
   display: flex;
   align-items: center;
@@ -101,4 +101,11 @@ const Side = styled.div<{ scroll: number }>`
   }
 `;
 
-// ${({ scroll }) => (scroll === 0 ? 'white' : 'black')} solid;
+const RightSide = styled.div`
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  font-size: 30px;
+  font-weight: 700;
+`;
