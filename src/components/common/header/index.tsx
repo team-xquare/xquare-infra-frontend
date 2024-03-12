@@ -39,7 +39,7 @@ export const Header = () => {
               console.log('click!');
             }}
           >
-            무료로 이용하세요
+            무료로 시작하기
           </Button>
         </RightSide>
         <WrapperBackground scroll={scroll} />
