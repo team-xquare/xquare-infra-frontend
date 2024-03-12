@@ -4,8 +4,6 @@ import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
 import { Button } from '../button';
 
-// 0 408
-
 export const Header = () => {
   const [scroll, setScroll] = useState<number>(0);
 
