@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import MainImg from '@/assets/Main.svg';
+import { Button } from '../common/button';
 
 export const FirstContainer = () => {
   return (
@@ -14,7 +15,9 @@ export const FirstContainer = () => {
           배포하는 경험을 할 수 있습니다.
         </div>
         <div>스퀘어는 보다 쉬운 방법으로 배포할 수 있고 쉽게 모니터링 할 수 있습니다.</div>
-        <div>자세히 보기</div>
+        <Button width={190} height={64} buttonColor="white" buttonStyle="ghost" onClick={() => console.log('click!!')}>
+          자세히 보기
+        </Button>
       </MainContainer>
     </Container>
   );
