@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import MainImg from '@/assets/Main.svg';
-import { Button } from '../common/button';
+import { Button } from '../common/Button';
 
 export const FirstContainer = () => {
   return (

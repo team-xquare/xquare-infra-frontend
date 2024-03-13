@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
-import { Button } from '../button';
+import { Button } from '../Button';
 import { useLocation } from 'react-router-dom';
 import { css } from '@emotion/react';
 
