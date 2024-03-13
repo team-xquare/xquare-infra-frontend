@@ -18,7 +18,7 @@ const Wrapper = styled.div<{ isOpen: boolean }>`
   width: ${({ isOpen }) => (isOpen ? '300px' : '60px')};
   left: 0;
   transition: 0.4s ease-in-out;
-  height: 100vw;
+  height: calc(100vh - 80px);
   background-color: white;
   border-right: 1px #dddddd solid;
   position: absolute;
