@@ -46,7 +46,7 @@ export const Header = () => {
             무료로 시작하기
           </Button>
         </RightSide>
-        <WrapperBackground scroll={scroll} />
+        <WrapperBackground scroll={_pathname === '' ? scroll : 0} />
       </Wrapper>
     </>
   );
@@ -63,6 +63,7 @@ const Wrapper = styled.div<{ scroll: number; pathname: string }>`
   justify-content: space-between;
   padding: 0 90px 0 90px;
   align-items: center;
+  background-color: ${({ pathname }) => pathname !== '' && 'white'};
   color: ${({ scroll }) => (scroll === 0 ? 'white' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'black')};
   ${({ pathname }) =>
     pathname !== '' &&
