@@ -2,9 +2,13 @@ import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
 import { Button } from '../button';
+import { useLocation } from 'react-router-dom';
+import { css } from '@emotion/react';
 
 export const Header = () => {
   const [scroll, setScroll] = useState<number>(0);
+  const { pathname } = useLocation();
+  const _pathname: string = pathname.substring(1);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,7 +24,7 @@ export const Header = () => {
 
   return (
     <>
-      <Wrapper scroll={scroll}>
+      <Wrapper scroll={scroll} pathname={_pathname}>
         <LeftSide scroll={scroll}>
           <img src={LogoImg} />
           <span>Xquare Infra</span>
@@ -48,7 +52,7 @@ export const Header = () => {
   );
 };
 
-const Wrapper = styled.div<{ scroll: number }>`
+const Wrapper = styled.div<{ scroll: number; pathname: string }>`
   position: fixed;
   transition: 0.25s ease-in-out;
   top: 0;
@@ -60,6 +64,11 @@ const Wrapper = styled.div<{ scroll: number }>`
   padding: 0 90px 0 90px;
   align-items: center;
   color: ${({ scroll }) => (scroll === 0 ? 'white' : scroll >= 408 ? 'rgba(0,0,0,0)' : 'black')};
+  ${({ pathname }) =>
+    pathname !== '' &&
+    css`
+      border-bottom: 1px #dddddd solid;
+    `};
   z-index: 999;
 `;
 
