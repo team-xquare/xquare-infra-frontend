@@ -46,6 +46,10 @@ const style = css`
     font-style: normal;
     font-family: 'Pretendard', sans-serif;
   }
+
+  body {
+    overflow-x: hidden;
+  }
 `;
 
 export const GlobalStyle = () => {
