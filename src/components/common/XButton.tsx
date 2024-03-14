@@ -43,6 +43,7 @@ const Wrapper = styled.div<Omit<ButtonPropsType, 'children' | 'onClick'>>`
   font-weight: 700;
   display: flex;
   justify-content: center;
+  gap: 6px;
   align-items: center;
   cursor: pointer;
   transition: 0.2s linear;
