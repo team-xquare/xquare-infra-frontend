@@ -3,6 +3,37 @@ import { Sidebar } from '@/components/common/sidebar';
 import { XButton } from '@/components/common/XButton';
 import { Icon } from '@iconify/react';
 import { theme } from '@/style/theme';
+import { TeamContainer } from '@/components/Team/TeamContainer';
+
+type TagType = 'club' | 'team' | 'alone' | 'etc';
+
+type TeamType = {
+  name: string;
+  admin: string;
+  deploy: string[];
+  tag: TagType;
+};
+
+const dummy: TeamType[] = [
+  {
+    name: '에일리언즈 (Team-aliens)',
+    admin: '김은빈',
+    deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
+    tag: 'team',
+  },
+  {
+    name: '에일리언즈 (Team-aliens)',
+    admin: '김은빈',
+    deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
+    tag: 'team',
+  },
+  {
+    name: '에일리언즈 (Team-aliens)',
+    admin: '김은빈',
+    deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
+    tag: 'team',
+  },
+];
 
 export const Team = () => {
   return (
@@ -29,7 +60,23 @@ export const Team = () => {
             <Icon icon={'ic:round-plus'} width={20} height={20} />팀 등록
           </XButton>
         </UtilContainer>
-        <TipBox>아직 생성하거나 속한 팀이 없습니다!</TipBox>
+        <ContainerWrapper>
+          {dummy.length > 0 ? (
+            dummy.map((element, index) => {
+              return (
+                <TeamContainer
+                  key={index}
+                  name={element.name}
+                  admin={element.admin}
+                  deploy={element.deploy}
+                  tag={element.tag}
+                />
+              );
+            })
+          ) : (
+            <TipBox>아직 생성하거나 속한 팀이 없습니다!</TipBox>
+          )}
+        </ContainerWrapper>
       </Container>
     </Wrapper>
   );
@@ -102,4 +149,12 @@ const TipBox = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 8px;
+`;
+
+const ContainerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  gap: 14px;
 `;
