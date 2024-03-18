@@ -29,6 +29,13 @@ const style = css`
     src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
   }
 
+  @font-face {
+    font-family: 'Pretendard';
+    font-weight: 100;
+    font-style: normal;
+    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Thin.woff') format('woff');
+  }
+
   * {
     margin: 0;
     padding: 0;
@@ -38,6 +45,10 @@ const style = css`
     list-style: none;
     font-style: normal;
     font-family: 'Pretendard', sans-serif;
+  }
+
+  body {
+    overflow-x: hidden;
   }
 `;
 

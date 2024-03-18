@@ -40,7 +40,7 @@ export const Button = ({
   );
 };
 
-const Wrapper = styled.div<Omit<ButtonPropsType, 'children, onClick'>>`
+const Wrapper = styled.div<Omit<ButtonPropsType, 'children' | 'onClick'>>`
   cursor: pointer;
   width: ${({ width }) => width + 'px'};
   height: ${({ height }) => height + 'px'};
