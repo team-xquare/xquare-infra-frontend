@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from './layout';
 import { Main } from '../pages/Main';
 import { Team } from '@/pages/Team';
+import { TeamCreate } from '@/pages/Team/Create';
 
 export const Router = createBrowserRouter([
   {
@@ -9,7 +10,13 @@ export const Router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: '', element: <Main /> },
-      { path: 'team', children: [{ index: true, element: <Team /> }] },
+      {
+        path: 'team',
+        children: [
+          { index: true, element: <Team /> },
+          { path: 'create', element: <TeamCreate /> },
+        ],
+      },
     ],
   },
 ]);
