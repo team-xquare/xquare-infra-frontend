@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
 import { css } from '@emotion/react';
 
-export const AutoComplete = ({ props }: { props?: string[] }) => {
+export const DropMenu = ({ props }: { props?: string[] }) => {
   return (
     <>
       {props && props.length >= 1 && (
