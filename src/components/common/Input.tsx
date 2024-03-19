@@ -63,7 +63,6 @@ const InputBox = styled.input`
   height: 46px;
   background-color: ${theme.color.gray1};
   border: 1px solid ${theme.color.gray5};
-  cursor: pointer;
   font-size: 16px;
   font-weight: 400;
   &::placeholder {
