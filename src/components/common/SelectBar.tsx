@@ -9,9 +9,10 @@ type SelectBarType = {
   selectedIndex?: number;
   onSelect: (index: number) => void;
   values: string[];
+  label?: string;
 };
 
-export const SelectBar = ({ selectedIndex, onSelect, values }: SelectBarType) => {
+export const SelectBar = ({ selectedIndex, onSelect, values, label }: SelectBarType) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const ref = useOutsideClick(() => {
     setIsOpen(false);
@@ -27,19 +28,26 @@ export const SelectBar = ({ selectedIndex, onSelect, values }: SelectBarType) =>
   }, [selectedIndex]);
 
   return (
-    <Wrapper ref={ref}>
-      <_SelectBar onClick={onOpen} selectedIndex={selectedIndex}>
-        <span>{selectedIndex === undefined ? '항목 보기' : values[selectedIndex]}</span>
-        <ImgContainer isOpen={isOpen}>
-          <img src={ArrowImg} />
-        </ImgContainer>
-      </_SelectBar>
-      {isOpen && <DropMenu values={values} onSelect={onSelect} onClose={setIsOpen} />}
+    <Wrapper label={label}>
+      {label && <Label>{label}</Label>}
+      <SelectBarWrapper ref={ref}>
+        <_SelectBar onClick={onOpen} selectedIndex={selectedIndex}>
+          <span>{selectedIndex === undefined ? '항목 보기' : values[selectedIndex]}</span>
+          <ImgContainer isOpen={isOpen}>
+            <img src={ArrowImg} />
+          </ImgContainer>
+        </_SelectBar>
+        {isOpen && <DropMenu values={values} onSelect={onSelect} onClose={setIsOpen} />}
+      </SelectBarWrapper>
     </Wrapper>
   );
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ label?: string }>`
+  height: ${({ label }) => (!!label ? '78px' : '50px')};
+`;
+
+const SelectBarWrapper = styled.div`
   position: relative;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -64,6 +72,19 @@ const _SelectBar = styled.div<Pick<SelectBarType, 'selectedIndex'>>`
   span {
     height: 18px;
   }
+`;
+
+const Label = styled.label`
+  width: 100%;
+  height: 22px;
+  cursor: default;
+  font-size: 14px;
+  font-weight: 400;
+  color: ${theme.color.gray6};
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  margin-left: 6px;
 `;
 
 const ImgContainer = styled.div<{ isOpen: boolean }>`
