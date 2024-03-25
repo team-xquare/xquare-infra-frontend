@@ -1,8 +1,15 @@
 import styled from '@emotion/styled';
 import { Sidebar } from '@/components/common/sidebar';
 import { Input } from '@/components/common/Input';
+import { SelectBar } from '@/components/common/SelectBar';
+import { useState } from 'react';
+
+type ProjectType = '동아리' | '팀 프로젝트' | '개인 프로젝트' | '기타';
+const projectKinds: ProjectType[] = ['동아리', '팀 프로젝트', '개인 프로젝트', '기타'];
 
 export const TeamCreate = () => {
+  const [selectedIndex, setSelectIndex] = useState<number>();
+
   return (
     <Wrapper>
       <Sidebar />
@@ -13,6 +20,8 @@ export const TeamCreate = () => {
         <Form>
           <Input width={400} label="팀 이름(한글)" placeholder="팀 이름(한글)" />
           <Input width={400} label="팀 이름(영어)" placeholder="팀 이름(영어)" />
+          <SelectBar selectedIndex={selectedIndex} onSelect={setSelectIndex} values={projectKinds} label="팀 분류" />
+          <div>hello world</div>
         </Form>
       </Container>
     </Wrapper>
@@ -43,6 +52,7 @@ const Title = styled.div`
   font-size: 30px;
   font-weight: 600;
   color: #202020;
+  cursor: default;
 `;
 
 const Form = styled.div`
