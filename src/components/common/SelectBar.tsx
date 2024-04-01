@@ -37,7 +37,7 @@ export const SelectBar = ({ selectedIndex, onSelect, values, label }: SelectBarT
             <img src={ArrowImg} />
           </ImgContainer>
         </_SelectBar>
-        {isOpen && <DropMenu values={values} onSelect={onSelect} onClose={setIsOpen} />}
+        {isOpen && <DropMenu values={values} onSelect={onSelect} onClose={setIsOpen} selectedIndex={selectedIndex} />}
       </SelectBarWrapper>
     </Wrapper>
   );

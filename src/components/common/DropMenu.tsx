@@ -4,11 +4,12 @@ import { css } from '@emotion/react';
 
 type DropMenuType = {
   values: string[];
+  selectedIndex?: number;
   onSelect: (index: number) => void;
   onClose: (bool: boolean) => void;
 };
 
-export const DropMenu = ({ values, onSelect, onClose }: DropMenuType) => {
+export const DropMenu = ({ values, onSelect, onClose, selectedIndex = -1 }: DropMenuType) => {
   return (
     <Wrapper>
       {values &&
@@ -22,6 +23,7 @@ export const DropMenu = ({ values, onSelect, onClose }: DropMenuType) => {
                 onSelect(index);
                 onClose(false);
               }}
+              selected={index === selectedIndex}
             >
               {element}
             </Box>
@@ -41,16 +43,17 @@ const Wrapper = styled.div`
   margin-top: 8px;
 `;
 
-const Box = styled.div<{ isLast: string }>`
+const Box = styled.div<{ isLast: string; selected: boolean }>`
   width: 100%;
   font-size: 12px;
   font-weight: 400;
-  color: ${theme.color.gray7};
+  color: ${({ selected }) => (selected ? theme.color.mainDark1 : theme.color.gray7)};
   height: 46px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  transition: 0.1s linear;
   ${({ isLast }) => {
     return (
       isLast === 'false' &&
@@ -59,4 +62,7 @@ const Box = styled.div<{ isLast: string }>`
       `
     );
   }};
+  :hover {
+    color: ${theme.color.mainDark1};
+  }
 `;
