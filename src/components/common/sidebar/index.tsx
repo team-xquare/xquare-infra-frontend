@@ -19,7 +19,7 @@ export const Sidebar = () => {
       >
         <div>
           <div>
-            <Icon icon={'ic:round-double-arrow'} width={40} height={40} />
+            <Icon icon={'ep:d-arrow-left'} width={24} height={24} />
           </div>
           <span>사이드바 축소</span>
         </div>
@@ -107,9 +107,12 @@ const BottomMenu = styled.div<{ isOpen: boolean }>`
     display: flex;
     align-items: center;
     > div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 40px;
       height: 40px;
-      flex: 0;
+      flex: none;
       transition: 0.4s ease-in-out;
       ${({ isOpen }) => isOpen && `transform: rotate(-180deg)`};
     }
