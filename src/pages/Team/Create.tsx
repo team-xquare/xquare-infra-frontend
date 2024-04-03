@@ -3,6 +3,7 @@ import { Sidebar } from '@/components/common/sidebar';
 import { Input } from '@/components/common/Input';
 import { SelectBar } from '@/components/common/SelectBar';
 import { useState } from 'react';
+import { XButton } from '@/components/common/XButton';
 
 type ProjectType = '동아리' | '팀 프로젝트' | '개인 프로젝트' | '기타';
 const projectKinds: ProjectType[] = ['동아리', '팀 프로젝트', '개인 프로젝트', '기타'];
@@ -21,7 +22,12 @@ export const TeamCreate = () => {
           <Input width={400} label="팀 이름(한글)" placeholder="팀 이름(한글)" />
           <Input width={400} label="팀 이름(영어)" placeholder="팀 이름(영어)" />
           <SelectBar selectedIndex={selectedIndex} onSelect={setSelectIndex} values={projectKinds} label="팀 분류" />
-          <div>hello world</div>
+          <TeamAddWrapper>
+            <Input width={400} label="팀원" placeholder="학생 검색" />
+            <XButton width={88} height={46} buttonStyle="solid">
+              학생 추가
+            </XButton>
+          </TeamAddWrapper>
         </Form>
       </Container>
     </Wrapper>
@@ -53,6 +59,12 @@ const Title = styled.div`
   font-weight: 600;
   color: #202020;
   cursor: default;
+`;
+
+const TeamAddWrapper = styled.div`
+  display: flex;
+  align-items: end;
+  gap: 10px;
 `;
 
 const Form = styled.div`
