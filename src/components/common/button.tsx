@@ -24,7 +24,7 @@ export const Button = ({
   onClick,
   font = 16,
   isBold = false,
-}: ButtonPropsType): ReactNode => {
+}: ButtonPropsType) => {
   return (
     <Wrapper
       width={width}
