@@ -1,5 +1,5 @@
 config:
-  name: xquare-infra
+  name: xquare-infra-frontend
   service_type: fe
   port: 3000
   domain:
