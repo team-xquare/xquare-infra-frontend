@@ -10,10 +10,18 @@ type ButtonPropsType = {
   width: number;
   height: number;
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
 };
 
-export const XButton = ({ buttonStyle, width, height, children, onClick }: ButtonPropsType) => {
+export const XButton = ({
+  buttonStyle,
+  width,
+  height,
+  children,
+  onClick = () => {
+    console.log('click!');
+  },
+}: ButtonPropsType) => {
   return (
     <Wrapper
       width={width}
@@ -39,6 +47,7 @@ const Wrapper = styled.div<Omit<ButtonPropsType, 'children' | 'onClick'>>`
       border: 1px solid ${theme.color.mainDark1};
     `};
   border-radius: 4px;
+  user-select: none;
   font-size: 14px;
   font-weight: 700;
   display: flex;
