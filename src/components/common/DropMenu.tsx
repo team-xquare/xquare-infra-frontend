@@ -41,6 +41,7 @@ const Wrapper = styled.div`
   background-color: ${theme.color.gray1};
   position: absolute;
   margin-top: 8px;
+  z-index: 10;
 `;
 
 const Box = styled.div<{ isLast: string; selected: boolean }>`
