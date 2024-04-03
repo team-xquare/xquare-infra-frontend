@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import styled from '@emotion/styled';
 
 type ButtonStyleType = 'solid' | 'ghost';
@@ -24,7 +24,7 @@ export const Button = ({
   onClick,
   font = 16,
   isBold = false,
-}: ButtonPropsType) => {
+}: ButtonPropsType): ReactNode => {
   return (
     <Wrapper
       width={width}
