@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { FirstContainer } from '@/components/Main/FirstContainer';
-import { SecondContainer } from '@/components/Main/SecondContainer';
-import { ThirdContainer } from '@/components/Main/ThirdContainer';
+import { FirstContainer } from '@/components/Main/firstContainer';
+import { SecondContainer } from '@/components/Main/secondContainer';
+import { ThirdContainer } from '@/components/Main/thirdContainer';
 import { Button } from '@/components/common/button';
 
 export const Main = () => {
