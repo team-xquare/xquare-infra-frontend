@@ -36,7 +36,7 @@ const SubFooter = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(180deg, rgba(201, 153, 209, 1) 0%, rgba(198, 0, 231, 1) 100%);
+  background-color: #6fe09e;
   > div:nth-child(1) {
     font-size: 16px;
     font-weight: 700;
