@@ -19,19 +19,19 @@ const dummy: TeamType[] = [
     name: '에일리언즈 (Team-aliens)',
     admin: '김은빈',
     deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
-    tag: 'team',
+    tag: 'club',
   },
   {
     name: '에일리언즈 (Team-aliens)',
     admin: '김은빈',
     deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
-    tag: 'team',
+    tag: 'alone',
   },
   {
     name: '에일리언즈 (Team-aliens)',
     admin: '김은빈',
     deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
-    tag: 'team',
+    tag: 'etc',
   },
 ];
 
@@ -84,7 +84,7 @@ export const Team = () => {
 
 const Wrapper = styled.div`
   margin-top: 80px;
-  margin-left: 60px;
+  margin-left: 80px;
   width: 100%;
   display: flex;
 `;
