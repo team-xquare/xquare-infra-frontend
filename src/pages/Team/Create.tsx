@@ -29,27 +29,21 @@ export const TeamCreate = () => {
   const [studentAddition, setStudentAddition] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<string[]>();
 
-  useEffect(() => {
-    if (studentIndex === -1) return;
-
-    if (selectedStudent) {
-      setSelectedStudent([...selectedStudent, array[studentIndex]]);
-    } else {
-      setSelectedStudent([array[studentIndex]]);
-    }
-
-    setStudentIndex(-1);
-    setStudentAddition('');
-  }, [studentIndex]);
+  const ref = useOutsideClick(() => {
+    setIsOpen(false);
+  });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStudentAddition(e.target.value);
     setIsOpen(false);
   };
 
-  const ref = useOutsideClick(() => {
-    setIsOpen(false);
-  });
+  const onDelete = (index: number) => {
+    const newArr: string[] | undefined = selectedStudent?.splice(index - 1, 1);
+
+    if (!newArr) return;
+    setArray(newArr);
+  };
 
   const chunkAddTag = () => {
     const addInput = (
@@ -63,12 +57,21 @@ export const TeamCreate = () => {
 
     if (!selectedStudent || selectedStudent.length === 0) return addInput;
 
-    const addTag = (element: string) => {
-      return <AddTag>{element}</AddTag>;
+    const addTag = (element: string, index: number) => {
+      return (
+        <AddTag
+          onClick={() => {
+            onDelete(index);
+          }}
+          key={`tag-${index}`}
+        >
+          {element}
+        </AddTag>
+      );
     };
 
-    const addTagWrapper = (children: React.ReactNode) => {
-      return <AddTagWrapper>{children}</AddTagWrapper>;
+    const addTagWrapper = (children: React.ReactNode, wrapperIndex: number) => {
+      return <AddTagWrapper key={`wrapper-${wrapperIndex}`}>{children}</AddTagWrapper>;
     };
 
     if (selectedStudent.length === 0) {
@@ -76,12 +79,13 @@ export const TeamCreate = () => {
     } else {
       const wrappedTags: React.ReactNode[] = [];
       const childrenArr: React.ReactNode[] = [];
+      let wrapperIndex = 0;
 
       for (let i = 1; i <= selectedStudent.length; i++) {
-        childrenArr.push(addTag(selectedStudent[i - 1]));
+        childrenArr.push(addTag(selectedStudent[i - 1], i));
 
         if (i % 3 === 0) {
-          wrappedTags.push(addTagWrapper([...childrenArr]));
+          wrappedTags.push(addTagWrapper([...childrenArr], wrapperIndex++));
           childrenArr.splice(0, childrenArr.length);
         }
       }
@@ -94,13 +98,15 @@ export const TeamCreate = () => {
 
   useEffect(() => {
     const newArrIndex: number[] = [];
-    dummyStudent.forEach((dummy, index) => {
+    const filteredDummyStudent = dummyStudent.filter((dummy) => !selectedStudent?.includes(dummy));
+
+    filteredDummyStudent.forEach((dummy, index) => {
       if (dummy.includes(studentAddition)) {
         newArrIndex.push(index);
       }
     });
 
-    const newArr: string[] = newArrIndex.map((index) => dummyStudent[index]);
+    const newArr: string[] = newArrIndex.map((index) => filteredDummyStudent[index]);
 
     if (studentAddition !== '' && newArr.length > 0) {
       const timer = setTimeout(() => {
@@ -110,7 +116,33 @@ export const TeamCreate = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [studentAddition]);
+  }, [studentAddition, selectedStudent]);
+
+  useEffect(() => {
+    if (studentIndex === -1) return;
+
+    if (selectedStudent) {
+      setSelectedStudent([...selectedStudent, array[studentIndex]]);
+    } else {
+      setSelectedStudent([array[studentIndex]]);
+    }
+
+    setStudentIndex(-1);
+    setStudentAddition('');
+  }, [studentIndex]);
+
+  useEffect(() => {
+    if (studentIndex === -1) return;
+
+    if (selectedStudent) {
+      setSelectedStudent([...selectedStudent, array[studentIndex]]);
+    } else {
+      setSelectedStudent([array[studentIndex]]);
+    }
+
+    setStudentIndex(-1);
+    setStudentAddition('');
+  }, [studentIndex]);
 
   return (
     <Wrapper>
@@ -248,8 +280,6 @@ const AddInputWrapper = styled.div<{ selectedStudent: number }>`
   width: 100%;
   padding: 0 16px;
   height: ${({ selectedStudent }) => {
-    console.log((selectedStudent / 3).toFixed(0));
-
     return `${46 + Math.floor(selectedStudent / 3) * 46}px`;
   }};
   background-color: ${theme.color.gray1};
