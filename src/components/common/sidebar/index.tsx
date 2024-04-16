@@ -114,7 +114,7 @@ const BottomMenu = styled.div<{ isOpen: boolean }>`
       height: 40px;
       flex: none;
       transition: 0.4s ease-in-out;
-      ${({ isOpen }) => isOpen && `transform: rotate(-180deg)`};
+      ${({ isOpen }) => (isOpen ? `transform: rotate(0deg)` : `transform: rotate(180deg)`)};
     }
     > span {
       font-size: 18px;
