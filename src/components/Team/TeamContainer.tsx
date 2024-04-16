@@ -47,7 +47,7 @@ export const TeamContainer = ({ name, admin, deploy, tag }: TeamType) => {
 };
 
 const Wrapper = styled.div`
-  width: 1120px;
+  width: 100%;
   height: 134px;
   padding: 20px 40px;
   border-radius: 6px;

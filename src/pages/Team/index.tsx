@@ -156,6 +156,8 @@ const TipBox = styled.div`
 `;
 
 const ContainerWrapper = styled.div`
+  width: 100%;
+  max-width: 1120px;
   display: flex;
   flex-direction: column;
   align-items: center;
