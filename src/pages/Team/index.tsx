@@ -84,7 +84,6 @@ export const Team = () => {
 
 const Wrapper = styled.div`
   margin-top: 80px;
-  margin-left: 80px;
   width: 100%;
   display: flex;
 `;
@@ -92,13 +91,16 @@ const Wrapper = styled.div`
 const Container = styled.div`
   width: 100%;
   height: calc(100vh - 80px);
+  padding-left: 100px;
+  padding-right: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
 const TitleContainer = styled.div`
-  width: 1120px;
+  width: 100%;
+  max-width: 1120px;
   margin-top: 80px;
 `;
 
@@ -115,12 +117,13 @@ const Describtion = styled.div`
 `;
 
 const UtilContainer = styled.div`
-  width: 1120px;
+  width: 100%;
+  max-width: 1120px;
   height: 50px;
   margin: 30px 0 30px 0;
   display: flex;
   justify-content: space-between;
-  & > div:nth-child(1) {
+  & > div:nth-of-type(1) {
     & > svg {
       position: relative;
       right: 24px;
@@ -141,7 +144,8 @@ const SearchBar = styled.input`
 `;
 
 const TipBox = styled.div`
-  width: 1120px;
+  width: 100%;
+  max-width: 1120px;
   height: 120px;
   color: ${theme.color.gray5};
   border: 1px ${theme.color.gray5} solid;
