@@ -30,13 +30,13 @@ export const Sidebar = () => {
 
 const Wrapper = styled.div<{ isOpen: boolean }>`
   width: ${({ isOpen }) => (isOpen ? '260px' : '80px')};
-  left: 0;
   transition: 0.4s ease-in-out;
   height: calc(100vh - 80px);
   background-color: white;
   border-right: 1px #dddddd solid;
-  position: absolute;
+  position: fixed;
   z-index: 10;
+  left: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
