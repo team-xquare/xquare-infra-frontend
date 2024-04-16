@@ -3,6 +3,7 @@ import { Layout } from './layout';
 import { Main } from '../pages/Main';
 import { Team } from '@/pages/Team';
 import { TeamCreate } from '@/pages/Team/Create';
+import { Error } from '@/pages/Error';
 
 export const Router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ export const Router = createBrowserRouter([
           { index: true, element: <Team /> },
           { path: 'create', element: <TeamCreate /> },
         ],
+      },
+      {
+        path: '*',
+        element: <Error />,
       },
     ],
   },
