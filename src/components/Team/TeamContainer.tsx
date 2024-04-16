@@ -1,6 +1,7 @@
 import { theme } from '@/style/theme';
 import styled from '@emotion/styled';
 import { Tag } from './Tag';
+import React from 'react';
 
 type TagType = 'club' | 'team' | 'alone' | 'etc';
 
@@ -25,15 +26,17 @@ export const TeamContainer = ({ name, admin, deploy, tag }: TeamType) => {
           switch (index) {
             case 0:
               return (
-                <>
+                <React.Fragment key={index}>
                   {element}
                   {deploy.length > 1 && ', '}
-                </>
+                </React.Fragment>
               );
             case 1:
-              return <>{element} </>;
+              return <React.Fragment key={index}>{element} </React.Fragment>;
             case 2:
-              return <>{deploy.length > 2 ? <>등 {deploy.length - 2}개</> : <></>}</>;
+              return (
+                <React.Fragment key={index}>{deploy.length > 2 ? <>등 {deploy.length - 2}개</> : <></>}</React.Fragment>
+              );
             default:
               return null;
           }
