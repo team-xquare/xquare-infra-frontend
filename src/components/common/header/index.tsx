@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
-// import { Button } from '@/components/common/Button';
+import { Button } from '@/components/common/Button';
 import { useLocation } from 'react-router-dom';
 import { css } from '@emotion/react';
 
@@ -36,7 +36,7 @@ export const Header = () => {
               <span>고객 지원</span>
             </Center>
             <RightSide>
-              {/* <Button
+              <Button
                 width={164}
                 height={40}
                 buttonStyle="ghost"
@@ -46,7 +46,7 @@ export const Header = () => {
                 }}
               >
                 무료로 시작하기
-              </Button> */}
+              </Button>
             </RightSide>
           </>
         )}
