@@ -4,6 +4,7 @@ import { XButton } from '@/components/common/XButton';
 import { Icon } from '@iconify/react';
 import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
+import { SearchBar } from '@/components/common/SearchBar';
 
 type TagType = 'club' | 'team' | 'alone' | 'etc';
 
@@ -45,10 +46,7 @@ export const Team = () => {
           <Describtion>프로젝트를 개발하고 관리할 팀을 정의해보세요.</Describtion>
         </TitleContainer>
         <UtilContainer>
-          <div>
-            <SearchBar placeholder="팀 검색" />
-            <Icon icon={'tabler:search'} width={20} height={20} color="#999999" />
-          </div>
+          <SearchBar width={312} placeholder="팀 검색" />
           <XButton
             width={100}
             height={50}
@@ -123,24 +121,6 @@ const UtilContainer = styled.div`
   margin: 30px 0 30px 0;
   display: flex;
   justify-content: space-between;
-  & > div:nth-of-type(1) {
-    & > svg {
-      position: relative;
-      right: 24px;
-      top: 6px;
-      cursor: pointer;
-    }
-  }
-`;
-
-const SearchBar = styled.input`
-  width: 312px;
-  height: 50px;
-  border-bottom: 1px ${theme.color.gray5} solid;
-  font-size: 14px;
-  & ::placeholder {
-    color: ${theme.color.gray2};
-  }
 `;
 
 const TipBox = styled.div`
