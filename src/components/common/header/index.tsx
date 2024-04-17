@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/common/button';
+// import { Button } from '@/components/common/Button';
 import { useLocation } from 'react-router-dom';
 import { css } from '@emotion/react';
 
@@ -25,27 +25,31 @@ export const Header = () => {
   return (
     <>
       <Wrapper scroll={scroll} pathname={_pathname}>
-        <LeftSide scroll={scroll}>
-          <img src={LogoImg} />
-          <span>Xquare Infra</span>
-        </LeftSide>
-        <Center>
-          <span>소개</span>
-          <span>고객 지원</span>
-        </Center>
-        <RightSide>
-          <Button
-            width={164}
-            height={40}
-            buttonStyle="ghost"
-            buttonColor={scroll === 0 ? 'white' : 'black'}
-            onClick={() => {
-              console.log('click!');
-            }}
-          >
-            무료로 시작하기
-          </Button>
-        </RightSide>
+        {_pathname === '' && (
+          <>
+            <LeftSide scroll={scroll}>
+              <img src={LogoImg} />
+              <span>Xquare Infra</span>
+            </LeftSide>
+            <Center>
+              <span>소개</span>
+              <span>고객 지원</span>
+            </Center>
+            <RightSide>
+              {/* <Button
+                width={164}
+                height={40}
+                buttonStyle="ghost"
+                buttonColor={scroll === 0 ? 'white' : 'black'}
+                onClick={() => {
+                  console.log('click!');
+                }}
+              >
+                무료로 시작하기
+              </Button> */}
+            </RightSide>
+          </>
+        )}
         <WrapperBackground scroll={_pathname === '' ? scroll : 0} />
       </Wrapper>
     </>
