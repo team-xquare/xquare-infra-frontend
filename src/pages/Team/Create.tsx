@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 import { Sidebar } from '@/components/common/sidebar';
@@ -8,17 +8,24 @@ import { useState } from 'react';
 import { XButton } from '@/components/common/XButton';
 import { DropMenu } from '@/components/common/DropMenu';
 import { theme } from '@/style/theme';
+import { Icon } from '@iconify/react';
 
 type ProjectType = '동아리' | '팀 프로젝트' | '개인 프로젝트' | '기타';
 const projectKinds: ProjectType[] = ['동아리', '팀 프로젝트', '개인 프로젝트', '기타'];
 
 const dummyStudent: string[] = [
-  '2106 김은빈',
-  '2101 김첨지',
-  '1111 부현수',
-  '1301 김이름',
-  '1122 가나다',
-  '2106 남궁윤교',
+  '2101 김명진',
+  '2102 김민재',
+  '2103 김승원',
+  '2104 김어진',
+  '2105 김준화',
+  '2107 박예빈',
+  '2108 변정현',
+  '2114 이태영',
+  '2201 김가은',
+  '2208 부현수',
+  '2222 박의엘',
+  '5555 남궁윤교',
 ];
 
 export const TeamCreate = () => {
@@ -28,6 +35,8 @@ export const TeamCreate = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [studentAddition, setStudentAddition] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<string[]>();
+  const [teamStudent, setTeamStudent] = useState<string[]>([]);
+  const addInputRef = useRef<HTMLInputElement>(null);
 
   const ref = useOutsideClick(() => {
     setIsOpen(false);
@@ -38,11 +47,31 @@ export const TeamCreate = () => {
     setIsOpen(false);
   };
 
+  const onInsert = () => {
+    if (!teamStudent || !selectedStudent) return;
+    const newArr: string[] = [...teamStudent, ...selectedStudent];
+
+    setSelectedStudent([]);
+    setTeamStudent(newArr);
+    console.log(newArr);
+  };
+
+  const onTeamStudentDelete = (index: number) => {
+    const newArr = [...teamStudent.slice(0, index), ...teamStudent.slice(index + 1)];
+    setTeamStudent(newArr);
+  };
+
   const onDelete = (index: number) => {
     const newArr: string[] | undefined = selectedStudent?.splice(index - 1, 1);
-
     if (!newArr) return;
     setArray(newArr);
+  };
+
+  const onKeydownBackspace = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (selectedStudent && e.code === 'Backspace') {
+      onDelete(selectedStudent.length - 1);
+      addInputRef.current?.focus();
+    }
   };
 
   const chunkAddTag = () => {
@@ -51,7 +80,9 @@ export const TeamCreate = () => {
         placeholder="학생 검색"
         value={studentAddition}
         onChange={onChange}
+        onKeyDown={onKeydownBackspace}
         selectedStudent={selectedStudent ? selectedStudent.length : 0}
+        ref={addInputRef}
       />
     );
 
@@ -97,10 +128,16 @@ export const TeamCreate = () => {
   };
 
   useEffect(() => {
+    if (studentAddition.length === 0) return;
+
     const newArrIndex: number[] = [];
-    const filteredDummyStudent = dummyStudent.filter((dummy) => !selectedStudent?.includes(dummy));
+    const filteredDummyStudent = dummyStudent.filter(
+      (dummy) => !selectedStudent?.includes(dummy) && !teamStudent?.includes(dummy),
+    );
 
     filteredDummyStudent.forEach((dummy, index) => {
+      if (newArrIndex.length >= 5) return;
+
       if (dummy.includes(studentAddition)) {
         newArrIndex.push(index);
       }
@@ -110,26 +147,13 @@ export const TeamCreate = () => {
 
     if (studentAddition !== '' && newArr.length > 0) {
       const timer = setTimeout(() => {
-        setIsOpen(true);
         setArray(newArr);
-      }, 400);
+        setIsOpen(true);
+      }, 100);
 
       return () => clearTimeout(timer);
     }
-  }, [studentAddition, selectedStudent]);
-
-  useEffect(() => {
-    if (studentIndex === -1) return;
-
-    if (selectedStudent) {
-      setSelectedStudent([...selectedStudent, array[studentIndex]]);
-    } else {
-      setSelectedStudent([array[studentIndex]]);
-    }
-
-    setStudentIndex(-1);
-    setStudentAddition('');
-  }, [studentIndex]);
+  }, [studentAddition]);
 
   useEffect(() => {
     if (studentIndex === -1) return;
@@ -157,11 +181,12 @@ export const TeamCreate = () => {
             <Input width={400} label="팀 이름(영어)" placeholder="팀 이름(영어)" />
             <SelectBar selectedIndex={selectedIndex} onSelect={setSelectIndex} values={projectKinds} label="팀 분류" />
             <TeamAddWrapper>
-              <AddInputContainer ref={ref}>
-                <AddLabel>팀원</AddLabel>
-                <AddInputWrapper selectedStudent={selectedStudent ? selectedStudent.length : 0}>
-                  {chunkAddTag()}
-                  {/* {selectedStudent?.map((element, index) => {
+              <div>
+                <AddInputContainer ref={ref}>
+                  <AddLabel>팀원</AddLabel>
+                  <AddInputWrapper selectedStudent={selectedStudent ? selectedStudent.length : 0}>
+                    {chunkAddTag()}
+                    {/* {selectedStudent?.map((element, index) => {
                     return <AddTag key={index}>{element}</AddTag>;
                   })}
                   <AddInput
@@ -170,14 +195,31 @@ export const TeamCreate = () => {
                     onChange={onChange}
                     selectedStudent={selectedStudent.length}
                   /> */}
-                </AddInputWrapper>
-                {isOpen && (
-                  <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
-                )}
-              </AddInputContainer>
-              <XButton width={88} height={46} buttonStyle="solid">
-                학생 추가
-              </XButton>
+                  </AddInputWrapper>
+                  {isOpen && (
+                    <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
+                  )}
+                </AddInputContainer>
+                <XButton width={88} height={46} buttonStyle="solid" onClick={onInsert}>
+                  학생 추가
+                </XButton>
+              </div>
+              <div>
+                {teamStudent.map((student, index) => {
+                  return (
+                    <AddedStudent key={index}>
+                      {student}
+                      <div
+                        onClick={() => {
+                          onTeamStudentDelete(index);
+                        }}
+                      >
+                        <Icon icon={'bitcoin-icons:cross-filled'} width={18} height={18} />
+                      </div>
+                    </AddedStudent>
+                  );
+                })}
+              </div>
             </TeamAddWrapper>
           </InputWrapper>
           <ButtonWrapper>
@@ -211,7 +253,7 @@ const Container = styled.div`
 `;
 
 const TitleContainer = styled.div`
-  max-width: 1100px;
+  max-width: 1120px;
   width: 100%;
   margin-top: 80px;
 `;
@@ -225,8 +267,39 @@ const Title = styled.div`
 
 const TeamAddWrapper = styled.div`
   display: flex;
-  align-items: end;
-  gap: 10px;
+  flex-direction: column;
+  align-items: start;
+  gap: 20px;
+  > div:nth-of-type(1) {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+  }
+  > div:nth-of-type(2) {
+    width: 508px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+`;
+
+const AddedStudent = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${theme.color.gray1};
+  color: ${theme.color.gray7};
+  border: 1px solid ${theme.color.gray5};
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  gap: 12px;
+  padding: 10px 20px;
+  > div {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
 `;
 
 const InputWrapper = styled.div`
@@ -249,7 +322,7 @@ const ButtonWrapper = styled.div`
 
 const Form = styled.div`
   margin-top: 56px;
-  max-width: 1100px;
+  max-width: 1120px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -258,7 +331,7 @@ const Form = styled.div`
 
 const AddInputContainer = styled.div`
   width: 400px;
-  height: 74px;
+  min-height: 74px;
   position: relative;
 `;
 
@@ -322,4 +395,8 @@ const AddTag = styled.div`
   align-items: center;
   font-size: 12px;
   margin: 5px 0;
+  transition: 0.1s linear;
+  &:hover {
+    opacity: 0.7;
+  }
 `;
