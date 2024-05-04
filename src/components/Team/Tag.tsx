@@ -1,7 +1,7 @@
 import { theme } from '@/style/theme';
 import styled from '@emotion/styled';
 
-type TagType = 'club' | 'team' | 'alone' | 'etc';
+type TagType = 'club' | 'team' | 'alone' | 'etc' | 'manage';
 
 export const Tag = ({ tag }: { tag: TagType }) => {
   const tagText = (): string => {
@@ -12,6 +12,8 @@ export const Tag = ({ tag }: { tag: TagType }) => {
         return '팀 프로젝트';
       case 'alone':
         return '개인 프로젝트';
+      case 'manage':
+        return '담당자';
       default:
         return '기타';
     }
@@ -24,13 +26,13 @@ const Wrapper = styled.div<{ tag: TagType }>`
   padding: 0 10px;
   height: 24px;
   font-size: 12px;
-  background-color: purple;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 50px;
   color: ${({ tag }) => {
     switch (tag) {
+      case 'manage':
       case 'club':
         return `${theme.color.mainDark2} !important`;
       case 'team':
@@ -43,6 +45,7 @@ const Wrapper = styled.div<{ tag: TagType }>`
   }};
   background-color: ${({ tag }) => {
     switch (tag) {
+      case 'manage':
       case 'club':
         return `${theme.color.mainLight2} !important`;
       case 'team':
