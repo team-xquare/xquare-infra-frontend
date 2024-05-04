@@ -214,7 +214,7 @@ export const TeamCreate = () => {
                           onTeamStudentDelete(index);
                         }}
                       >
-                        <Icon icon={'bitcoin-icons:cross-filled'} width={18} height={18} />
+                        <Icon icon={'bitcoin-icons:cross-filled'} width={18} height={18} color="#343434" />
                       </div>
                     </AddedStudent>
                   );
