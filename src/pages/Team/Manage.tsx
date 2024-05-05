@@ -1,9 +1,14 @@
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { Sidebar } from '@/components/common/sidebar';
 import { theme } from '@/style/theme';
 import { SearchBar } from '@/components/common/SearchBar';
 import { XButton } from '@/components/common/XButton';
 import { useModal } from '@/hooks/useModal';
+import * as MemberAddModal from '@/components/Team/TeamManage/MemberAddModal';
+import { Icon } from '@iconify/react';
+import { Tag } from '@/components/Team/Tag';
+import { DropMenu } from '@/components/common/DropMenu';
 
 const dummyMember: string[] = [
   '0000 테스트',
@@ -20,18 +25,62 @@ const dummyMember: string[] = [
   '0000 테스트',
 ];
 
+const array: string[] = ['담당자 지정', '팀원 삭제'];
+
 export const TeamManage = () => {
-  const { isVisible, onShow, ModalWrapper } = useModal();
+  const [isOpen, setIsOpen] = useState<number | boolean>(false);
+
+  const { isVisible, onShow, ModalWrapper, onClose } = useModal({
+    defaultVisible: 'memberDel',
+  });
+
+  function setStudentIndex(index: number): void {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <>
       {isVisible === 'memberAdd' && (
         <ModalWrapper width={548} height={648}>
-          hello
+          <MemberAddModal.Wrapper>
+            <MemberAddModal.TopContainer>
+              <div>
+                팀원 추가
+                <Icon
+                  icon={'bitcoin-icons:cross-filled'}
+                  width={24}
+                  height={24}
+                  color="#343434"
+                  cursor={'pointer'}
+                  onClick={onClose}
+                />
+              </div>
+              <SearchBar width={214} placeholder="학생 검색" />
+            </MemberAddModal.TopContainer>
+            <MemberAddModal.MiddleContainer>
+              {dummyMember.map((member, index) => (
+                <MemberBox key={index}>{member}</MemberBox>
+              ))}
+            </MemberAddModal.MiddleContainer>
+            <MemberAddModal.BottomContainer>
+              <div>홍길동, 이름김, 테스트 등 3명</div>
+              <XButton buttonStyle="solid" width={100} height={50}>
+                담당자 변경
+              </XButton>
+            </MemberAddModal.BottomContainer>
+          </MemberAddModal.Wrapper>
         </ModalWrapper>
       )}
-      {/* {isVisible === 'memberDel' && <ModalWrapper>bye</ModalWrapper>}
-      {isVisible === 'managerChange' && <ModalWrapper>good</ModalWrapper>} */}
+      {isVisible === 'memberDel' && (
+        <ModalWrapper width={538} height={200}>
+          bye
+        </ModalWrapper>
+      )}
+      {isVisible === 'managerChange' && (
+        <ModalWrapper width={538} height={200}>
+          good
+        </ModalWrapper>
+      )}
       <Wrapper>
         <Sidebar />
         <ContainerWrapper>
@@ -69,7 +118,25 @@ export const TeamManage = () => {
               </div>
               <MemberBoxContainer>
                 {dummyMember.map((member, index) => (
-                  <MemberBox key={index}>{member}</MemberBox>
+                  <MemberBox key={index}>
+                    <div>
+                      <div>{member}</div>
+                      <Tag tag="manage" />
+                    </div>
+                    <Icon
+                      icon={'bi:three-dots-vertical'}
+                      color="#999999"
+                      width={20}
+                      height={20}
+                      cursor={'pointer'}
+                      onClick={() => {
+                        setIsOpen(index);
+                      }}
+                    />
+                    {isOpen && (
+                      <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
+                    )}
+                  </MemberBox>
                 ))}
               </MemberBoxContainer>
             </MemberContainer>
@@ -193,7 +260,7 @@ const MemberContainer = styled.div`
     width: 100%;
     justify-content: space-between;
   }
-  > div:nth-child(3) {
+  > div:nth-of-type(3) {
     width: 100%;
     max-width: 1042px;
   }
@@ -219,4 +286,14 @@ const MemberBox = styled.div`
   justify-content: space-between;
   align-items: center;
   border: 1px solid ${theme.color.gray4};
+  > div:first-of-type {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    > div:first-of-type {
+      font-size: 20px;
+      font-weight: 500;
+      color: ${theme.color.gray8};
+    }
+  }
 `;
