@@ -1,14 +1,16 @@
 import { useState } from 'react';
+import { useOutsideClick } from '@/hooks/useOutsideClick';
+import { useModal } from '@/hooks/useModal';
 import styled from '@emotion/styled';
 import { Sidebar } from '@/components/common/sidebar';
 import { theme } from '@/style/theme';
 import { SearchBar } from '@/components/common/SearchBar';
 import { XButton } from '@/components/common/XButton';
-import { useModal } from '@/hooks/useModal';
-import * as MemberAddModal from '@/components/Team/TeamManage/MemberAddModal';
 import { Icon } from '@iconify/react';
 import { Tag } from '@/components/Team/Tag';
-import { DropMenu } from '@/components/common/DropMenu';
+import * as MemberAddModal from '@/components/Team/TeamManage/MemberAddModal';
+import * as MemberManageModal from '@/components/Team/TeamManage/MemberManageModal';
+import * as ThreeDotMenu from '@/components/Team/TeamManage/ThreeDotMenu';
 
 const dummyMember: string[] = [
   '0000 테스트',
@@ -25,18 +27,18 @@ const dummyMember: string[] = [
   '0000 테스트',
 ];
 
-const array: string[] = ['담당자 지정', '팀원 삭제'];
-
 export const TeamManage = () => {
   const [isOpen, setIsOpen] = useState<number | boolean>(false);
-
+  const ref = useOutsideClick(() => {
+    setIsOpen(false);
+  });
   const { isVisible, onShow, ModalWrapper, onClose } = useModal({
     defaultVisible: 'memberDel',
   });
 
-  function setStudentIndex(index: number): void {
-    throw new Error('Function not implemented.');
-  }
+  const onOpen = (index: number) => {
+    if (!isOpen) setIsOpen(index);
+  };
 
   return (
     <>
@@ -71,14 +73,50 @@ export const TeamManage = () => {
           </MemberAddModal.Wrapper>
         </ModalWrapper>
       )}
-      {isVisible === 'memberDel' && (
-        <ModalWrapper width={538} height={200}>
-          bye
-        </ModalWrapper>
-      )}
       {isVisible === 'managerChange' && (
         <ModalWrapper width={538} height={200}>
-          good
+          <MemberManageModal.Wrapper>
+            <div>담당자 변경</div>
+            <div>담당자를 김은빈 학생에서 홍길동 학생으로 변경하시겠습니까?</div>
+            <div>
+              <XButton
+                width={58}
+                height={50}
+                buttonStyle="ghost"
+                onClick={() => {
+                  onClose();
+                }}
+              >
+                취소
+              </XButton>
+              <XButton width={100} height={50} buttonStyle="solid">
+                담당자 변경
+              </XButton>
+            </div>
+          </MemberManageModal.Wrapper>
+        </ModalWrapper>
+      )}
+      {isVisible === 'memberDel' && (
+        <ModalWrapper width={538} height={200}>
+          <MemberManageModal.Wrapper>
+            <div>팀원 삭제</div>
+            <div>김은빈 학생을 팀에서 삭제하시겠습니까?</div>
+            <div>
+              <XButton
+                width={58}
+                height={50}
+                buttonStyle="ghost"
+                onClick={() => {
+                  onClose();
+                }}
+              >
+                취소
+              </XButton>
+              <XButton width={100} height={50} buttonStyle="solid">
+                팀원 삭제
+              </XButton>
+            </div>
+          </MemberManageModal.Wrapper>
         </ModalWrapper>
       )}
       <Wrapper>
@@ -123,19 +161,38 @@ export const TeamManage = () => {
                       <div>{member}</div>
                       <Tag tag="manage" />
                     </div>
-                    <Icon
-                      icon={'bi:three-dots-vertical'}
-                      color="#999999"
-                      width={20}
-                      height={20}
-                      cursor={'pointer'}
-                      onClick={() => {
-                        setIsOpen(index);
-                      }}
-                    />
-                    {isOpen && (
-                      <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
-                    )}
+                    <MemberBoxInRightContainer ref={ref}>
+                      <Icon
+                        icon={'bi:three-dots-vertical'}
+                        color="#999999"
+                        width={20}
+                        height={20}
+                        cursor={'pointer'}
+                        onClick={() => {
+                          onOpen(index);
+                        }}
+                      />
+                      {isOpen === index && (
+                        <ThreeDotMenu.Wrapper>
+                          <ThreeDotMenu.Box
+                            isLast={'false'}
+                            onMouseDown={() => {
+                              onShow('managerChange');
+                            }}
+                          >
+                            담당자 지정
+                          </ThreeDotMenu.Box>
+                          <ThreeDotMenu.Box
+                            isLast={'true'}
+                            onMouseDown={() => {
+                              onShow('memberDel');
+                            }}
+                          >
+                            팀원 삭제
+                          </ThreeDotMenu.Box>
+                        </ThreeDotMenu.Wrapper>
+                      )}
+                    </MemberBoxInRightContainer>
                   </MemberBox>
                 ))}
               </MemberBoxContainer>
@@ -296,4 +353,10 @@ const MemberBox = styled.div`
       color: ${theme.color.gray8};
     }
   }
+`;
+
+const MemberBoxInRightContainer = styled.div`
+  display: flex;
+  justify-content: end;
+  position: relative;
 `;
