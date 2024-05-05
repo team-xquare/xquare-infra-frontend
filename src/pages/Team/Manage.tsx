@@ -32,9 +32,7 @@ export const TeamManage = () => {
   const ref = useOutsideClick(() => {
     setIsOpen(false);
   });
-  const { isVisible, onShow, ModalWrapper, onClose } = useModal({
-    defaultVisible: 'memberDel',
-  });
+  const { isVisible, onShow, ModalWrapper, onClose } = useModal();
 
   const onOpen = (index: number) => {
     if (!isOpen) setIsOpen(index);
