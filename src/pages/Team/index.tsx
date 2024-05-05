@@ -133,6 +133,7 @@ const TipBox = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 8px;
+  font-size: 20px;
 `;
 
 const ContainerWrapper = styled.div`
