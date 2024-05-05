@@ -69,7 +69,7 @@ export const TeamCreate = () => {
 
   const onKeydownBackspace = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (selectedStudent && e.code === 'Backspace' && studentAddition.length === 0) {
-      onDelete(selectedStudent.length - 1);
+      onDelete(selectedStudent.length);
       addInputRef.current?.focus();
     }
   };
