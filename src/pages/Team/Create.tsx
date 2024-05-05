@@ -31,7 +31,7 @@ const dummyStudent: string[] = [
 export const TeamCreate = () => {
   const [array, setArray] = useState<string[]>(dummyStudent);
   const [selectedIndex, setSelectIndex] = useState<number>();
-  const [studentIndex, setStudentIndex] = useState<number>(-1);
+  const [studentIndex, setStudentIndex] = useState<number | undefined>(undefined);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [studentAddition, setStudentAddition] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<string[]>();
@@ -156,7 +156,7 @@ export const TeamCreate = () => {
   }, [studentAddition]);
 
   useEffect(() => {
-    if (studentIndex === -1) return;
+    if (studentIndex === -1 || studentIndex === undefined) return;
 
     if (selectedStudent) {
       setSelectedStudent([...selectedStudent, array[studentIndex]]);

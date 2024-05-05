@@ -6,13 +6,22 @@ import { useOutsideClick } from '@/hooks/useOutsideClick';
 import ArrowImg from '@/assets/Arrow.svg';
 
 type SelectBarType = {
-  selectedIndex?: number;
-  onSelect: (index: number) => void;
+  selectedIndex?: number | undefined;
+  onSelect: (index: number | undefined) => void;
   values: string[];
   label?: string;
+  placehold?: string;
+  canCancle?: boolean;
 };
 
-export const SelectBar = ({ selectedIndex, onSelect, values, label }: SelectBarType) => {
+export const SelectBar = ({
+  selectedIndex,
+  onSelect,
+  values,
+  label,
+  placehold = '항목 보기',
+  canCancle = false,
+}: SelectBarType) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const ref = useOutsideClick(() => {
     setIsOpen(false);
@@ -32,12 +41,20 @@ export const SelectBar = ({ selectedIndex, onSelect, values, label }: SelectBarT
       {label && <Label>{label}</Label>}
       <SelectBarWrapper ref={ref}>
         <_SelectBar onClick={onOpen} selectedIndex={selectedIndex}>
-          <span>{selectedIndex === undefined ? '항목 보기' : values[selectedIndex]}</span>
+          <span>{selectedIndex === undefined ? placehold : values[selectedIndex]}</span>
           <ImgContainer isOpen={isOpen}>
             <img src={ArrowImg} />
           </ImgContainer>
         </_SelectBar>
-        {isOpen && <DropMenu values={values} onSelect={onSelect} onClose={setIsOpen} selectedIndex={selectedIndex} />}
+        {isOpen && (
+          <DropMenu
+            values={values}
+            onSelect={onSelect}
+            onClose={setIsOpen}
+            selectedIndex={selectedIndex}
+            canCancle={canCancle}
+          />
+        )}
       </SelectBarWrapper>
     </Wrapper>
   );

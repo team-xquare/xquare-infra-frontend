@@ -5,11 +5,12 @@ import { css } from '@emotion/react';
 type DropMenuType = {
   values: string[];
   selectedIndex?: number;
-  onSelect: (index: number) => void;
+  onSelect: (index: number | undefined) => void;
   onClose: (bool: boolean) => void;
+  canCancle?: boolean;
 };
 
-export const DropMenu = ({ values, onSelect, onClose, selectedIndex = -1 }: DropMenuType) => {
+export const DropMenu = ({ values, onSelect, onClose, selectedIndex = -1, canCancle = false }: DropMenuType) => {
   return (
     <Wrapper>
       {values &&
@@ -20,6 +21,10 @@ export const DropMenu = ({ values, onSelect, onClose, selectedIndex = -1 }: Drop
               key={index}
               isLast={(values.length - 1 === index).toString()}
               onClick={() => {
+                if (canCancle === true && index == selectedIndex) {
+                  onSelect(undefined);
+                  return;
+                }
                 onSelect(index);
                 onClose(false);
               }}
