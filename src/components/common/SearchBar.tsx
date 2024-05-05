@@ -26,6 +26,7 @@ export const SearchBar = ({
 const Wrapper = styled.div<{ width: number }>`
   width: ${({ width }) => `${width}px`};
   position: relative;
+  flex: none;
   & > svg {
     position: absolute;
     right: 0px;
