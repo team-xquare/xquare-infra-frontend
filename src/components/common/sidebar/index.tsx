@@ -162,7 +162,8 @@ const BottomMenu = styled.div<{ isOpen: boolean }>`
       overflow: hidden;
       word-break: keep-all;
       white-space: nowrap;
-      text-align: center;
+      text-align: start;
+      margin-left: 10px;
     }
   }
 `;
