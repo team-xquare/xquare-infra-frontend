@@ -5,6 +5,11 @@ import { Team } from '@/pages/Team';
 import { TeamCreate } from '@/pages/Team/Create';
 import { Error } from '@/pages/Error';
 import { TeamManage } from '@/pages/Team/Manage';
+import { TeamContainer } from '@/pages/Team/Container';
+import { TeamDeployInformation } from '@/pages/Team/deploy/Information';
+import { TeamDeploy } from '@/pages/Team/deploy';
+import { TeamDeployCreate } from '@/pages/Team/deploy/Create';
+import { TeamDeployContainer } from '@/pages/Team/deploy/Container';
 
 export const Router = createBrowserRouter([
   {
@@ -17,8 +22,33 @@ export const Router = createBrowserRouter([
         children: [
           { index: true, element: <Team /> },
           { path: 'create', element: <TeamCreate /> },
-          { path: 'manage', element: <TeamManage /> },
+          {
+            path: ':id',
+            children: [
+              { index: true, element: <Error /> },
+              { path: 'manage', element: <TeamManage /> },
+              { path: 'container', element: <TeamContainer /> },
+              {
+                path: 'deploy',
+                children: [
+                  { index: true, element: <TeamDeploy /> },
+                  { path: 'create', element: <TeamDeployCreate /> },
+                  {
+                    path: ':id',
+                    children: [
+                      { index: true, element: <TeamDeployInformation /> },
+                      { path: 'container', element: <TeamDeployContainer /> },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
         ],
+      },
+      {
+        path: 'deploy',
+        children: [{ index: true }],
       },
       {
         path: '*',
