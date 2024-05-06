@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 type ButtonStyleType = 'solid' | 'ghost';
 
 type ButtonPropsType = {
-  buttonStyle: ButtonStyleType;
+  buttonStyle?: ButtonStyleType;
   width: number;
   height: number;
   children: ReactNode;
@@ -14,7 +14,7 @@ type ButtonPropsType = {
 };
 
 export const XButton = ({
-  buttonStyle,
+  buttonStyle = 'solid',
   width,
   height,
   children,
