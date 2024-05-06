@@ -1,20 +1,58 @@
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useMatch } from 'react-router-dom';
+
+const menu = [
+  {
+    path: '/team',
+    isBack: false,
+    menu: [
+      { icon: 'ph:circles-four-light', name: '팀' },
+      { icon: 'icon-park-outline:people', name: '계정' },
+    ],
+  },
+  {
+    path: '/team/:id',
+    isBack: false,
+    menu: [
+      { icon: 'ph:circles-four-light', name: '팀2' },
+      { icon: 'icon-park-outline:people', name: '계정2' },
+    ],
+  },
+  {
+    path: '/team/:id/manage',
+    isBack: false,
+    menu: [
+      { icon: 'ph:circles-four-light', name: '팀3' },
+      { icon: 'icon-park-outline:people', name: '계정3' },
+    ],
+  },
+];
 
 export const Sidebar = () => {
-  const [isOpen, seIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const currentMenu = menu.find((item) => useMatch(item.path));
 
   return (
     <Wrapper isOpen={isOpen}>
       <Container>
-        <Menu isOpen={isOpen}>a</Menu>
-        <Menu isOpen={isOpen}>b</Menu>
+        {currentMenu &&
+          currentMenu.menu.map((menuItem, index) => (
+            <Menu key={index} isOpen={isOpen}>
+              <div>
+                <div>
+                  <Icon icon={menuItem.icon} width={24} height={24} />
+                </div>
+                <span>{menuItem.name}</span>
+              </div>
+            </Menu>
+          ))}
       </Container>
       <BottomMenu
         isOpen={isOpen}
         onClick={() => {
-          seIsOpen(!isOpen);
+          setIsOpen(!isOpen);
         }}
       >
         <div>
@@ -54,7 +92,7 @@ const Menu = styled.div<{ isOpen: boolean }>`
   width: ${({ isOpen }) => (isOpen ? '240px' : '60px')};
   padding: 10px;
   height: 60px;
-  border-radius: 8px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -70,18 +108,23 @@ const Menu = styled.div<{ isOpen: boolean }>`
     display: flex;
     align-items: center;
     > div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 40px;
       height: 40px;
-      flex: 0;
+      flex: none;
+      transition: 0.4s ease-in-out;
     }
     > span {
-      font-size: 20px;
+      font-size: 18px;
       width: 180px;
       transition: 0.4s ease-in-out;
       overflow: hidden;
       word-break: keep-all;
       white-space: nowrap;
-      text-align: center;
+      text-align: start;
+      margin-left: 10px;
     }
   }
 `;
@@ -91,7 +134,7 @@ const BottomMenu = styled.div<{ isOpen: boolean }>`
   width: ${({ isOpen }) => (isOpen ? '240px' : '60px')};
   padding: 10px;
   height: 60px;
-  border-radius: 8px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   overflow: hidden;
