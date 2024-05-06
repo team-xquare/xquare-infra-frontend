@@ -3,29 +3,25 @@ import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useMatch } from 'react-router-dom';
 
-const menu = [
+type MenuType = {
+  icon: string;
+  name: string;
+  link: string;
+};
+
+type MenusType = {
+  path: string;
+  isBack: boolean | string;
+  menu: MenuType[];
+};
+
+const menu: MenusType[] = [
   {
     path: '/team',
     isBack: false,
     menu: [
-      { icon: 'ph:circles-four-light', name: '팀' },
-      { icon: 'icon-park-outline:people', name: '계정' },
-    ],
-  },
-  {
-    path: '/team/:id',
-    isBack: false,
-    menu: [
-      { icon: 'ph:circles-four-light', name: '팀2' },
-      { icon: 'icon-park-outline:people', name: '계정2' },
-    ],
-  },
-  {
-    path: '/team/:id/manage',
-    isBack: false,
-    menu: [
-      { icon: 'ph:circles-four-light', name: '팀3' },
-      { icon: 'icon-park-outline:people', name: '계정3' },
+      { icon: 'ph:circles-four-light', name: '팀', link: '' },
+      { icon: 'icon-park-outline:people', name: '계정', link: '' },
     ],
   },
 ];
