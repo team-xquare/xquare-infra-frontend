@@ -10,6 +10,8 @@ import { TeamDeployInformation } from '@/pages/Team/deploy/Information';
 import { TeamDeploy } from '@/pages/Team/deploy';
 import { TeamDeployCreate } from '@/pages/Team/deploy/Create';
 import { TeamDeployContainer } from '@/pages/Team/deploy/Container';
+import { TeamDeployContainerDetail } from '@/pages/Team/deploy/Container/Detail';
+import { Login } from '@/pages/Login';
 
 export const Router = createBrowserRouter([
   {
@@ -37,7 +39,13 @@ export const Router = createBrowserRouter([
                     path: ':id',
                     children: [
                       { index: true, element: <TeamDeployInformation /> },
-                      { path: 'container', element: <TeamDeployContainer /> },
+                      {
+                        path: 'container',
+                        children: [
+                          { index: true, element: <TeamDeployContainer /> },
+                          { path: ':id', element: <TeamDeployContainerDetail /> },
+                        ],
+                      },
                     ],
                   },
                 ],
@@ -47,8 +55,8 @@ export const Router = createBrowserRouter([
         ],
       },
       {
-        path: 'deploy',
-        children: [{ index: true }],
+        path: 'login',
+        element: <Login />,
       },
       {
         path: '*',
