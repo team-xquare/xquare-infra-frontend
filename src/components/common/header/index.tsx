@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { useLocation } from 'react-router-dom';
 import { css } from '@emotion/react';
+import { theme } from '@/style/theme';
 
 export const Header = () => {
   const [scroll, setScroll] = useState<number>(0);
@@ -25,7 +26,7 @@ export const Header = () => {
   return (
     <>
       <Wrapper scroll={scroll} pathname={_pathname}>
-        {_pathname === '' && (
+        {_pathname === '' ? (
           <>
             <LeftSide scroll={scroll}>
               <img src={LogoImg} />
@@ -48,6 +49,14 @@ export const Header = () => {
                 무료로 시작하기
               </Button>
             </RightSide>
+          </>
+        ) : (
+          <>
+            <LeftSide2>
+              <img src={LogoImg} />
+              <span>Xquare Infra</span>
+            </LeftSide2>
+            <RightSide2>rlaisqls@dsm.hs.kr</RightSide2>
           </>
         )}
         <WrapperBackground scroll={_pathname === '' ? scroll : 0} />
@@ -103,14 +112,25 @@ const LeftSide = styled.div<{ scroll: number }>`
   width: 300px;
   display: flex;
   align-items: center;
+  gap: 14px;
   justify-content: start;
   font-size: 30px;
   font-weight: 700;
   > span {
     transition: 0.25s ease-in-out;
-    margin-left: 14px;
     color: ${({ scroll }) => (scroll === 0 ? 'white' : scroll >= 408 ? '#9650fa' : 'black')};
   }
+`;
+
+const LeftSide2 = styled.div`
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 14px;
+  font-size: 30px;
+  font-weight: 700;
+  color: ${theme.color.gray9};
 `;
 
 const RightSide = styled.div`
@@ -120,4 +140,10 @@ const RightSide = styled.div`
   justify-content: end;
   font-size: 30px;
   font-weight: 700;
+`;
+
+const RightSide2 = styled.div`
+  display: flex;
+  gap: 8px;
+  color: ${theme.color.gray8};
 `;
