@@ -6,7 +6,7 @@ import { XButton } from '@/components/common/XButton';
 import { Icon } from '@iconify/react';
 import { Tag } from '@/components/Team/Tag';
 
-export const Deploy = () => {
+export const TeamDeploy = () => {
   return (
     <Wrapper>
       <Sidebar />
