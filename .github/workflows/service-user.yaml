@@ -27,4 +27,4 @@ jobs:
           yarn_docker_build: false
           yarn_workspace: .
           buildargs: |
-            VITE_TEST_DATA=${{ secrets.VITE_TEST_DATA }}
+            VITE_SERVER_BASE_URL=${{ secrets.VITE_SERVER_BASE_URL }}
