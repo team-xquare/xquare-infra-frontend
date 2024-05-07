@@ -5,8 +5,26 @@ import { SearchBar } from '@/components/common/SearchBar';
 import { XButton } from '@/components/common/XButton';
 import { Icon } from '@iconify/react';
 import { Tag } from '@/components/Team/Tag';
+import { useQuery } from '@tanstack/react-query';
+import { instance } from '@/utils/apis/axios';
+import { useNavigate } from 'react-router-dom';
+
+const tmp: { [key: string]: any } = {
+  AVAILABLE: '활성',
+  WAIT_FOR_APPROVE: '승인 대기',
+};
 
 export const TeamDeploy = () => {
+  const navigate = useNavigate();
+
+  const { data }: { data: any } = useQuery({
+    queryKey: ['deploy_list'],
+    queryFn: () => instance.get(`/deploy/all?teamId=${'5e25c8b1-4f7c-4703-8752-45294dd87c6a'}`),
+    select: (res) => res.data.deploy_list,
+  });
+
+  console.log(data);
+
   return (
     <Wrapper>
       <Sidebar />
@@ -18,20 +36,22 @@ export const TeamDeploy = () => {
             <Describtion>프로젝트를 등록하고 해당 프로젝트에 대한 배포 액션을 설정할 수 있습니다.</Describtion>
             <UtilContainer>
               <SearchBar width={312} placeholder="프로젝트 검색" />
-              <XButton width={138} height={50} buttonStyle="solid">
+              <XButton width={138} height={50} buttonStyle="solid" onClick={() => navigate('create')}>
                 <Icon icon={'ic:round-plus'} width={20} height={20} />
                 프로젝트 등록
               </XButton>
             </UtilContainer>
           </TitleContainer>
           <DeployBoxContainer>
-            <DeployBox>
-              <div>
-                dms-front
-                <Tag tag="활성" />
-              </div>
-              <div>team-aliens/DMS</div>
-            </DeployBox>
+            {data?.map((item: any, index: number) => (
+              <DeployBox key={index} onClick={() => navigate(`${item.deploy_id}`)}>
+                <div>
+                  {item.deploy_name}
+                  <Tag tag={tmp[item.deploy_status]} />
+                </div>
+                <div>{item.repository}</div>
+              </DeployBox>
+            ))}
           </DeployBoxContainer>
         </Container>
       </ContainerWrapper>
@@ -106,6 +126,7 @@ const DeployBoxContainer = styled.div`
 `;
 
 const DeployBox = styled.div`
+  cursor: pointer;
   width: 100%;
   max-width: 1120px;
   height: 100px;

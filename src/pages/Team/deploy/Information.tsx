@@ -2,35 +2,50 @@ import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
 import { Sidebar } from '@/components/common/sidebar';
 import { Tag } from '@/components/Team/Tag';
+import { useQuery } from '@tanstack/react-query';
+import { instance } from '@/utils/apis/axios';
+
+const tmp: { [key: string]: any } = {
+  AVAILABLE: '활성',
+  WAIT_FOR_APPROVE: '승인 대기',
+};
 
 export const TeamDeployInformation = () => {
+  const { data } = useQuery({
+    queryKey: ['information'],
+    queryFn: () => instance.get(`/deploy/${'5fc5217b-ad87-45a8-8ea4-cc9315698fb1'}`),
+    select: (res) => res.data,
+  });
+
   return (
     <Wrapper>
       <Sidebar />
       <ContainerWrapper>
         <Container>
           <TitleContainer>
-            <TeamName>에일리언즈 / dms-frontend</TeamName>
+            <TeamName>{data?.team_name_en} / projectName</TeamName>
             <Title>배포 관리</Title>
             <Describtion>프로젝트에 대한 정보를 관리합니다.</Describtion>
           </TitleContainer>
           <InformationContainer>
             <Information>
               <div>한줄 설명</div>
-              <div>DMS 프론트엔드 프로젝트입니다.</div>
+              <div>{data?.one_line_description}</div>
             </Information>
             <Information>
               <div>Github Repository</div>
-              <div>https://github.com/team-aliens/DMS-Backend</div>
+              <div>
+                https://github.com/{data?.team_name_en}/{data?.repository}
+              </div>
             </Information>
             <Information>
               <div>프로젝트 상위 경로</div>
-              <div>/</div>
+              <div>{data?.project_root_dir}</div>
             </Information>
             <Information>
               <div>상태 (관리자 승인 후 배포 가능)</div>
               <div>
-                <Tag tag="활성" />
+                <Tag tag={tmp[data?.deploy_status]} />
               </div>
             </Information>
           </InformationContainer>

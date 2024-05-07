@@ -5,13 +5,46 @@ import { Sidebar } from '@/components/common/sidebar';
 import { Input } from '@/components/common/Input';
 import { SelectBar } from '@/components/common/SelectBar';
 import { XButton } from '@/components/common/XButton';
+import { useMutation } from '@tanstack/react-query';
+import { instance } from '@/utils/apis/axios';
+import { useNavigate } from 'react-router-dom';
 
 const deployType: string[] = ['frontend', 'backend'];
 const databaseType: string[] = ['mysql', 'redis'];
+const deployType_Type: string[] = ['fe', 'be'];
 
 export const TeamDeployCreate = () => {
-  const [deploySeleted, setDeploySelected] = useState<number | undefined>();
-  const [databaseSeleted, setDatabaseSelected] = useState<number | undefined>();
+  const navigate = useNavigate();
+  const [dbSel, setDbSel] = useState<number | undefined>();
+  const [mjSel, setMjSel] = useState<number | undefined>();
+
+  const [data, setData] = useState({
+    deploy_name: '',
+    organization: '',
+    repository: '',
+    project_root_dir: '',
+    one_line_description: '',
+    deploy_type: '',
+    use_redis: false,
+    use_mysql: false,
+  });
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: () => instance.post(`deploy?team_id=${'5e25c8b1-4f7c-4703-8752-45294dd87c6a'}`, data),
+    onSuccess: (res) => {
+      const { deploy_id, team_id } = res?.data;
+      console.log(res?.data);
+      navigate(`/team/1/deploy/${deploy_id}`);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
 
   return (
     <Wrapper>
@@ -23,31 +56,67 @@ export const TeamDeployCreate = () => {
           </TitleContainer>
           <Form>
             <InputWrapper>
-              <Input width={328} label="배포 이름 (영어)" placeholder="배포 이름 (영어)" />
-              <Input width={426} label="깃허브 Organization 이름" placeholder="team-xquare" />
-              <Input width={426} label="깃허브 Repository 이름" placeholder="example-backend" />
+              <Input
+                width={328}
+                label="배포 이름 (영어)"
+                placeholder="배포 이름 (영어)"
+                name="deploy_name"
+                onChange={handleChange}
+              />
+              <Input
+                width={426}
+                label="깃허브 Organization 이름"
+                placeholder="team-xquare"
+                name="organization"
+                onChange={handleChange}
+              />
+              <Input
+                width={426}
+                label="깃허브 Repository 이름"
+                placeholder="example-backend"
+                name="repository"
+                onChange={handleChange}
+              />
               <SelectBar
-                selectedIndex={deploySeleted}
-                onSelect={setDeploySelected}
+                selectedIndex={mjSel}
+                onSelect={(item) => {
+                  setMjSel(item);
+                  setData({ ...data, deploy_type: deployType_Type[item as number] });
+                }}
                 values={deployType}
                 label="배포 타입"
               />
               <SelectBar
                 canCancle={true}
                 placehold="사용하지 않음"
-                selectedIndex={databaseSeleted}
-                onSelect={setDatabaseSelected}
+                selectedIndex={dbSel}
+                onSelect={(item) => {
+                  setDbSel(item);
+                  setData({ ...data, use_redis: !!item, use_mysql: !!!item });
+                }}
                 values={databaseType}
                 label="DB 사용여부"
               />
-              <Input width={426} label="프로젝트 상위 경로" placeholder="/" />
-              <Input width={426} label="한줄 설명" placeholder="이러이러한 프로젝트입니다." />
+              <Input
+                width={426}
+                label="프로젝트 상위 경로"
+                placeholder="/"
+                name="project_root_dir"
+                onChange={handleChange}
+              />
+              <Input
+                width={426}
+                label="한줄 설명"
+                placeholder="이러이러한 프로젝트입니다."
+                name="one_line_description"
+                onChange={handleChange}
+              />
             </InputWrapper>
             <ButtonWrapper>
               <XButton width={58} height={50} buttonStyle="ghost">
                 취소
               </XButton>
-              <XButton width={84} height={50} buttonStyle="solid">
+              <XButton width={84} height={50} buttonStyle="solid" onClick={mutate}>
                 생성하기
               </XButton>
             </ButtonWrapper>
