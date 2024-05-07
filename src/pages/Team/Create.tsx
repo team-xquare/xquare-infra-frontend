@@ -12,6 +12,7 @@ import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import { TeamCreateType, TeamType } from '@/utils/types/teamType';
 import { teamCreate } from '@/utils/apis/team';
+import { getUser } from '@/utils/apis/user';
 
 type ProjectType = '동아리' | '팀 프로젝트' | '개인 프로젝트' | '기타';
 const projectKinds: ProjectType[] = ['동아리', '팀 프로젝트', '개인 프로젝트', '기타'];
@@ -39,18 +40,33 @@ export const TeamCreate = () => {
     team_type: '',
     team_member_list: [],
   });
-  const [array, setArray] = useState<string[]>(dummyStudent);
+  const [array, setArray] = useState<string[]>();
   const [selectedIndex, setSelectIndex] = useState<number>();
   const [studentIndex, setStudentIndex] = useState<number | undefined>(undefined);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [studentAddition, setStudentAddition] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<string[]>();
   const [teamStudent, setTeamStudent] = useState<string[]>([]);
-  const [students, setStudents] = useState();
+  const [postStudent, setPostStudent] = useState<string[]>();
+  const [students, setStudents] = useState<
+    {
+      number_and_name: string;
+      user_id: string;
+    }[]
+  >();
+  const [studentNames, setStudentNames] = useState<string[]>();
   const addInputRef = useRef<HTMLInputElement>(null);
   const link = useNavigate();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    getUser().then((res) => {
+      console.log(res.data);
+
+      setStudents(res.data);
+      setStudentNames(res.data.map((item: any) => item.number_and_name));
+      setArray(res.data.map((item: any) => item.number_and_name));
+    });
+  }, []);
 
   useEffect(() => {
     setData({
@@ -60,11 +76,13 @@ export const TeamCreate = () => {
   }, [selectedIndex]);
 
   useEffect(() => {
+    if (!postStudent) return;
+
     setData({
       ...data,
-      team_member_list: [...teamStudent],
+      team_member_list: [...postStudent],
     });
-  }, [teamStudent]);
+  }, [postStudent]);
 
   const ref = useOutsideClick(() => {
     setIsOpen(false);
@@ -73,13 +91,13 @@ export const TeamCreate = () => {
   const onSubmit = () => {
     console.log(data);
 
-    // teamCreate(data)
-    //   .then((res) => {
-    //     console.log(res.data);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    teamCreate(data)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,9 +196,10 @@ export const TeamCreate = () => {
 
   useEffect(() => {
     if (studentAddition.length === 0) return;
+    if (!studentNames) return;
 
     const newArrIndex: number[] = [];
-    const filteredDummyStudent = dummyStudent.filter(
+    const filteredDummyStudent = studentNames.filter(
       (dummy) => !selectedStudent?.includes(dummy) && !teamStudent?.includes(dummy),
     );
 
@@ -205,16 +224,32 @@ export const TeamCreate = () => {
   }, [studentAddition]);
 
   useEffect(() => {
+    if (!studentNames || !students) return;
+
     if (studentIndex === -1 || studentIndex === undefined) return;
 
     if (selectedStudent) {
-      setSelectedStudent([...selectedStudent, array[studentIndex]]);
+      setSelectedStudent([...selectedStudent, studentNames[studentIndex]]);
     } else {
-      setSelectedStudent([array[studentIndex]]);
+      setSelectedStudent([studentNames[studentIndex]]);
     }
 
     setStudentIndex(-1);
     setStudentAddition('');
+
+    if (selectedStudent) {
+      setPostStudent(
+        students
+          .filter((item) => [...selectedStudent, studentNames[studentIndex]].includes(item.number_and_name))
+          .map((filteredItem) => filteredItem.user_id),
+      );
+    } else {
+      setPostStudent(
+        students
+          .filter((item) => [studentNames[studentIndex]].includes(item.number_and_name))
+          .map((filteredItem) => filteredItem.user_id),
+      );
+    }
   }, [studentIndex]);
 
   return (
@@ -257,8 +292,8 @@ export const TeamCreate = () => {
                     selectedStudent={selectedStudent.length}
                   /> */}
                   </AddInputWrapper>
-                  {isOpen && (
-                    <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
+                  {isOpen && studentNames && (
+                    <DropMenu values={studentNames} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
                   )}
                 </AddInputContainer>
                 <XButton width={88} height={46} buttonStyle="solid" onClick={onInsert}>

@@ -62,7 +62,7 @@ export const Team = () => {
                   key={index}
                   name={element.team_name_ko}
                   admin={element.administrator_name}
-                  // deploy={element.team_type}
+                  deploy={element.deploy_list}
                   tag={element.team_type}
                 />
               );
