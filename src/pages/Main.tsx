@@ -37,12 +37,12 @@ const SubFooter = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: #6fe09e;
-  > div:nth-child(1) {
+  > div:nth-of-type(1) {
     font-size: 16px;
     font-weight: 700;
     color: white;
   }
-  > div:nth-child(2) {
+  > div:nth-of-type(2) {
     font-size: 56px;
     font-weight: 700;
     text-align: center;

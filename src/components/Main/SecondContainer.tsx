@@ -67,13 +67,13 @@ const LeftBox = styled.div`
   flex-direction: column;
   gap: 40px;
   color: #17181a;
-  > div:nth-child(1) {
+  > div:nth-of-type(1) {
     font-size: 32px;
     font-weight: 700;
     line-height: 42px;
     margin-top: -12px;
   }
-  > div:nth-child(2) {
+  > div:nth-of-type(2) {
     font-size: 16px;
     font-weight: 600;
     color: #9245db;
@@ -98,11 +98,11 @@ const DescriptionBox = styled.div`
   gap: 24px;
   align-items: start;
   color: #17181a;
-  > div:nth-child(1) {
+  > div:nth-of-type(1) {
     font-size: 20px;
     font-weight: 700;
   }
-  > div:nth-child(2) {
+  > div:nth-of-type(2) {
     font-size: 16px;
     line-height: 24px;
   }

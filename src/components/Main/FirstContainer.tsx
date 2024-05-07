@@ -45,15 +45,15 @@ const MainContainer = styled.div`
   right: auto;
   color: white;
   z-index: 3;
-  > div:nth-child(1) {
+  > div:nth-of-type(1) {
     font-size: 48px;
     font-weight: 700;
   }
-  > div:nth-child(2) {
+  > div:nth-of-type(2) {
     margin: 32px 0 64px 0;
     font-size: 20px;
   }
-  > div:nth-child(3) {
+  > div:nth-of-type(3) {
     width: 190px;
     height: 64px;
     border: 1px white solid;

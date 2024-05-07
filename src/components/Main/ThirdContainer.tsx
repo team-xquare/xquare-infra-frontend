@@ -58,7 +58,7 @@ const CardBox = styled.div`
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  > div:nth-child(1) {
+  > div:nth-of-type(1) {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -69,12 +69,12 @@ const CardBox = styled.div`
       width: 208px;
     }
   }
-  > div:nth-child(2) {
+  > div:nth-of-type(2) {
     font-size: 20px;
     font-weight: 700;
     margin-top: 26px;
   }
-  > div:nth-child(3) {
+  > div:nth-of-type(3) {
     font-size: 16px;
     margin-top: 22px;
     text-align: center;
