@@ -4,6 +4,9 @@ WORKDIR /app
 
 RUN apk add --no-cache libc6-compat
 
+# .env 파일 생성
+RUN echo "VITE_API_URL=https://api.example.com" > .env
+
 COPY . ./
 
 RUN yarn install --immutable
@@ -12,8 +15,7 @@ RUN yarn build
 # 실행 단계
 FROM nginx:alpine AS runner
 
-ENV VITE_SERVER_BASE_URL='abcd'
-
+# Nginx 설정
 RUN echo "\
 server {\
     listen 3000;\
