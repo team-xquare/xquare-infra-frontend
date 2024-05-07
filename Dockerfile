@@ -12,6 +12,8 @@ RUN yarn build
 # 실행 단계
 FROM nginx:alpine AS runner
 
+ENV VITE_SERVER_BASE_URL='abcd'
+
 RUN echo "\
 server {\
     listen 3000;\
