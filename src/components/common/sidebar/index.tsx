@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { useMatch, useNavigate } from 'react-router-dom';
+import { useMatch, useNavigate, useParams } from 'react-router-dom';
 
 type MenuType = {
   icon: string;
@@ -11,14 +11,14 @@ type MenuType = {
 
 type MenusType = {
   path: string;
-  isBack: boolean | string;
+  back: undefined | string;
   menu: MenuType[];
 };
 
 const menu: MenusType[] = [
   {
     path: '/team',
-    isBack: false,
+    back: undefined,
     menu: [
       { icon: 'ph:circles-four-light', name: '팀', link: '/team' },
       { icon: 'icon-park-outline:people', name: '계정', link: '' },
@@ -26,7 +26,7 @@ const menu: MenusType[] = [
   },
   {
     path: '/team/create',
-    isBack: false,
+    back: undefined,
     menu: [
       { icon: 'ph:circles-four-light', name: '팀', link: '/team' },
       { icon: 'icon-park-outline:people', name: '계정', link: '' },
@@ -34,40 +34,60 @@ const menu: MenusType[] = [
   },
   {
     path: '/team/:id/manage',
-    isBack: false,
+    back: undefined,
     menu: [
-      { icon: 'ph:circles-four-light', name: '팀2', link: '' },
-      { icon: 'icon-park-outline:people', name: '계정2', link: '' },
+      { icon: 'ph:circles-four-light', name: '팀 관리', link: '' },
+      { icon: 'icon-park-outline:people', name: '배포', link: `/team/-team-/deploy` },
+    ],
+  },
+  {
+    path: '/team/:id/deploy',
+    back: '/team/-team-/manage',
+    menu: [
+      { icon: 'ph:circles-four-light', name: '팀 관리', link: '' },
+      { icon: 'icon-park-outline:people', name: '배포', link: `/team/-team-/deploy` },
     ],
   },
 ];
 
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(true);
   const currentMenu = menu.find((item) => useMatch(item.path));
   const link = useNavigate();
+  const params: any = useParams();
 
   return (
     <Wrapper isOpen={isOpen}>
-      <Container>
-        {currentMenu &&
-          currentMenu.menu.map((menuItem, index) => (
-            <Menu
-              key={index}
-              isOpen={isOpen}
-              onClick={() => {
-                link(menuItem.link);
-              }}
-            >
-              <div>
+      <div>
+        <BackContainer isOpen={isOpen}>
+          <div>
+            <div>
+              <Icon icon="iconamoon:arrow-left-2-bold" width={28} height={28} />
+            </div>
+            <span>돌아가기</span>
+          </div>
+        </BackContainer>
+        <Container>
+          {currentMenu &&
+            currentMenu.menu.map((menuItem, index) => (
+              <Menu
+                key={index}
+                isOpen={isOpen}
+                onClick={() => {
+                  link(menuItem.link.replaceAll('-team-', params?.teamUUID));
+                }}
+              >
                 <div>
-                  <Icon icon={menuItem.icon} width={24} height={24} />
+                  <div>
+                    <Icon icon={menuItem.icon} width={24} height={24} />
+                  </div>
+                  <span>{menuItem.name}</span>
                 </div>
-                <span>{menuItem.name}</span>
-              </div>
-            </Menu>
-          ))}
-      </Container>
+              </Menu>
+            ))}
+        </Container>
+      </div>
+
       <BottomMenu
         isOpen={isOpen}
         onClick={() => {
@@ -98,17 +118,53 @@ const Wrapper = styled.div<{ isOpen: boolean }>`
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 30px 0 30px 0;
+  padding: 0 0 30px 0;
+`;
+
+const BackContainer = styled.div<{ isOpen: boolean }>`
+  display: flex;
+  transition: 0.4s ease-in-out;
+  align-items: center;
+  width: ${({ isOpen }) => (isOpen ? '260px' : '80px')};
+  padding: 15px 10px 15px 10px;
+  border-bottom: 1px solid #dddddd;
+  overflow: hidden;
+  > div {
+    width: 240px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    > div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      transition: 0.4s ease-in-out;
+    }
+    > span {
+      font-size: 18px;
+      width: 180px;
+      transition: 0.4s ease-in-out;
+      overflow: hidden;
+      word-break: keep-all;
+      white-space: nowrap;
+      text-align: start;
+      margin-left: 10px;
+    }
+  }
 `;
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  padding-top: 30px;
 `;
 
 const Menu = styled.div<{ isOpen: boolean }>`
   cursor: pointer;
-  width: ${({ isOpen }) => (isOpen ? '240px' : '60px')};
+  width: ${({ isOpen }) => (isOpen ? '260px' : '80px')};
   padding: 10px;
   height: 60px;
   border-radius: 20px;
