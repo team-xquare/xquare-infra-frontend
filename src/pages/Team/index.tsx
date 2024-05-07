@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react';
 import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
 import { SearchBar } from '@/components/common/SearchBar';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { teamCheck } from '@/utils/apis/team';
 import { useNavigate } from 'react-router-dom';
 
@@ -58,13 +58,19 @@ export const Team = () => {
           {teamArray.length > 0 ? (
             teamArray.map((element: any, index: any) => {
               return (
-                <TeamContainer
-                  key={index}
-                  name={element.team_name_ko}
-                  admin={element.administrator_name}
-                  deploy={element.deploy_list}
-                  tag={element.team_type}
-                />
+                <div
+                  onClick={() => {
+                    link(`/team/${element.team_id}/manage`);
+                  }}
+                >
+                  <TeamContainer
+                    key={index}
+                    name={element.team_name_ko}
+                    admin={element.administrator_name}
+                    deploy={element.deploy_list}
+                    tag={element.team_type}
+                  />
+                </div>
               );
             })
           ) : (
@@ -140,4 +146,7 @@ const ContainerWrapper = styled.div`
   align-items: center;
   justify-content: start;
   gap: 14px;
+  > div {
+    width: 100%;
+  }
 `;
