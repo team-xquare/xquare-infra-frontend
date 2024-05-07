@@ -2,11 +2,12 @@ import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/common/Button';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { css } from '@emotion/react';
 import { theme } from '@/style/theme';
 
 export const Header = () => {
+  const navigate = useNavigate();
   const [scroll, setScroll] = useState<number>(0);
   const { pathname } = useLocation();
   const _pathname: string = pathname.substring(1);
@@ -43,7 +44,7 @@ export const Header = () => {
                 buttonStyle="ghost"
                 buttonColor={scroll === 0 ? 'white' : 'black'}
                 onClick={() => {
-                  console.log('click!');
+                  navigate('/login');
                 }}
               >
                 무료로 시작하기
