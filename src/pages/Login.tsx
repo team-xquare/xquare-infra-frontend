@@ -3,8 +3,11 @@ import { Input } from '@/components/common/Input';
 import { XButton } from '@/components/common/XButton';
 import { useState } from 'react';
 import { login, signup } from '@/utils/apis/auth';
+import { Cookie } from '@/utils/cookie';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
+  const link = useNavigate();
   const [data, setData] = useState<{ account_id: string; password: string }>({ account_id: '', password: '' });
 
   const { account_id, password } = data;
@@ -20,23 +23,20 @@ export const Login = () => {
   const onLogin = () => {
     login(data)
       .then((res) => {
-        console.log(res.data);
+        Cookie.set('accessToken', res.data.access_token);
+        Cookie.set('refreshToken', res.data.refresh_token);
+        link('/team');
       })
       .catch((err) => {
-        console.log(err);
         if (err.response.status === 404) {
           const email: string | null = prompt('회원가입이 되지 않았습니다.\n이메일을 입력해주세요');
-          console.log(123);
-
           if (email == null) return;
-          console.log(456);
-
           signup({ ...data, email: email })
-            .then((res) => {
-              console.log(res.data);
+            .then(() => {
+              alert('회원가입이 완료되었습니다.\n다시 로그인 해주세요.');
             })
-            .catch((err) => {
-              console.log(err);
+            .catch(() => {
+              alert('회원가입이 도중 문제가 발생했습니다.\n다시 시도해주세요.');
             });
         }
       });

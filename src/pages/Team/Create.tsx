@@ -9,9 +9,13 @@ import { XButton } from '@/components/common/XButton';
 import { DropMenu } from '@/components/common/DropMenu';
 import { theme } from '@/style/theme';
 import { Icon } from '@iconify/react';
+import { useNavigate } from 'react-router-dom';
+import { TeamCreateType, TeamType } from '@/utils/types/teamType';
+import { teamCreate } from '@/utils/apis/team';
 
 type ProjectType = '동아리' | '팀 프로젝트' | '개인 프로젝트' | '기타';
 const projectKinds: ProjectType[] = ['동아리', '팀 프로젝트', '개인 프로젝트', '기타'];
+const projectKindToTeamType: TeamType[] = ['CLUB', 'TEAM_PROJECT', 'PRIVATE_PROJECT', 'ETC'];
 
 const dummyStudent: string[] = [
   '2101 김명진',
@@ -29,6 +33,12 @@ const dummyStudent: string[] = [
 ];
 
 export const TeamCreate = () => {
+  const [data, setData] = useState<TeamCreateType>({
+    team_name_ko: '',
+    team_name_en: '',
+    team_type: '',
+    team_member_list: [],
+  });
   const [array, setArray] = useState<string[]>(dummyStudent);
   const [selectedIndex, setSelectIndex] = useState<number>();
   const [studentIndex, setStudentIndex] = useState<number | undefined>(undefined);
@@ -36,11 +46,50 @@ export const TeamCreate = () => {
   const [studentAddition, setStudentAddition] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<string[]>();
   const [teamStudent, setTeamStudent] = useState<string[]>([]);
+  const [students, setStudents] = useState();
   const addInputRef = useRef<HTMLInputElement>(null);
+  const link = useNavigate();
+
+  useEffect(() => {}, []);
+
+  useEffect(() => {
+    setData({
+      ...data,
+      team_type: projectKindToTeamType[selectedIndex ?? -1] ?? '',
+    });
+  }, [selectedIndex]);
+
+  useEffect(() => {
+    setData({
+      ...data,
+      team_member_list: [...teamStudent],
+    });
+  }, [teamStudent]);
 
   const ref = useOutsideClick(() => {
     setIsOpen(false);
   });
+
+  const onSubmit = () => {
+    console.log(data);
+
+    // teamCreate(data)
+    //   .then((res) => {
+    //     console.log(res.data);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+  };
+
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setData({
+      ...data,
+      [name]: value,
+    });
+  };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStudentAddition(e.target.value);
@@ -177,8 +226,20 @@ export const TeamCreate = () => {
         </TitleContainer>
         <Form>
           <InputWrapper>
-            <Input width={400} label="팀 이름(한글)" placeholder="팀 이름(한글)" />
-            <Input width={400} label="팀 이름(영어)" placeholder="팀 이름(영어)" />
+            <Input
+              width={400}
+              label="팀 이름(한글)"
+              placeholder="팀 이름(한글)"
+              name="team_name_ko"
+              onChange={onInputChange}
+            />
+            <Input
+              width={400}
+              label="팀 이름(영어)"
+              placeholder="팀 이름(영어)"
+              name="team_name_en"
+              onChange={onInputChange}
+            />
             <SelectBar selectedIndex={selectedIndex} onSelect={setSelectIndex} values={projectKinds} label="팀 분류" />
             <TeamAddWrapper>
               <div>
@@ -223,10 +284,24 @@ export const TeamCreate = () => {
             </TeamAddWrapper>
           </InputWrapper>
           <ButtonWrapper>
-            <XButton width={58} height={50} buttonStyle="ghost">
+            <XButton
+              width={58}
+              height={50}
+              buttonStyle="ghost"
+              onClick={() => {
+                link('/team');
+              }}
+            >
               취소
             </XButton>
-            <XButton width={84} height={50} buttonStyle="solid">
+            <XButton
+              width={84}
+              height={50}
+              buttonStyle="solid"
+              onClick={() => {
+                onSubmit();
+              }}
+            >
               생성하기
             </XButton>
           </ButtonWrapper>

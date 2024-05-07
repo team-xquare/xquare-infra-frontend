@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { useMatch } from 'react-router-dom';
+import { useMatch, useNavigate } from 'react-router-dom';
 
 type MenuType = {
   icon: string;
@@ -20,8 +20,24 @@ const menu: MenusType[] = [
     path: '/team',
     isBack: false,
     menu: [
-      { icon: 'ph:circles-four-light', name: '팀', link: '' },
+      { icon: 'ph:circles-four-light', name: '팀', link: '/team' },
       { icon: 'icon-park-outline:people', name: '계정', link: '' },
+    ],
+  },
+  {
+    path: '/team/create',
+    isBack: false,
+    menu: [
+      { icon: 'ph:circles-four-light', name: '팀', link: '/team' },
+      { icon: 'icon-park-outline:people', name: '계정', link: '' },
+    ],
+  },
+  {
+    path: '/team/:id/manage',
+    isBack: false,
+    menu: [
+      { icon: 'ph:circles-four-light', name: '팀2', link: '' },
+      { icon: 'icon-park-outline:people', name: '계정2', link: '' },
     ],
   },
 ];
@@ -29,13 +45,20 @@ const menu: MenusType[] = [
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const currentMenu = menu.find((item) => useMatch(item.path));
+  const link = useNavigate();
 
   return (
     <Wrapper isOpen={isOpen}>
       <Container>
         {currentMenu &&
           currentMenu.menu.map((menuItem, index) => (
-            <Menu key={index} isOpen={isOpen}>
+            <Menu
+              key={index}
+              isOpen={isOpen}
+              onClick={() => {
+                link(menuItem.link);
+              }}
+            >
               <div>
                 <div>
                   <Icon icon={menuItem.icon} width={24} height={24} />

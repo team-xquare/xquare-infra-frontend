@@ -1,18 +1,17 @@
 import { theme } from '@/style/theme';
 import styled from '@emotion/styled';
 import { Tag } from './Tag';
-import React from 'react';
 
 type TagType = 'club' | 'team' | 'alone' | 'etc';
 
 type TeamType = {
   name: string;
   admin: string;
-  deploy: string[];
+  deploy?: string[];
   tag: TagType;
 };
 
-export const TeamContainer = ({ name, admin, deploy, tag }: TeamType) => {
+export const TeamContainer = ({ name, admin, tag }: TeamType) => {
   return (
     <Wrapper>
       <div>
@@ -20,7 +19,7 @@ export const TeamContainer = ({ name, admin, deploy, tag }: TeamType) => {
         <Tag tag={tag} />
       </div>
       <div>관리자: {admin}</div>
-      <div>
+      {/* <div>
         배포:&nbsp;
         {deploy.map((element, index) => {
           switch (index) {
@@ -41,7 +40,7 @@ export const TeamContainer = ({ name, admin, deploy, tag }: TeamType) => {
               return null;
           }
         })}
-      </div>
+      </div> */}
     </Wrapper>
   );
 };

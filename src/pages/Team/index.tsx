@@ -5,8 +5,11 @@ import { Icon } from '@iconify/react';
 import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
 import { SearchBar } from '@/components/common/SearchBar';
+import { useEffect, useState } from 'react';
+import { teamCheck } from '@/utils/apis/team';
+import { useNavigate } from 'react-router-dom';
 
-type TagType = 'club' | 'team' | 'alone' | 'etc';
+type TagType = 'CLUB' | 'TEAM_PROJECT' | 'PRIVATE_PROJECT' | 'ETC';
 
 type TeamType = {
   name: string;
@@ -15,28 +18,21 @@ type TeamType = {
   tag: TagType;
 };
 
-const dummy: TeamType[] = [
-  {
-    name: '에일리언즈 (Team-aliens)',
-    admin: '김은빈',
-    deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
-    tag: 'club',
-  },
-  {
-    name: '에일리언즈 (Team-aliens)',
-    admin: '김은빈',
-    deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
-    tag: 'alone',
-  },
-  {
-    name: '에일리언즈 (Team-aliens)',
-    admin: '김은빈',
-    deploy: ['DMS-Backend', 'DMS', 'DMS-admin', 'DMS-admin-front', 'DMS-auth'],
-    tag: 'etc',
-  },
-];
-
 export const Team = () => {
+  const [teamArray, setTeamArray] = useState<any>([]);
+  const link = useNavigate();
+
+  useEffect(() => {
+    teamCheck()
+      .then((res) => {
+        console.log(res.data);
+        setTeamArray(res.data.team_list);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   return (
     <Wrapper>
       <Sidebar />
@@ -52,22 +48,22 @@ export const Team = () => {
             height={50}
             buttonStyle="solid"
             onClick={() => {
-              console.log('click!!');
+              link('/team/create');
             }}
           >
             <Icon icon={'ic:round-plus'} width={20} height={20} />팀 등록
           </XButton>
         </UtilContainer>
         <ContainerWrapper>
-          {dummy.length > 0 ? (
-            dummy.map((element, index) => {
+          {teamArray.length > 0 ? (
+            teamArray.map((element: any, index: any) => {
               return (
                 <TeamContainer
                   key={index}
-                  name={element.name}
-                  admin={element.admin}
-                  deploy={element.deploy}
-                  tag={element.tag}
+                  name={element.team_name_ko}
+                  admin={element.administrator_name}
+                  // deploy={element.team_type}
+                  tag={element.team_type}
                 />
               );
             })

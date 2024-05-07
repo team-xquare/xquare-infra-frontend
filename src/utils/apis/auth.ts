@@ -1,12 +1,13 @@
 import { instance } from './axios';
 import { SignInType, SignUpType } from '../types/authType';
+import axios from 'axios';
 
 const router = 'auth';
 
 export const login = async (data: SignInType) => {
-  return await instance.post(`${router}/login`, data);
+  return await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/${router}/login`, data);
 };
 
 export const signup = async (data: SignUpType) => {
-  return await instance.post(`${router}/signup`, data);
+  return await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/${router}/signup`, data);
 };
