@@ -26,3 +26,5 @@ jobs:
           config_file_path: ./.xquare/config.yaml
           yarn_docker_build: false
           yarn_workspace: .
+          buildargs: |
+            VITE_TEST_DATA=${{ secrets.VITE_TEST_DATA }}
