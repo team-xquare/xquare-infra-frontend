@@ -7,7 +7,7 @@ export const App = () => {
 
   return (
     <StyledProvider>
-      1
+      2
       <RouterProvider router={Router} />
     </StyledProvider>
   );
