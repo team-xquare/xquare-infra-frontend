@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
 # .env 파일 생성
-RUN echo "VITE_API_URL=https://api.example.com" > .env
+RUN echo "VITE_SERVER_BASE_URL=https://api.example.com" > .env
 
 COPY . ./
 
