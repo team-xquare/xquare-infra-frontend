@@ -24,7 +24,7 @@ export type TeamCreateType = {
 export type MemberType = {
   member_name: string;
   member_number: string;
-  member_role: MemberRoleType[];
+  member_role: MemberRoleType;
   user_id: string;
 };
 
