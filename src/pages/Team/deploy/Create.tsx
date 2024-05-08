@@ -1,24 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
 import { Sidebar } from '@/components/common/sidebar';
 import { Input } from '@/components/common/Input';
 import { SelectBar } from '@/components/common/SelectBar';
 import { XButton } from '@/components/common/XButton';
-import { useMutation } from '@tanstack/react-query';
-import { instance } from '@/utils/apis/axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { DeployCreateType, DeployType } from '@/utils/types/deploy';
+import { deployCreate } from '@/utils/apis/deploy';
 
-const deployType: string[] = ['frontend', 'backend'];
-const databaseType: string[] = ['mysql', 'redis'];
-const deployType_Type: string[] = ['fe', 'be'];
+const selectType: string[] = ['사용하지 않음', '사용함'];
+const deployType: DeployType[] = ['fe', 'be'];
 
 export const TeamDeployCreate = () => {
-  const navigate = useNavigate();
-  const [dbSel, setDbSel] = useState<number | undefined>();
-  const [mjSel, setMjSel] = useState<number | undefined>();
+  const { teamUUID } = useParams();
+  const link = useNavigate();
+  const [mySQL, setMySQL] = useState<number | undefined>(0);
+  const [redis, setRedis] = useState<number | undefined>(0);
+  const [deployIndex, setDeployIndex] = useState<number | undefined>();
 
-  const [data, setData] = useState({
+  const [data, setData] = useState<DeployCreateType>({
     deploy_name: '',
     organization: '',
     repository: '',
@@ -29,22 +30,29 @@ export const TeamDeployCreate = () => {
     use_mysql: false,
   });
 
-  const handleChange = (e: any) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
 
-  const { mutate } = useMutation({
-    mutationFn: () => instance.post(`deploy?team_id=${'5e25c8b1-4f7c-4703-8752-45294dd87c6a'}`, data),
-    onSuccess: (res) => {
-      const { deploy_id, team_id } = res?.data;
-      console.log(res?.data);
-      navigate(`/team/1/deploy/${deploy_id}`);
-    },
-    onError: (err) => {
-      console.log(err);
-    },
-  });
+  const onSubmit = () => {
+    if (!teamUUID) return;
+
+    console.log(data);
+
+    deployCreate(teamUUID, data).then((res) => {
+      link(`/team/${teamUUID}/deploy/${res.data.deploy_id}`);
+    });
+  };
+
+  useEffect(() => {
+    setData({ ...data, use_redis: Boolean(redis), use_mysql: Boolean(mySQL) });
+  }, [mySQL, redis]);
+
+  useEffect(() => {
+    if (deployIndex === undefined) return;
+    setData({ ...data, deploy_type: deployType[deployIndex] });
+  }, [deployIndex]);
 
   return (
     <Wrapper>
@@ -61,52 +69,38 @@ export const TeamDeployCreate = () => {
                 label="배포 이름 (영어)"
                 placeholder="배포 이름 (영어)"
                 name="deploy_name"
-                onChange={handleChange}
+                onChange={onChange}
               />
               <Input
                 width={426}
                 label="깃허브 Organization 이름"
                 placeholder="team-xquare"
                 name="organization"
-                onChange={handleChange}
+                onChange={onChange}
               />
               <Input
                 width={426}
                 label="깃허브 Repository 이름"
                 placeholder="example-backend"
                 name="repository"
-                onChange={handleChange}
+                onChange={onChange}
               />
-              <SelectBar
-                selectedIndex={mjSel}
-                onSelect={(item) => {
-                  setMjSel(item);
-                  setData({ ...data, deploy_type: deployType_Type[item as number] });
-                }}
-                values={deployType}
-                label="배포 타입"
-              />
+              <SelectBar selectedIndex={deployIndex} onSelect={setDeployIndex} values={deployType} label="배포 타입" />
               <SelectbarContainer>
                 <SelectBar
                   canCancle={true}
                   placehold="사용하지 않음"
-                  selectedIndex={dbSel}
-                  onSelect={(item) => {
-                    setDbSel(item);
-                    setData({ ...data, use_redis: !!item, use_mysql: !!!item });
-                  }}
-                  values={databaseType}
+                  selectedIndex={mySQL}
+                  onSelect={setMySQL}
+                  values={selectType}
                   label="MySQL 사용여부"
                 />
                 <SelectBar
                   canCancle={true}
                   placehold="사용하지 않음"
-                  selectedIndex={dbSel}
-                  onSelect={(item) => {
-                    setDbSel(item);
-                    setData({ ...data, use_redis: !!item, use_mysql: !!!item });
-                  }}
-                  values={databaseType}
+                  selectedIndex={redis}
+                  onSelect={setRedis}
+                  values={selectType}
                   label="Redis 사용여부"
                 />
               </SelectbarContainer>
@@ -115,21 +109,21 @@ export const TeamDeployCreate = () => {
                 label="프로젝트 상위 경로"
                 placeholder="/"
                 name="project_root_dir"
-                onChange={handleChange}
+                onChange={onChange}
               />
               <Input
                 width={426}
                 label="한줄 설명"
                 placeholder="이러이러한 프로젝트입니다."
                 name="one_line_description"
-                onChange={handleChange}
+                onChange={onChange}
               />
             </InputWrapper>
             <ButtonWrapper>
               <XButton width={58} height={50} buttonStyle="ghost">
                 취소
               </XButton>
-              <XButton width={84} height={50} buttonStyle="solid" onClick={mutate}>
+              <XButton width={84} height={50} buttonStyle="solid" onClick={onSubmit}>
                 생성하기
               </XButton>
             </ButtonWrapper>

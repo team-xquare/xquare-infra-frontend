@@ -1,5 +1,5 @@
 export type DeployStatusType = 'AVAILABLE' | 'WAIT_FOR_APPROVE';
-export type DeployType = 'frontend' | 'backend';
+export type DeployType = 'fe' | 'be';
 
 export type DeployListType = {
   deploy_id: string;
@@ -27,7 +27,7 @@ export type DeployCreateType = {
   repository: string;
   project_root_dir: string;
   one_line_description: string;
-  deploy_type: DeployType;
+  deploy_type: DeployType | '';
   use_redis: boolean;
   use_mysql: boolean;
 };
