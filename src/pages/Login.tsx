@@ -5,10 +5,11 @@ import { useState } from 'react';
 import { login, signup } from '@/utils/apis/auth';
 import { Cookie } from '@/utils/cookie';
 import { useNavigate } from 'react-router-dom';
+import { SignInType } from '@/utils/types/authType';
 
 export const Login = () => {
   const link = useNavigate();
-  const [data, setData] = useState<{ account_id: string; password: string }>({ account_id: '', password: '' });
+  const [data, setData] = useState<SignInType>({ account_id: '', password: '' });
 
   const { account_id, password } = data;
 
