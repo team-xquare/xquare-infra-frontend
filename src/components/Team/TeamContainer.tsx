@@ -2,17 +2,16 @@ import { theme } from '@/style/theme';
 import styled from '@emotion/styled';
 import { Tag } from './Tag';
 import React from 'react';
+import { TeamType } from '@/utils/types/teamType';
 
-type TagType = 'club' | 'team' | 'alone' | 'etc';
-
-type TeamType = {
+type TeamContainerType = {
   name: string;
   admin: string;
   deploy: string[];
-  tag: TagType;
+  tag: TeamType;
 };
 
-export const TeamContainer = ({ name, admin, tag, deploy }: TeamType) => {
+export const TeamContainer = ({ name, admin, tag, deploy }: TeamContainerType) => {
   return (
     <Wrapper>
       <div>
@@ -22,25 +21,31 @@ export const TeamContainer = ({ name, admin, tag, deploy }: TeamType) => {
       <div>관리자: {admin}</div>
       <div>
         배포:&nbsp;
-        {deploy.map((element, index) => {
-          switch (index) {
-            case 0:
-              return (
-                <React.Fragment key={index}>
-                  {element}
-                  {deploy.length > 1 && ', '}
-                </React.Fragment>
-              );
-            case 1:
-              return <React.Fragment key={index}>{element} </React.Fragment>;
-            case 2:
-              return (
-                <React.Fragment key={index}>{deploy.length > 2 ? <>등 {deploy.length - 2}개</> : <></>}</React.Fragment>
-              );
-            default:
-              return null;
-          }
-        })}
+        {deploy.length > 0 ? (
+          deploy.map((element, index) => {
+            switch (index) {
+              case 0:
+                return (
+                  <React.Fragment key={index}>
+                    {element}
+                    {deploy.length > 1 && ', '}
+                  </React.Fragment>
+                );
+              case 1:
+                return <React.Fragment key={index}>{element} </React.Fragment>;
+              case 2:
+                return (
+                  <React.Fragment key={index}>
+                    {deploy.length > 2 ? <>등 {deploy.length - 2}개</> : <></>}
+                  </React.Fragment>
+                );
+              default:
+                return null;
+            }
+          })
+        ) : (
+          <>배포된 컨테이너 없음.</>
+        )}
       </div>
     </Wrapper>
   );
