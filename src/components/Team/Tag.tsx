@@ -1,17 +1,18 @@
 import { theme } from '@/style/theme';
+import { TeamType } from '@/utils/types/teamType';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-type TagType = 'club' | 'team' | 'alone' | 'etc' | 'manage' | 'PROD' | 'STAG' | '활성' | '대기중' | '오류';
+type TagType = TeamType | 'manage' | 'PROD' | 'STAG' | '활성' | '대기중' | '오류';
 
 export const Tag = ({ tag }: { tag: TagType }) => {
   const tagText = (): string => {
     switch (tag) {
-      case 'club':
+      case 'CLUB':
         return '동아리';
-      case 'team':
+      case 'TEAM_PROJECT':
         return '팀 프로젝트';
-      case 'alone':
+      case 'PRIVATE_PROJECT':
         return '개인 프로젝트';
       case 'manage':
         return '담당자';
@@ -25,7 +26,7 @@ export const Tag = ({ tag }: { tag: TagType }) => {
         return '대기';
       case '오류':
         return '오류';
-      case 'etc':
+      case 'ETC':
       default:
         return '기타';
     }
@@ -45,11 +46,11 @@ const Wrapper = styled.div<{ tag: TagType }>`
   color: ${({ tag }) => {
     switch (tag) {
       case 'manage':
-      case 'club':
+      case 'CLUB':
         return `${theme.color.mainDark2} !important`;
-      case 'team':
+      case 'TEAM_PROJECT':
         return `#0C288A !important`;
-      case 'alone':
+      case 'PRIVATE_PROJECT':
         return `#876900 !important`;
       case 'PROD':
       case 'STAG':
@@ -60,7 +61,7 @@ const Wrapper = styled.div<{ tag: TagType }>`
         return `${theme.color.gray6}`;
       case '오류':
         return `${theme.color.errorDark2}`;
-      case 'etc':
+      case 'ETC':
       default:
         return `${theme.color.gray6} !important`;
     }
@@ -68,11 +69,11 @@ const Wrapper = styled.div<{ tag: TagType }>`
   background-color: ${({ tag }) => {
     switch (tag) {
       case 'manage':
-      case 'club':
+      case 'CLUB':
         return `${theme.color.mainLight2} !important`;
-      case 'team':
+      case 'TEAM_PROJECT':
         return `#ECF5FF !important`;
-      case 'alone':
+      case 'PRIVATE_PROJECT':
         return `#FFFBDB !important`;
       case 'STAG':
       case 'PROD':
@@ -83,7 +84,7 @@ const Wrapper = styled.div<{ tag: TagType }>`
         return `${theme.color.gray2}`;
       case '오류':
         return `${theme.color.errorLight}`;
-      case 'etc':
+      case 'ETC':
       default:
         return `${theme.color.gray2} !important`;
     }
