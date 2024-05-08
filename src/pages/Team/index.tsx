@@ -5,31 +5,22 @@ import { Icon } from '@iconify/react';
 import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
 import { SearchBar } from '@/components/common/SearchBar';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { teamCheck } from '@/utils/apis/team';
 import { useNavigate } from 'react-router-dom';
-
-type TagType = 'CLUB' | 'TEAM_PROJECT' | 'PRIVATE_PROJECT' | 'ETC';
-
-type TeamType = {
-  name: string;
-  admin: string;
-  deploy: string[];
-  tag: TagType;
-};
+import { TeamCheckType } from '@/utils/types/teamType';
 
 export const Team = () => {
-  const [teamArray, setTeamArray] = useState<any>([]);
+  const [teamList, setTeamList] = useState<TeamCheckType>({ team_list: [] });
   const link = useNavigate();
 
   useEffect(() => {
     teamCheck()
       .then((res) => {
-        console.log(res.data);
-        setTeamArray(res.data.team_list);
+        setTeamList(res.data);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        alert('오류가 발생했습니다');
       });
   }, []);
 
@@ -55,8 +46,8 @@ export const Team = () => {
           </XButton>
         </UtilContainer>
         <ContainerWrapper>
-          {teamArray.length > 0 ? (
-            teamArray.map((element: any, index: any) => {
+          {teamList.team_list.length > 0 ? (
+            teamList.team_list.map((element: any, index: any) => {
               return (
                 <div
                   onClick={() => {
