@@ -37,7 +37,7 @@ export const TeamDeployCreate = () => {
   const { mutate } = useMutation({
     mutationFn: () => instance.post(`deploy?team_id=${'5e25c8b1-4f7c-4703-8752-45294dd87c6a'}`, data),
     onSuccess: (res) => {
-      const { deploy_id, team_id } = res?.data;
+      const { deploy_id } = res?.data;
       console.log(res?.data);
       navigate(`/team/1/deploy/${deploy_id}`);
     },
