@@ -1,40 +1,24 @@
+import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
 import { Tag } from '@/components/Team/Tag';
 import { XButton } from '@/components/common/XButton';
-
-type EnvType = 'PROD' | 'STAG';
-type ContainerType = '활성' | '대기중' | '오류';
-
-type TeamContainerType = {
-  name: string;
-  path: string;
-  url: string;
-  lastDeploy: string;
-  env: EnvType;
-  container: ContainerType;
-};
-
-const dummy: TeamContainerType[] = [
-  {
-    name: 'dms-backend',
-    path: 'team-aliens/DMS-Backend',
-    url: 'https://dms-dms.com',
-    lastDeploy: '2023-03-06 17:57',
-    env: 'PROD',
-    container: '활성',
-  },
-  {
-    name: 'dms-backend',
-    path: 'team-aliens/DMS-Backend',
-    url: 'https://dms-dms.com',
-    lastDeploy: '2023-03-06 17:57',
-    env: 'PROD',
-    container: '활성',
-  },
-];
+import { ContainerAllType } from '@/utils/types/containerType';
+import { getAllContainer } from '@/utils/apis/container';
+import { useParams } from 'react-router-dom';
 
 export const TeamDeployContainer = () => {
+  const { deployUUID } = useParams();
+  const [data, setData] = useState<ContainerAllType[]>();
+
+  useEffect(() => {
+    if (!deployUUID) return;
+
+    getAllContainer(deployUUID).then((res) => {
+      setData(res.data);
+    });
+  }, []);
+
   return (
     <Wrapper>
       <TitleContainer>
@@ -51,30 +35,30 @@ export const TeamDeployContainer = () => {
           재발급
         </XButton>
       </UtilContainer>
-      {dummy ? (
-        <div>
+      {data ? (
+        <>
           <Label>컨테이너</Label>
           <ContainerBoxContainer>
-            {dummy.map((ele, index) => {
+            {data.map((item, index) => {
               return (
                 <ContainerBox key={index}>
                   <div>
                     <div>
-                      {ele.name}
-                      <Tag tag={ele.env} />
-                      <Tag tag={ele.container as any} />
+                      {item.container_name}
+                      <Tag tag={item.container_environment} />
+                      <Tag tag={item.container_status} />
                     </div>
                     <div>
-                      <span>{ele.path}</span>
-                      <span>{ele.url}</span>
-                      <span>마지막 배포: {ele.lastDeploy}</span>
+                      <span>{item.repository}</span>
+                      <span>{item.domain}</span>
+                      <span>마지막 배포: {item.last_deploy.split('T')[0]}</span>
                     </div>
                   </div>
                 </ContainerBox>
               );
             })}
           </ContainerBoxContainer>
-        </div>
+        </>
       ) : (
         <TipBox>
           아직 프로젝트에서 배포된 정보가 없습니다.
@@ -127,6 +111,8 @@ const UtilContainer = styled.div`
   display: flex;
   gap: 10px;
   align-items: end;
+  width: 100%;
+  max-width: 1120px;
 `;
 
 const SecretKey = styled.div`
@@ -143,6 +129,7 @@ const SecretKey = styled.div`
 
 const Label = styled.label`
   width: 100%;
+  max-width: 1120px;
   height: 22px;
   cursor: default;
   font-size: 14px;
@@ -172,6 +159,8 @@ const ContainerBoxContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 14px;
+  width: 100%;
+  max-width: 1120px;
 `;
 
 const ContainerBox = styled.div`
