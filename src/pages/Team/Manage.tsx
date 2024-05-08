@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 import { useModal } from '@/hooks/useModal';
 import styled from '@emotion/styled';
-import { Sidebar } from '@/components/common/sidebar';
 import { theme } from '@/style/theme';
 import { SearchBar } from '@/components/common/SearchBar';
 import { XButton } from '@/components/common/XButton';
@@ -198,97 +197,92 @@ export const TeamManage = () => {
             </ModalWrapper>
           )}
           <Wrapper>
-            <Sidebar />
-            <ContainerWrapper>
-              <Container>
-                <TitleContainer>
-                  <TeamName>{data.team_name_ko}</TeamName>
-                  <Title>팀 관리</Title>
-                  <Describtion>팀 정보를 관리해보세요</Describtion>
-                </TitleContainer>
-                <InformationContainer>
-                  <div>
-                    <div>{data.team_name_ko}</div>
-                    <div>{data.team_name_en}</div>
-                  </div>
-                  <div>
-                    <div>팀원 수 : {data.member_count}</div>
-                    <div>생성자 : {data.admin_name}</div>
-                    <div>생성일 : {data.created_at.split('T')[0]}</div>
-                  </div>
-                </InformationContainer>
-                <MemberContainer>
-                  <div>팀원</div>
-                  <div>
-                    <SearchBar width={336} placeholder="팀원 검색" />
-                    <XButton
-                      width={88}
-                      height={50}
-                      buttonStyle="solid"
-                      onClick={() => {
-                        onShow('memberAdd');
-                      }}
-                    >
-                      팀원 추가
-                    </XButton>
-                  </div>
-                  <MemberBoxContainer>
-                    {data.member_list.map((member, index) => {
-                      return (
-                        <MemberBox key={index} isSelected={false}>
-                          <div>
-                            <div>
-                              {member.member_number} {member.member_name}
-                            </div>
-                            {member.member_role === 'ADMINISTRATOR' && <Tag tag="manage" />}
-                          </div>
-                          <MemberBoxInRightContainer ref={ref}>
+            <TitleContainer>
+              <TeamName>{data.team_name_ko}</TeamName>
+              <Title>팀 관리</Title>
+              <Describtion>팀 정보를 관리해보세요</Describtion>
+            </TitleContainer>
+            <InformationContainer>
+              <div>
+                <div>{data.team_name_ko}</div>
+                <div>{data.team_name_en}</div>
+              </div>
+              <div>
+                <div>팀원 수 : {data.member_count}</div>
+                <div>생성자 : {data.admin_name}</div>
+                <div>생성일 : {data.created_at.split('T')[0]}</div>
+              </div>
+            </InformationContainer>
+            <MemberContainer>
+              <div>팀원</div>
+              <div>
+                <SearchBar width={336} placeholder="팀원 검색" />
+                <XButton
+                  width={88}
+                  height={50}
+                  buttonStyle="solid"
+                  onClick={() => {
+                    onShow('memberAdd');
+                  }}
+                >
+                  팀원 추가
+                </XButton>
+              </div>
+              <MemberBoxContainer>
+                {data.member_list.map((member, index) => {
+                  return (
+                    <MemberBox key={index} isSelected={false}>
+                      <div>
+                        <div>
+                          {member.member_number} {member.member_name}
+                        </div>
+                        {member.member_role === 'ADMINISTRATOR' && <Tag tag="manage" />}
+                      </div>
+                      <MemberBoxInRightContainer ref={ref}>
+                        <>
+                          {data.is_admin && (
                             <>
-                              {data.is_admin && (
-                                <>
-                                  <Icon
-                                    icon={'bi:three-dots-vertical'}
-                                    color="#999999"
-                                    width={20}
-                                    height={20}
-                                    cursor={'pointer'}
-                                    onClick={() => {
-                                      onOpen(index);
-                                      setSelectedMemberUUID(member.user_id);
-                                      setSelectedMemberName(`${member.member_number} ${member.member_name}`);
+                              <Icon
+                                icon={'bi:three-dots-vertical'}
+                                color="#999999"
+                                width={20}
+                                height={20}
+                                cursor={'pointer'}
+                                onClick={() => {
+                                  onOpen(index);
+                                  setSelectedMemberUUID(member.user_id);
+                                  setSelectedMemberName(`${member.member_number} ${member.member_name}`);
+                                }}
+                              />
+                              {isOpen === index && (
+                                <ThreeDotMenu.Wrapper>
+                                  <ThreeDotMenu.Box
+                                    isLast={'false'}
+                                    onMouseDown={() => {
+                                      onShow('managerChange');
                                     }}
-                                  />
-                                  {isOpen === index && (
-                                    <ThreeDotMenu.Wrapper>
-                                      <ThreeDotMenu.Box
-                                        isLast={'false'}
-                                        onMouseDown={() => {
-                                          onShow('managerChange');
-                                        }}
-                                      >
-                                        담당자 지정
-                                      </ThreeDotMenu.Box>
-                                      <ThreeDotMenu.Box
-                                        isLast={'true'}
-                                        onMouseDown={() => {
-                                          onShow('memberDel');
-                                        }}
-                                      >
-                                        팀원 삭제
-                                      </ThreeDotMenu.Box>
-                                    </ThreeDotMenu.Wrapper>
-                                  )}
-                                </>
+                                  >
+                                    담당자 지정
+                                  </ThreeDotMenu.Box>
+                                  <ThreeDotMenu.Box
+                                    isLast={'true'}
+                                    onMouseDown={() => {
+                                      onShow('memberDel');
+                                    }}
+                                  >
+                                    팀원 삭제
+                                  </ThreeDotMenu.Box>
+                                </ThreeDotMenu.Wrapper>
                               )}
                             </>
-                          </MemberBoxInRightContainer>
-                        </MemberBox>
-                      );
-                    })}
-                  </MemberBoxContainer>
-                </MemberContainer>
-              </Container>
-            </ContainerWrapper>
+                          )}
+                        </>
+                      </MemberBoxInRightContainer>
+                    </MemberBox>
+                  );
+                })}
+              </MemberBoxContainer>
+            </MemberContainer>
           </Wrapper>
         </>
       )}
@@ -297,26 +291,10 @@ export const TeamManage = () => {
 };
 
 const Wrapper = styled.div`
-  margin-top: 80px;
   width: 100%;
-  display: flex;
-`;
-
-const ContainerWrapper = styled.div`
-  width: 100%;
-  height: calc(100vh - 80px + 200px);
-  padding-left: 100px;
-  padding-right: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 1120px;
-  display: flex;
-  flex-direction: column;
   gap: 30px;
 `;
 
@@ -326,7 +304,6 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 80px;
 `;
 
 const TeamName = styled.div`
@@ -384,7 +361,6 @@ const InformationContainer = styled.div`
 const MemberContainer = styled.div`
   width: 100%;
   max-width: 1120px;
-  height: 544px;
   background-color: ${theme.color.gray1};
   border-radius: 6px;
   border: 1px solid ${theme.color.gray5};
@@ -417,7 +393,6 @@ const MemberContainer = styled.div`
 
 const MemberBoxContainer = styled.div`
   width: 100%;
-  height: 408px;
   display: flex;
   flex-direction: column;
   gap: 10px;

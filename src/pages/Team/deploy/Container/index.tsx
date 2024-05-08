@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
-import { Sidebar } from '@/components/common/sidebar';
 import { Tag } from '@/components/Team/Tag';
 import { XButton } from '@/components/common/XButton';
 
@@ -38,83 +37,62 @@ const dummy: TeamContainerType[] = [
 export const TeamDeployContainer = () => {
   return (
     <Wrapper>
-      <Sidebar />
-      <ContainerWrapper>
-        <Container>
-          <TitleContainer>
-            <TeamName>에일리언즈 / dms-frontend</TeamName>
-            <Title>프로젝트 배포</Title>
-            <Describtion>프로젝트를 배포하기 위한 정보를 관리합니다.</Describtion>
-          </TitleContainer>
-          <UtilContainer>
-            <div>
-              <Label>배포 키</Label>
-              <SecretKey>*******************</SecretKey>
-            </div>
-            <XButton width={70} height={46} buttonStyle="solid">
-              재발급
-            </XButton>
-          </UtilContainer>
-          {dummy ? (
-            <div>
-              <Label>컨테이너</Label>
-              <ContainerBoxContainer>
-                {dummy.map((ele, index) => {
-                  return (
-                    <ContainerBox key={index}>
-                      <div>
-                        <div>
-                          {ele.name}
-                          <Tag tag={ele.env} />
-                          <Tag tag={ele.container} />
-                        </div>
-                        <div>
-                          <span>{ele.path}</span>
-                          <span>{ele.url}</span>
-                          <span>마지막 배포: {ele.lastDeploy}</span>
-                        </div>
-                      </div>
-                    </ContainerBox>
-                  );
-                })}
-              </ContainerBoxContainer>
-            </div>
-          ) : (
-            <TipBox>
-              아직 프로젝트에서 배포된 정보가 없습니다.
-              <br />
-              등록한 배포에 대한 액션이 동작하면 이 곳에서 배포된 컨테이너를 확인할 수 있습니다.
-              <br />
-              배포 액션을 설정하는 방법은 여기에서 확인해주세요!
-            </TipBox>
-          )}
-        </Container>
-      </ContainerWrapper>
+      <TitleContainer>
+        <TeamName>에일리언즈 / dms-frontend</TeamName>
+        <Title>프로젝트 배포</Title>
+        <Describtion>프로젝트를 배포하기 위한 정보를 관리합니다.</Describtion>
+      </TitleContainer>
+      <UtilContainer>
+        <div>
+          <Label>배포 키</Label>
+          <SecretKey>*******************</SecretKey>
+        </div>
+        <XButton width={70} height={46} buttonStyle="solid">
+          재발급
+        </XButton>
+      </UtilContainer>
+      {dummy ? (
+        <div>
+          <Label>컨테이너</Label>
+          <ContainerBoxContainer>
+            {dummy.map((ele, index) => {
+              return (
+                <ContainerBox key={index}>
+                  <div>
+                    <div>
+                      {ele.name}
+                      <Tag tag={ele.env} />
+                      <Tag tag={ele.container as any} />
+                    </div>
+                    <div>
+                      <span>{ele.path}</span>
+                      <span>{ele.url}</span>
+                      <span>마지막 배포: {ele.lastDeploy}</span>
+                    </div>
+                  </div>
+                </ContainerBox>
+              );
+            })}
+          </ContainerBoxContainer>
+        </div>
+      ) : (
+        <TipBox>
+          아직 프로젝트에서 배포된 정보가 없습니다.
+          <br />
+          등록한 배포에 대한 액션이 동작하면 이 곳에서 배포된 컨테이너를 확인할 수 있습니다.
+          <br />
+          배포 액션을 설정하는 방법은 여기에서 확인해주세요!
+        </TipBox>
+      )}
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  margin-top: 80px;
   width: 100%;
-  display: flex;
-`;
-
-const ContainerWrapper = styled.div`
-  width: 100%;
-  height: calc(100vh - 80px + 200px);
-  padding-left: 100px;
-  padding-right: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 1120px;
-  display: flex;
-  flex-direction: column;
   gap: 30px;
 `;
 

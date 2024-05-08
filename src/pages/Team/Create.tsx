@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { useOutsideClick } from '@/hooks/useOutsideClick';
-import { Sidebar } from '@/components/common/sidebar';
 import { Input } from '@/components/common/Input';
 import { SelectBar } from '@/components/common/SelectBar';
 import { useState } from 'react';
@@ -232,35 +231,33 @@ export const TeamCreate = () => {
 
   return (
     <Wrapper>
-      <Sidebar />
-      <Container>
-        <TitleContainer>
-          <Title>팀 생성</Title>
-        </TitleContainer>
-        <Form>
-          <InputWrapper>
-            <Input
-              width={400}
-              label="팀 이름(한글)"
-              placeholder="팀 이름(한글)"
-              onChange={onDataChange}
-              name="team_name_ko"
-            />
-            <Input
-              width={400}
-              label="팀 이름(영어)"
-              placeholder="팀 이름(영어)"
-              onChange={onDataChange}
-              name="team_name_en"
-            />
-            <SelectBar selectedIndex={selectedIndex} onSelect={setSelectIndex} values={projectKinds} label="팀 분류" />
-            <TeamAddWrapper>
-              <div>
-                <AddInputContainer ref={ref}>
-                  <AddLabel>팀원</AddLabel>
-                  <AddInputWrapper selectedStudent={selectedStudent ? selectedStudent.length : 0}>
-                    {chunkAddTag()}
-                    {/* {selectedStudent?.map((element, index) => {
+      <TitleContainer>
+        <Title>팀 생성</Title>
+      </TitleContainer>
+      <Form>
+        <InputWrapper>
+          <Input
+            width={400}
+            label="팀 이름(한글)"
+            placeholder="팀 이름(한글)"
+            onChange={onDataChange}
+            name="team_name_ko"
+          />
+          <Input
+            width={400}
+            label="팀 이름(영어)"
+            placeholder="팀 이름(영어)"
+            onChange={onDataChange}
+            name="team_name_en"
+          />
+          <SelectBar selectedIndex={selectedIndex} onSelect={setSelectIndex} values={projectKinds} label="팀 분류" />
+          <TeamAddWrapper>
+            <div>
+              <AddInputContainer ref={ref}>
+                <AddLabel>팀원</AddLabel>
+                <AddInputWrapper selectedStudent={selectedStudent ? selectedStudent.length : 0}>
+                  {chunkAddTag()}
+                  {/* {selectedStudent?.map((element, index) => {
                     return <AddTag key={index}>{element}</AddTag>;
                   })}
                   <AddInput
@@ -269,58 +266,48 @@ export const TeamCreate = () => {
                     onChange={onChange}
                     selectedStudent={selectedStudent.length}
                   /> */}
-                  </AddInputWrapper>
-                  {isOpen && array && (
-                    <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
-                  )}
-                </AddInputContainer>
-                <XButton width={88} height={46} buttonStyle="solid" onClick={onInsert}>
-                  학생 추가
-                </XButton>
-              </div>
-              <div>
-                {teamStudent.map((student, index) => {
-                  return (
-                    <AddedStudent key={index}>
-                      {student}
-                      <div
-                        onClick={() => {
-                          onTeamStudentDelete(index);
-                        }}
-                      >
-                        <Icon icon={'bitcoin-icons:cross-filled'} width={18} height={18} color="#343434" />
-                      </div>
-                    </AddedStudent>
-                  );
-                })}
-              </div>
-            </TeamAddWrapper>
-          </InputWrapper>
-          <ButtonWrapper>
-            <XButton width={58} height={50} buttonStyle="ghost">
-              취소
-            </XButton>
-            <XButton width={84} height={50} buttonStyle="solid" onClick={onSubmit}>
-              생성하기
-            </XButton>
-          </ButtonWrapper>
-        </Form>
-      </Container>
+                </AddInputWrapper>
+                {isOpen && array && (
+                  <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
+                )}
+              </AddInputContainer>
+              <XButton width={88} height={46} buttonStyle="solid" onClick={onInsert}>
+                학생 추가
+              </XButton>
+            </div>
+            <div>
+              {teamStudent.map((student, index) => {
+                return (
+                  <AddedStudent key={index}>
+                    {student}
+                    <div
+                      onClick={() => {
+                        onTeamStudentDelete(index);
+                      }}
+                    >
+                      <Icon icon={'bitcoin-icons:cross-filled'} width={18} height={18} color="#343434" />
+                    </div>
+                  </AddedStudent>
+                );
+              })}
+            </div>
+          </TeamAddWrapper>
+        </InputWrapper>
+        <ButtonWrapper>
+          <XButton width={58} height={50} buttonStyle="ghost">
+            취소
+          </XButton>
+          <XButton width={84} height={50} buttonStyle="solid" onClick={onSubmit}>
+            생성하기
+          </XButton>
+        </ButtonWrapper>
+      </Form>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  margin-top: 80px;
   width: 100%;
-  display: flex;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  height: calc(100vh - 80px);
-  padding-left: 100px;
-  padding-right: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -329,7 +316,6 @@ const Container = styled.div`
 const TitleContainer = styled.div`
   max-width: 1120px;
   width: 100%;
-  margin-top: 80px;
 `;
 
 const Title = styled.div`

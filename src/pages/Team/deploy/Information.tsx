@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
-import { Sidebar } from '@/components/common/sidebar';
 import { Tag } from '@/components/Team/Tag';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -21,65 +20,46 @@ export const TeamDeployInformation = () => {
 
   return (
     <Wrapper>
-      <Sidebar />
-      <ContainerWrapper>
-        {data && (
-          <Container>
-            <TitleContainer>
-              <TeamName>{data.team_name_en} / projectName</TeamName>
-              <Title>배포 관리</Title>
-              <Describtion>프로젝트에 대한 정보를 관리합니다.</Describtion>
-            </TitleContainer>
-            <InformationContainer>
-              <Information>
-                <div>한줄 설명</div>
-                <div>{data.one_line_description}</div>
-              </Information>
-              <Information>
-                <div>Github Repository</div>
-                <div>
-                  https://github.com/{data.team_name_en}/{data.repository}
-                </div>
-              </Information>
-              <Information>
-                <div>프로젝트 상위 경로</div>
-                <div>{data.project_root_dir}</div>
-              </Information>
-              <Information>
-                <div>상태 (관리자 승인 후 배포 가능)</div>
-                <div>
-                  <Tag tag={data.deploy_status} />
-                </div>
-              </Information>
-            </InformationContainer>
-          </Container>
-        )}
-      </ContainerWrapper>
+      {data && (
+        <>
+          <TitleContainer>
+            <TeamName>{data.team_name_en} / projectName</TeamName>
+            <Title>배포 관리</Title>
+            <Describtion>프로젝트에 대한 정보를 관리합니다.</Describtion>
+          </TitleContainer>
+          <InformationContainer>
+            <Information>
+              <div>한줄 설명</div>
+              <div>{data.one_line_description}</div>
+            </Information>
+            <Information>
+              <div>Github Repository</div>
+              <div>
+                https://github.com/{data.team_name_en}/{data.repository}
+              </div>
+            </Information>
+            <Information>
+              <div>프로젝트 상위 경로</div>
+              <div>{data.project_root_dir}</div>
+            </Information>
+            <Information>
+              <div>상태 (관리자 승인 후 배포 가능)</div>
+              <div>
+                <Tag tag={data.deploy_status} />
+              </div>
+            </Information>
+          </InformationContainer>
+        </>
+      )}
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  margin-top: 80px;
   width: 100%;
-  display: flex;
-`;
-
-const ContainerWrapper = styled.div`
-  width: 100%;
-  height: calc(100vh - 80px + 200px);
-  padding-left: 100px;
-  padding-right: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 1120px;
-  display: flex;
-  flex-direction: column;
   gap: 30px;
 `;
 

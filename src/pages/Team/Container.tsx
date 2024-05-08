@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
-import { Sidebar } from '@/components/common/sidebar';
 import { SearchBar } from '@/components/common/SearchBar';
 import { SelectBar } from '@/components/common/SelectBar';
 import { Tag } from '@/components/Team/Tag';
@@ -40,97 +39,76 @@ export const TeamContainer = () => {
 
   return (
     <Wrapper>
-      <Sidebar />
-      <ContainerWrapper>
-        <Container>
-          <TitleContainer>
-            <TeamName>에일리언즈</TeamName>
-            <Title>컨테이너</Title>
-            <Describtion>프로젝트에 대해 배포된 컨테이너를 확인할 수 있습니다</Describtion>
-            <UtilContainer>
-              <SearchBar width={312} placeholder="배포 검색" />
-              <div>
-                <SelectBar
-                  placehold="환경"
-                  values={envKinds}
-                  canCancle={true}
-                  selectedIndex={selectedEnvIndex}
-                  onSelect={setSelectEnvIndex}
-                />
-                <SelectBar
-                  placehold="프로젝트"
-                  values={projectKinds}
-                  canCancle={true}
-                  selectedIndex={selectedProjectIndex}
-                  onSelect={setSelectProjectIndex}
-                />
-                <SelectBar
-                  placehold="컨테이너 상태"
-                  values={containerKinds}
-                  canCancle={true}
-                  selectedIndex={selectedContainerIndex}
-                  onSelect={setSelectContainerIndex}
-                />
-              </div>
-            </UtilContainer>
-          </TitleContainer>
-          {dummy ? (
-            <ContainerBoxContainer>
-              {dummy.map((ele, index) => {
-                return (
-                  <ContainerBox key={index}>
-                    <div>
-                      <div>
-                        {ele.name}
-                        <Tag tag={ele.env} />
-                        <Tag tag={ele.container} />
-                      </div>
-                      <div>
-                        <span>{ele.path}</span>
-                        <span>{ele.url}</span>
-                        <span>마지막 배포: {ele.lastDeploy}</span>
-                      </div>
-                    </div>
-                  </ContainerBox>
-                );
-              })}
-            </ContainerBoxContainer>
-          ) : (
-            <TipBox>
-              아직 프로젝트에서 배포된 정보가 없습니다.
-              <br />
-              등록한 배포에 대한 액션이 동작하면 이 곳에서 배포된 컨테이너를 확인할 수 있습니다.
-              <br />
-              배포 액션을 설정하는 방법은 여기에서 확인해주세요!
-            </TipBox>
-          )}
-        </Container>
-      </ContainerWrapper>
+      <TitleContainer>
+        <TeamName>에일리언즈</TeamName>
+        <Title>컨테이너</Title>
+        <Describtion>프로젝트에 대해 배포된 컨테이너를 확인할 수 있습니다</Describtion>
+        <UtilContainer>
+          <SearchBar width={312} placeholder="배포 검색" />
+          <div>
+            <SelectBar
+              placehold="환경"
+              values={envKinds}
+              canCancle={true}
+              selectedIndex={selectedEnvIndex}
+              onSelect={setSelectEnvIndex}
+            />
+            <SelectBar
+              placehold="프로젝트"
+              values={projectKinds}
+              canCancle={true}
+              selectedIndex={selectedProjectIndex}
+              onSelect={setSelectProjectIndex}
+            />
+            <SelectBar
+              placehold="컨테이너 상태"
+              values={containerKinds}
+              canCancle={true}
+              selectedIndex={selectedContainerIndex}
+              onSelect={setSelectContainerIndex}
+            />
+          </div>
+        </UtilContainer>
+      </TitleContainer>
+      {dummy ? (
+        <ContainerBoxContainer>
+          {dummy.map((ele, index) => {
+            return (
+              <ContainerBox key={index}>
+                <div>
+                  <div>
+                    {ele.name}
+                    <Tag tag={ele.env} />
+                    <Tag tag={ele.container as any} />
+                  </div>
+                  <div>
+                    <span>{ele.path}</span>
+                    <span>{ele.url}</span>
+                    <span>마지막 배포: {ele.lastDeploy}</span>
+                  </div>
+                </div>
+              </ContainerBox>
+            );
+          })}
+        </ContainerBoxContainer>
+      ) : (
+        <TipBox>
+          아직 프로젝트에서 배포된 정보가 없습니다.
+          <br />
+          등록한 배포에 대한 액션이 동작하면 이 곳에서 배포된 컨테이너를 확인할 수 있습니다.
+          <br />
+          배포 액션을 설정하는 방법은 여기에서 확인해주세요!
+        </TipBox>
+      )}
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  margin-top: 80px;
   width: 100%;
-  display: flex;
-`;
-
-const ContainerWrapper = styled.div`
-  width: 100%;
-  height: calc(100vh - 80px + 200px);
-  padding-left: 100px;
-  padding-right: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 1120px;
-  display: flex;
-  flex-direction: column;
   gap: 30px;
 `;
 

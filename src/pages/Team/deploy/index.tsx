@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
-import { Sidebar } from '@/components/common/sidebar';
 import { SearchBar } from '@/components/common/SearchBar';
 import { XButton } from '@/components/common/XButton';
 import { Icon } from '@iconify/react';
@@ -25,65 +24,39 @@ export const TeamDeploy = () => {
 
   return (
     <Wrapper>
-      <Sidebar />
-      <ContainerWrapper>
-        <Container>
-          <TitleContainer>
-            <TeamName>에일리언즈</TeamName>
-            <Title>배포</Title>
-            <Describtion>프로젝트를 등록하고 해당 프로젝트에 대한 배포 액션을 설정할 수 있습니다.</Describtion>
-            <UtilContainer>
-              <SearchBar width={312} placeholder="프로젝트 검색" />
-              <XButton
-                width={138}
-                height={50}
-                buttonStyle="solid"
-                onClick={() => link(`/team/${teamUUID}/deploy/create`)}
-              >
-                <Icon icon={'ic:round-plus'} width={20} height={20} />
-                프로젝트 등록
-              </XButton>
-            </UtilContainer>
-          </TitleContainer>
-          <DeployBoxContainer>
-            {data &&
-              data.deploy_list.map((item, index) => (
-                <DeployBox key={index} onClick={() => link(`/team/${teamUUID}/deploy/${item.deploy_id}`)}>
-                  <div>
-                    {item.deploy_name}
-                    <Tag tag={item.deploy_status} />
-                  </div>
-                  <div>{item.repository}</div>
-                </DeployBox>
-              ))}
-          </DeployBoxContainer>
-        </Container>
-      </ContainerWrapper>
+      <TitleContainer>
+        <TeamName>에일리언즈</TeamName>
+        <Title>배포</Title>
+        <Describtion>프로젝트를 등록하고 해당 프로젝트에 대한 배포 액션을 설정할 수 있습니다.</Describtion>
+        <UtilContainer>
+          <SearchBar width={312} placeholder="프로젝트 검색" />
+          <XButton width={138} height={50} buttonStyle="solid" onClick={() => link(`/team/${teamUUID}/deploy/create`)}>
+            <Icon icon={'ic:round-plus'} width={20} height={20} />
+            프로젝트 등록
+          </XButton>
+        </UtilContainer>
+      </TitleContainer>
+      <DeployBoxContainer>
+        {data &&
+          data.deploy_list.map((item, index) => (
+            <DeployBox key={index} onClick={() => link(`/team/${teamUUID}/deploy/${item.deploy_id}`)}>
+              <div>
+                {item.deploy_name}
+                <Tag tag={item.deploy_status} />
+              </div>
+              <div>{item.repository}</div>
+            </DeployBox>
+          ))}
+      </DeployBoxContainer>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  margin-top: 80px;
   width: 100%;
-  display: flex;
-`;
-
-const ContainerWrapper = styled.div`
-  width: 100%;
-  height: calc(100vh - 80px + 200px);
-  padding-left: 100px;
-  padding-right: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 1120px;
-  display: flex;
-  flex-direction: column;
   gap: 30px;
 `;
 
@@ -93,7 +66,6 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 80px;
 `;
 
 const TeamName = styled.div`
