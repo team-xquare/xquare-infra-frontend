@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { Icon } from '@iconify/react';
-import { useMatch, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 type MenuType = {
   icon: string;
@@ -50,9 +50,18 @@ const menu: MenusType[] = [
   },
 ];
 
-export const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(true);
-  const currentMenu = menu.find((item) => useMatch(item.path));
+interface PropType {
+  isOpen: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export const Sidebar = ({ isOpen, setOpen }: PropType) => {
+  const { pathname }: any = useLocation();
+  const raw_pathname = pathname
+    .split('/')
+    .map((i: any) => (i.includes('-') ? ':id' : i))
+    .join('/');
+  const currentMenu = menu?.find((item) => item.path === raw_pathname);
   const link = useNavigate();
   const params: any = useParams();
 
@@ -91,7 +100,7 @@ export const Sidebar = () => {
       <BottomMenu
         isOpen={isOpen}
         onClick={() => {
-          setIsOpen(!isOpen);
+          setOpen(!isOpen);
         }}
       >
         <div>
@@ -106,12 +115,11 @@ export const Sidebar = () => {
 };
 
 const Wrapper = styled.div<{ isOpen: boolean }>`
-  width: ${({ isOpen }) => (isOpen ? '260px' : '80px')};
+  width: ${({ isOpen }) => (isOpen ? '260px' : '60px')};
   transition: 0.4s ease-in-out;
   height: calc(100vh - 80px);
   background-color: white;
   border-right: 1px #dddddd solid;
-  position: fixed;
   z-index: 10;
   left: 0;
   display: flex;
@@ -125,7 +133,7 @@ const BackContainer = styled.div<{ isOpen: boolean }>`
   display: flex;
   transition: 0.4s ease-in-out;
   align-items: center;
-  width: ${({ isOpen }) => (isOpen ? '260px' : '80px')};
+  width: ${({ isOpen }) => (isOpen ? '260px' : '60px')};
   padding: 15px 10px 15px 10px;
   border-bottom: 1px solid #dddddd;
   overflow: hidden;
@@ -140,8 +148,6 @@ const BackContainer = styled.div<{ isOpen: boolean }>`
       align-items: center;
       width: 40px;
       height: 40px;
-      flex: none;
-      transition: 0.4s ease-in-out;
     }
     > span {
       font-size: 18px;
@@ -164,12 +170,13 @@ const Container = styled.div`
 
 const Menu = styled.div<{ isOpen: boolean }>`
   cursor: pointer;
-  width: ${({ isOpen }) => (isOpen ? '260px' : '80px')};
+  width: ${({ isOpen }) => (isOpen ? '235px' : '60px')};
   padding: 10px;
   height: 60px;
   border-radius: 20px;
   display: flex;
   align-items: center;
+  align-self: center;
   overflow: hidden;
   transition:
     background-color 0.1s linear,
@@ -206,7 +213,7 @@ const Menu = styled.div<{ isOpen: boolean }>`
 
 const BottomMenu = styled.div<{ isOpen: boolean }>`
   cursor: pointer;
-  width: ${({ isOpen }) => (isOpen ? '240px' : '60px')};
+  width: ${({ isOpen }) => (isOpen ? '235px' : '60px')};
   padding: 10px;
   height: 60px;
   border-radius: 20px;

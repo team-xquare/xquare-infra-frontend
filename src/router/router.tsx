@@ -12,6 +12,7 @@ import { TeamDeployCreate } from '@/pages/Team/deploy/Create';
 import { TeamDeployContainer } from '@/pages/Team/deploy/Container';
 import { TeamDeployContainerDetail } from '@/pages/Team/deploy/Container/Detail';
 import { Login } from '@/pages/Login';
+import { SideBarLayout } from './sideBarLayout';
 
 export const Router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ export const Router = createBrowserRouter([
       { path: '', element: <Main /> },
       {
         path: 'team',
+        element: <SideBarLayout />,
         children: [
           { index: true, element: <Team /> },
           { path: 'create', element: <TeamCreate /> },
