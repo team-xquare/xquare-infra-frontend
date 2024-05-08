@@ -94,9 +94,12 @@ const InformationContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 30px;
+  width: 100%;
+  max-width: 1120px;
 `;
 
 const Information = styled.div`
+  width: 100%;
   display: flex;
   gap: 30px;
   > div:nth-of-type(1) {
