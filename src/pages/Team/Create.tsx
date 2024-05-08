@@ -9,29 +9,15 @@ import { XButton } from '@/components/common/XButton';
 import { DropMenu } from '@/components/common/DropMenu';
 import { theme } from '@/style/theme';
 import { Icon } from '@iconify/react';
-import { useNavigate } from 'react-router-dom';
+import { getUser } from '@/utils/apis/user';
+import { UserType } from '@/utils/types/userType';
 import { TeamCreateType, TeamType } from '@/utils/types/teamType';
 import { teamCreate } from '@/utils/apis/team';
-import { getUser } from '@/utils/apis/user';
+import { useNavigate } from 'react-router-dom';
 
 type ProjectType = '동아리' | '팀 프로젝트' | '개인 프로젝트' | '기타';
 const projectKinds: ProjectType[] = ['동아리', '팀 프로젝트', '개인 프로젝트', '기타'];
-const projectKindToTeamType: TeamType[] = ['CLUB', 'TEAM_PROJECT', 'PRIVATE_PROJECT', 'ETC'];
-
-const dummyStudent: string[] = [
-  '2101 김명진',
-  '2102 김민재',
-  '2103 김승원',
-  '2104 김어진',
-  '2105 김준화',
-  '2107 박예빈',
-  '2108 변정현',
-  '2114 이태영',
-  '2201 김가은',
-  '2208 부현수',
-  '2222 박의엘',
-  '5555 남궁윤교',
-];
+const teamTypeArray: TeamType[] = ['CLUB', 'TEAM_PROJECT', 'PRIVATE_PROJECT', 'ETC'];
 
 export const TeamCreate = () => {
   const [data, setData] = useState<TeamCreateType>({
@@ -41,66 +27,41 @@ export const TeamCreate = () => {
     team_member_list: [],
   });
   const [array, setArray] = useState<string[]>();
+  const [usuallyArray, setUsuallyArray] = useState<UserType[]>();
+  const [usuallyNameArray, setUsuallyNameArray] = useState<string[]>();
+  const [memberUUIDArray, setMemberUUIDArray] = useState<string[]>();
   const [selectedIndex, setSelectIndex] = useState<number>();
   const [studentIndex, setStudentIndex] = useState<number | undefined>(undefined);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [studentAddition, setStudentAddition] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<string[]>();
   const [teamStudent, setTeamStudent] = useState<string[]>([]);
-  const [postStudent, setPostStudent] = useState<string[]>();
-  const [students, setStudents] = useState<
-    {
-      number_and_name: string;
-      user_id: string;
-    }[]
-  >();
-  const [studentNames, setStudentNames] = useState<string[]>();
   const addInputRef = useRef<HTMLInputElement>(null);
   const link = useNavigate();
 
   useEffect(() => {
     getUser().then((res) => {
-      console.log(res.data);
-
-      setStudents(res.data);
-      setStudentNames(res.data.map((item: any) => item.number_and_name));
       setArray(res.data.map((item: any) => item.number_and_name));
+      setUsuallyNameArray(res.data.map((item: any) => item.number_and_name));
+      setUsuallyArray(res.data);
     });
   }, []);
-
-  useEffect(() => {
-    setData({
-      ...data,
-      team_type: projectKindToTeamType[selectedIndex ?? -1] ?? '',
-    });
-  }, [selectedIndex]);
-
-  useEffect(() => {
-    if (!postStudent) return;
-
-    setData({
-      ...data,
-      team_member_list: [...postStudent],
-    });
-  }, [postStudent]);
 
   const ref = useOutsideClick(() => {
     setIsOpen(false);
   });
 
   const onSubmit = () => {
-    console.log(data);
+    if (!data.team_name_ko) alert('팀 이름(한글)을 작성해주세요');
+    if (!data.team_name_en) alert('팀 이름(영어)을 작성해주세요');
+    if (!data.team_type) alert('팀 분류를 선택해주세요');
 
-    teamCreate(data)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    teamCreate(data).then(() => {
+      link('/team');
+    });
   };
 
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setData({
@@ -120,7 +81,6 @@ export const TeamCreate = () => {
 
     setSelectedStudent([]);
     setTeamStudent(newArr);
-    console.log(newArr);
   };
 
   const onTeamStudentDelete = (index: number) => {
@@ -196,10 +156,10 @@ export const TeamCreate = () => {
 
   useEffect(() => {
     if (studentAddition.length === 0) return;
-    if (!studentNames) return;
+    if (!usuallyNameArray) return;
 
     const newArrIndex: number[] = [];
-    const filteredDummyStudent = studentNames.filter(
+    const filteredDummyStudent = usuallyNameArray.filter(
       (dummy) => !selectedStudent?.includes(dummy) && !teamStudent?.includes(dummy),
     );
 
@@ -224,33 +184,51 @@ export const TeamCreate = () => {
   }, [studentAddition]);
 
   useEffect(() => {
-    if (!studentNames || !students) return;
+    if (!array) return;
 
     if (studentIndex === -1 || studentIndex === undefined) return;
 
     if (selectedStudent) {
-      setSelectedStudent([...selectedStudent, studentNames[studentIndex]]);
+      setSelectedStudent([...selectedStudent, array[studentIndex]]);
     } else {
-      setSelectedStudent([studentNames[studentIndex]]);
+      setSelectedStudent([array[studentIndex]]);
     }
 
     setStudentIndex(-1);
     setStudentAddition('');
-
-    if (selectedStudent) {
-      setPostStudent(
-        students
-          .filter((item) => [...selectedStudent, studentNames[studentIndex]].includes(item.number_and_name))
-          .map((filteredItem) => filteredItem.user_id),
-      );
-    } else {
-      setPostStudent(
-        students
-          .filter((item) => [studentNames[studentIndex]].includes(item.number_and_name))
-          .map((filteredItem) => filteredItem.user_id),
-      );
-    }
   }, [studentIndex]);
+
+  useEffect(() => {
+    if (!usuallyArray) return;
+
+    setMemberUUIDArray(
+      usuallyArray
+        .filter((item) => {
+          return teamStudent?.includes(item.number_and_name);
+        })
+        .map((item) => {
+          return item.user_id;
+        }),
+    );
+  }, [teamStudent]);
+
+  useEffect(() => {
+    if (!memberUUIDArray) return;
+
+    setData({
+      ...data,
+      team_member_list: [...memberUUIDArray],
+    });
+  }, [memberUUIDArray]);
+
+  useEffect(() => {
+    if (selectedIndex === undefined) return;
+
+    setData({
+      ...data,
+      team_type: teamTypeArray[selectedIndex],
+    });
+  }, [selectedIndex]);
 
   return (
     <Wrapper>
@@ -265,15 +243,15 @@ export const TeamCreate = () => {
               width={400}
               label="팀 이름(한글)"
               placeholder="팀 이름(한글)"
+              onChange={onDataChange}
               name="team_name_ko"
-              onChange={onInputChange}
             />
             <Input
               width={400}
               label="팀 이름(영어)"
               placeholder="팀 이름(영어)"
+              onChange={onDataChange}
               name="team_name_en"
-              onChange={onInputChange}
             />
             <SelectBar selectedIndex={selectedIndex} onSelect={setSelectIndex} values={projectKinds} label="팀 분류" />
             <TeamAddWrapper>
@@ -292,8 +270,8 @@ export const TeamCreate = () => {
                     selectedStudent={selectedStudent.length}
                   /> */}
                   </AddInputWrapper>
-                  {isOpen && studentNames && (
-                    <DropMenu values={studentNames} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
+                  {isOpen && array && (
+                    <DropMenu values={array} onClose={setIsOpen} onSelect={setStudentIndex} selectedIndex={-1} />
                   )}
                 </AddInputContainer>
                 <XButton width={88} height={46} buttonStyle="solid" onClick={onInsert}>
@@ -319,24 +297,10 @@ export const TeamCreate = () => {
             </TeamAddWrapper>
           </InputWrapper>
           <ButtonWrapper>
-            <XButton
-              width={58}
-              height={50}
-              buttonStyle="ghost"
-              onClick={() => {
-                link('/team');
-              }}
-            >
+            <XButton width={58} height={50} buttonStyle="ghost">
               취소
             </XButton>
-            <XButton
-              width={84}
-              height={50}
-              buttonStyle="solid"
-              onClick={() => {
-                onSubmit();
-              }}
-            >
+            <XButton width={84} height={50} buttonStyle="solid" onClick={onSubmit}>
               생성하기
             </XButton>
           </ButtonWrapper>
