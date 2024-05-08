@@ -35,4 +35,5 @@ export type TeamDetailType = {
   admin_name: string;
   created_at: string;
   member_list: MemberType[];
+  is_admin: boolean;
 };

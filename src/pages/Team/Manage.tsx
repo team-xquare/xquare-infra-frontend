@@ -201,38 +201,44 @@ export const TeamManage = () => {
                             {member.member_role === 'ADMINISTRATOR' && <Tag tag="manage" />}
                           </div>
                           <MemberBoxInRightContainer ref={ref}>
-                            <Icon
-                              icon={'bi:three-dots-vertical'}
-                              color="#999999"
-                              width={20}
-                              height={20}
-                              cursor={'pointer'}
-                              onClick={() => {
-                                onOpen(index);
-                                setSelectedMemberUUID(member.user_id);
-                                setSelectedMemberName(`${member.member_number} ${member.member_name}`);
-                              }}
-                            />
-                            {isOpen === index && (
-                              <ThreeDotMenu.Wrapper>
-                                <ThreeDotMenu.Box
-                                  isLast={'false'}
-                                  onMouseDown={() => {
-                                    onShow('managerChange');
-                                  }}
-                                >
-                                  담당자 지정
-                                </ThreeDotMenu.Box>
-                                <ThreeDotMenu.Box
-                                  isLast={'true'}
-                                  onMouseDown={() => {
-                                    onShow('memberDel');
-                                  }}
-                                >
-                                  팀원 삭제
-                                </ThreeDotMenu.Box>
-                              </ThreeDotMenu.Wrapper>
-                            )}
+                            <>
+                              {data.is_admin && (
+                                <>
+                                  <Icon
+                                    icon={'bi:three-dots-vertical'}
+                                    color="#999999"
+                                    width={20}
+                                    height={20}
+                                    cursor={'pointer'}
+                                    onClick={() => {
+                                      onOpen(index);
+                                      setSelectedMemberUUID(member.user_id);
+                                      setSelectedMemberName(`${member.member_number} ${member.member_name}`);
+                                    }}
+                                  />
+                                  {isOpen === index && (
+                                    <ThreeDotMenu.Wrapper>
+                                      <ThreeDotMenu.Box
+                                        isLast={'false'}
+                                        onMouseDown={() => {
+                                          onShow('managerChange');
+                                        }}
+                                      >
+                                        담당자 지정
+                                      </ThreeDotMenu.Box>
+                                      <ThreeDotMenu.Box
+                                        isLast={'true'}
+                                        onMouseDown={() => {
+                                          onShow('memberDel');
+                                        }}
+                                      >
+                                        팀원 삭제
+                                      </ThreeDotMenu.Box>
+                                    </ThreeDotMenu.Wrapper>
+                                  )}
+                                </>
+                              )}
+                            </>
                           </MemberBoxInRightContainer>
                         </MemberBox>
                       );
