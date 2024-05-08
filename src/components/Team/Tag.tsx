@@ -1,9 +1,10 @@
 import { theme } from '@/style/theme';
+import { DeployStatusType } from '@/utils/types/deploy';
 import { TeamType } from '@/utils/types/teamType';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-type TagType = TeamType | 'manage' | 'PROD' | 'STAG' | '활성' | '대기중' | '오류';
+type TagType = TeamType | 'manage' | 'PROD' | 'STAG' | DeployStatusType | '오류';
 
 export const Tag = ({ tag }: { tag: TagType }) => {
   const tagText = (): string => {
@@ -20,9 +21,9 @@ export const Tag = ({ tag }: { tag: TagType }) => {
         return 'STAG';
       case 'PROD':
         return 'PROD';
-      case '활성':
+      case 'AVAILABLE':
         return '활성';
-      case '대기중':
+      case 'WAIT_FOR_APPROVE':
         return '대기';
       case '오류':
         return '오류';
@@ -55,9 +56,9 @@ const Wrapper = styled.div<{ tag: TagType }>`
       case 'PROD':
       case 'STAG':
         return `${theme.color.gray6}`;
-      case '활성':
+      case 'AVAILABLE':
         return `${theme.color.infoDark2}`;
-      case '대기중':
+      case 'WAIT_FOR_APPROVE':
         return `${theme.color.gray6}`;
       case '오류':
         return `${theme.color.errorDark2}`;
@@ -78,9 +79,9 @@ const Wrapper = styled.div<{ tag: TagType }>`
       case 'STAG':
       case 'PROD':
         return `${theme.color.gray1}`;
-      case '활성':
+      case 'AVAILABLE':
         return `${theme.color.infoLight}`;
-      case '대기중':
+      case 'WAIT_FOR_APPROVE':
         return `${theme.color.gray2}`;
       case '오류':
         return `${theme.color.errorLight}`;

@@ -36,7 +36,7 @@ export const Router = createBrowserRouter([
                   { index: true, element: <TeamDeploy /> },
                   { path: 'create', element: <TeamDeployCreate /> },
                   {
-                    path: ':deoployUUID',
+                    path: ':deployUUID',
                     children: [
                       { index: true, element: <TeamDeployInformation /> },
                       {

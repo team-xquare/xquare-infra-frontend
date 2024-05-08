@@ -37,7 +37,7 @@ export const TeamDeployCreate = () => {
   const { mutate } = useMutation({
     mutationFn: () => instance.post(`deploy?team_id=${'5e25c8b1-4f7c-4703-8752-45294dd87c6a'}`, data),
     onSuccess: (res) => {
-      const { deploy_id } = res?.data;
+      const { deploy_id, team_id } = res?.data;
       console.log(res?.data);
       navigate(`/team/1/deploy/${deploy_id}`);
     },
@@ -86,17 +86,30 @@ export const TeamDeployCreate = () => {
                 values={deployType}
                 label="배포 타입"
               />
-              <SelectBar
-                canCancle={true}
-                placehold="사용하지 않음"
-                selectedIndex={dbSel}
-                onSelect={(item) => {
-                  setDbSel(item);
-                  setData({ ...data, use_redis: !!item, use_mysql: !!!item });
-                }}
-                values={databaseType}
-                label="DB 사용여부"
-              />
+              <SelectbarContainer>
+                <SelectBar
+                  canCancle={true}
+                  placehold="사용하지 않음"
+                  selectedIndex={dbSel}
+                  onSelect={(item) => {
+                    setDbSel(item);
+                    setData({ ...data, use_redis: !!item, use_mysql: !!!item });
+                  }}
+                  values={databaseType}
+                  label="MySQL 사용여부"
+                />
+                <SelectBar
+                  canCancle={true}
+                  placehold="사용하지 않음"
+                  selectedIndex={dbSel}
+                  onSelect={(item) => {
+                    setDbSel(item);
+                    setData({ ...data, use_redis: !!item, use_mysql: !!!item });
+                  }}
+                  values={databaseType}
+                  label="Redis 사용여부"
+                />
+              </SelectbarContainer>
               <Input
                 width={426}
                 label="프로젝트 상위 경로"
@@ -187,5 +200,10 @@ const ButtonWrapper = styled.div`
   height: 50px;
   display: flex;
   justify-content: end;
+  gap: 20px;
+`;
+
+const SelectbarContainer = styled.div`
+  display: flex;
   gap: 20px;
 `;
