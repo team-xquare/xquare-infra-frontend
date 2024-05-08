@@ -14,6 +14,8 @@ const queryClient = new QueryClient({
 });
 
 export const App = () => {
+  console.log(import.meta.env.VITE_SERVER_BASE_URL);
+
   return (
     <QueryClientProvider client={queryClient}>
       <StyledProvider>
