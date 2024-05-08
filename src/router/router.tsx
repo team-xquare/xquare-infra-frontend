@@ -25,7 +25,7 @@ export const Router = createBrowserRouter([
           { index: true, element: <Team /> },
           { path: 'create', element: <TeamCreate /> },
           {
-            path: ':id',
+            path: ':teamUUID',
             children: [
               { index: true, element: <Error /> },
               { path: 'manage', element: <TeamManage /> },
@@ -36,14 +36,14 @@ export const Router = createBrowserRouter([
                   { index: true, element: <TeamDeploy /> },
                   { path: 'create', element: <TeamDeployCreate /> },
                   {
-                    path: ':id',
+                    path: ':deoployUUID',
                     children: [
                       { index: true, element: <TeamDeployInformation /> },
                       {
                         path: 'container',
                         children: [
                           { index: true, element: <TeamDeployContainer /> },
-                          { path: ':id', element: <TeamDeployContainerDetail /> },
+                          { path: ':containerUUID', element: <TeamDeployContainerDetail /> },
                         ],
                       },
                     ],
