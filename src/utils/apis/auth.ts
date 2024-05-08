@@ -1,4 +1,3 @@
-import { instance } from './axios';
 import { SignInType, SignUpType } from '../types/authType';
 import axios from 'axios';
 
