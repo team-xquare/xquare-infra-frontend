@@ -1,10 +1,11 @@
 import { theme } from '@/style/theme';
+import { ContainerEnvType, ContainerStatusType } from '@/utils/types/containerType';
 import { DeployStatusType } from '@/utils/types/deploy';
 import { TeamType } from '@/utils/types/teamType';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-type TagType = TeamType | 'manage' | 'PROD' | 'STAG' | DeployStatusType | '오류';
+type TagType = TeamType | 'manage' | ContainerEnvType | DeployStatusType | '오류' | ContainerStatusType;
 
 export const Tag = ({ tag }: { tag: TagType }) => {
   const tagText = (): string => {
@@ -17,14 +18,17 @@ export const Tag = ({ tag }: { tag: TagType }) => {
         return '개인 프로젝트';
       case 'manage':
         return '담당자';
-      case 'STAG':
+      case 'stag':
         return 'STAG';
-      case 'PROD':
+      case 'prod':
         return 'PROD';
       case 'AVAILABLE':
+      case 'RUNNING':
         return '활성';
       case 'WAIT_FOR_APPROVE':
+      case 'PENDING':
         return '대기';
+      case 'ERROR':
       case '오류':
         return '오류';
       case 'ETC':
@@ -53,14 +57,17 @@ const Wrapper = styled.div<{ tag: TagType }>`
         return `#0C288A !important`;
       case 'PRIVATE_PROJECT':
         return `#876900 !important`;
-      case 'PROD':
-      case 'STAG':
+      case 'prod':
+      case 'stag':
         return `${theme.color.gray6}`;
       case 'AVAILABLE':
+      case 'RUNNING':
         return `${theme.color.infoDark2}`;
       case 'WAIT_FOR_APPROVE':
+      case 'PENDING':
         return `${theme.color.gray6}`;
       case '오류':
+      case 'ERROR':
         return `${theme.color.errorDark2}`;
       case 'ETC':
       default:
@@ -76,14 +83,17 @@ const Wrapper = styled.div<{ tag: TagType }>`
         return `#ECF5FF !important`;
       case 'PRIVATE_PROJECT':
         return `#FFFBDB !important`;
-      case 'STAG':
-      case 'PROD':
+      case 'stag':
+      case 'prod':
         return `${theme.color.gray1}`;
       case 'AVAILABLE':
+      case 'RUNNING':
         return `${theme.color.infoLight}`;
       case 'WAIT_FOR_APPROVE':
+      case 'PENDING':
         return `${theme.color.gray2}`;
       case '오류':
+      case 'ERROR':
         return `${theme.color.errorLight}`;
       case 'ETC':
       default:
@@ -92,8 +102,8 @@ const Wrapper = styled.div<{ tag: TagType }>`
   }};
   border: ${({ tag }) => {
     switch (tag) {
-      case 'PROD':
-      case 'STAG':
+      case 'prod':
+      case 'stag':
         return css`1px solid ${theme.color.gray5}`;
     }
   }};
