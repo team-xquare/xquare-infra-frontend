@@ -13,17 +13,20 @@ import * as MemberManageModal from '@/components/Team/TeamManage/MemberManageMod
 import * as ThreeDotMenu from '@/components/Team/TeamManage/ThreeDotMenu';
 import { TeamDetailType } from '@/utils/types/teamType';
 import { useParams } from 'react-router-dom';
-import { teamDetailCheck, teamMemberDelete } from '@/utils/apis/team';
+import { teamDetailCheck, teamMemberDelete, teamMemberPut } from '@/utils/apis/team';
 import { getUser } from '@/utils/apis/user';
+import { UserType } from '@/utils/types/userType';
 
 export const TeamManage = () => {
   const { teamUUID } = useParams();
   const [isOpen, setIsOpen] = useState<number | boolean>(false);
   const [data, setData] = useState<TeamDetailType>();
-  const [users, setUsers] = useState<string[]>();
+  const [users, setUsers] = useState<UserType[]>();
+  const [userNames, setUserNames] = useState<string[]>();
   const [teamMember, setTeamMember] = useState<string[]>();
   const [selectedMamberName, setSelectedMemberName] = useState<string>();
   const [selectedMemberUUID, setSelectedMemberUUID] = useState<string>();
+  const [selectedStudent, setSelectedStudent] = useState<string[]>([]);
   const ref = useOutsideClick(() => {
     setIsOpen(false);
   });
@@ -40,7 +43,8 @@ export const TeamManage = () => {
 
   useEffect(() => {
     getUser().then((res) => {
-      setUsers(res.data.map((item: any) => item.number_and_name));
+      setUsers(res.data);
+      setUserNames(res.data.map((item: any) => item.number_and_name));
     });
   }, []);
 
@@ -61,6 +65,28 @@ export const TeamManage = () => {
       .catch(() => {
         onClose();
       });
+  };
+
+  const onMemberAdd = () => {
+    if (!users || !teamUUID) return;
+
+    const newArr: string[] = users
+      .filter((user) => selectedStudent.includes(user.number_and_name))
+      .map((user) => {
+        return user.user_id;
+      });
+
+    teamMemberPut(teamUUID, newArr).then(() => {
+      teamDetailCheck(teamUUID)
+        .then((res) => {
+          setData(res.data);
+          setTeamMember(res.data.member_list.map((item: any) => `${item.member_number} ${item.member_name}`));
+          onClose();
+        })
+        .catch(() => {
+          onClose();
+        });
+    });
   };
 
   return (
@@ -85,18 +111,34 @@ export const TeamManage = () => {
                   <SearchBar width={214} placeholder="학생 검색" />
                 </MemberAddModal.TopContainer>
                 <MemberAddModal.MiddleContainer>
-                  {users &&
+                  {userNames &&
                     teamMember &&
-                    users
+                    userNames
                       .filter((member) => !teamMember.includes(member))
                       .map((member, index) => {
-                        return <MemberBox key={index}>{member}</MemberBox>;
+                        return (
+                          <MemberBox
+                            key={index}
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedStudent.includes(member)}
+                            onClick={() => {
+                              if (selectedStudent.includes(member)) {
+                                const newArr = selectedStudent.filter((student) => student !== member);
+                                setSelectedStudent(newArr);
+                              } else {
+                                setSelectedStudent([...selectedStudent, member]);
+                              }
+                            }}
+                          >
+                            {member}
+                          </MemberBox>
+                        );
                       })}
                 </MemberAddModal.MiddleContainer>
                 <MemberAddModal.BottomContainer>
                   <div>홍길동, 이름김, 테스트 등 3명</div>
-                  <XButton buttonStyle="solid" width={100} height={50}>
-                    담당자 변경
+                  <XButton buttonStyle="solid" width={100} height={50} onClick={onMemberAdd}>
+                    팀원 추가
                   </XButton>
                 </MemberAddModal.BottomContainer>
               </MemberAddModal.Wrapper>
@@ -193,7 +235,7 @@ export const TeamManage = () => {
                   <MemberBoxContainer>
                     {data.member_list.map((member, index) => {
                       return (
-                        <MemberBox key={index}>
+                        <MemberBox key={index} isSelected={false}>
                           <div>
                             <div>
                               {member.member_number} {member.member_name}
@@ -382,7 +424,7 @@ const MemberBoxContainer = styled.div`
   overflow: auto;
 `;
 
-const MemberBox = styled.div`
+const MemberBox = styled.div<{ isSelected: boolean }>`
   width: 100%;
   max-width: 1042px;
   height: 60px;
@@ -392,7 +434,7 @@ const MemberBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid ${theme.color.gray4};
+  border: 1px solid ${({ isSelected }) => (isSelected ? theme.color.main : theme.color.gray4)};
   > div:first-of-type {
     display: flex;
     gap: 8px;
