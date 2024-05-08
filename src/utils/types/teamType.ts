@@ -1,4 +1,4 @@
-export type TeamType = 'CLUB' | 'TEAM_PROJECT' | 'PRIVATE_PROJECT' | 'ETC' | string;
+export type TeamType = 'CLUB' | 'TEAM_PROJECT' | 'PRIVATE_PROJECT' | 'ETC';
 export type MemberRoleType = 'ADMINISTRATOR' | 'MEMBER';
 
 export type TeamListType = {
