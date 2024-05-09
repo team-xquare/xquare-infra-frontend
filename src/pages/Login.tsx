@@ -24,8 +24,10 @@ export const Login = () => {
   const onLogin = () => {
     login(data)
       .then((res) => {
-        Cookie.set('accessToken', res.data.access_token);
-        Cookie.set('refreshToken', res.data.refresh_token);
+        const { access_token, refresh_token, email } = res?.data;
+        Cookie.set('accessToken', access_token);
+        Cookie.set('refreshToken', refresh_token);
+        Cookie.set('email', email);
         link('/team');
       })
       .catch((err) => {

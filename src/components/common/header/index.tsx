@@ -5,12 +5,14 @@ import { Button } from '@/components/common/Button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { css } from '@emotion/react';
 import { theme } from '@/style/theme';
+import { Cookie } from '@/utils/cookie';
 
 export const Header = () => {
   const navigate = useNavigate();
   const [scroll, setScroll] = useState<number>(0);
   const { pathname } = useLocation();
   const _pathname: string = pathname.substring(1);
+  const email = Cookie.get('email');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,7 +59,7 @@ export const Header = () => {
               <img src={LogoImg} />
               <span>Xquare Infra</span>
             </LeftSide2>
-            <RightSide2>rlaisqls@dsm.hs.kr</RightSide2>
+            <RightSide2>{email ? email : ''}</RightSide2>
           </>
         )}
         <WrapperBackground scroll={_pathname === '' ? scroll : 0} />
