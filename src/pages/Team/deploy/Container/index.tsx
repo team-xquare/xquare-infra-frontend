@@ -4,12 +4,26 @@ import { theme } from '@/style/theme';
 import { Tag } from '@/components/Team/Tag';
 import { XButton } from '@/components/common/XButton';
 import { ContainerAllType } from '@/utils/types/containerType';
-import { getAllContainer } from '@/utils/apis/container';
+import { getAllContainer, getCPU, getMemory } from '@/utils/apis/container';
 import { useParams } from 'react-router-dom';
+import { ContainerGraph } from '@/components/graph/ContainerGraph';
+
+type DateValueMap = {
+  [dateString: string]: string;
+};
+
+// 숫자 키를 가지며, 그 값이 DateValueMap 타입인 객체를 정의합니다.
+type JsonData = {
+  [key: number]: DateValueMap;
+};
 
 export const TeamDeployContainer = () => {
   const { deployUUID } = useParams();
   const [data, setData] = useState<ContainerAllType[]>();
+  const [prodCpu, setProdCpu] = useState<JsonData>();
+  const [prodMemory, setProdMemory] = useState<JsonData>();
+  const [stagCpu, setStagCpu] = useState<JsonData>();
+  const [stagMemory, setStagMemory] = useState<JsonData>();
 
   useEffect(() => {
     if (!deployUUID) return;
@@ -18,6 +32,30 @@ export const TeamDeployContainer = () => {
       setData(res.data);
     });
   }, []);
+
+  useEffect(() => {
+    if (!deployUUID || !data) return;
+    getCPU(deployUUID, data[0].container_environment).then((res) => {
+      setProdCpu(res.data);
+      console.log(res.data);
+    });
+    if (!data[1]) return;
+    getCPU(deployUUID, data[1].container_environment).then((res) => {
+      setStagCpu(res.data);
+    });
+  }, [data]);
+
+  useEffect(() => {
+    if (!deployUUID || !data) return;
+    getMemory(deployUUID, data[0].container_environment).then((res) => {
+      setProdMemory(res.data);
+      console.log(res.data);
+    });
+    if (!data[1]) return;
+    getMemory(deployUUID, data[1].container_environment).then((res) => {
+      setStagMemory(res.data);
+    });
+  }, [data]);
 
   return (
     <Wrapper>
@@ -53,6 +91,32 @@ export const TeamDeployContainer = () => {
                       <span>{item.domain}</span>
                       <span>마지막 배포: {item.last_deploy.split('T')[0]}</span>
                     </div>
+                  </div>
+                  <div>
+                    {index === 0 && prodMemory && (
+                      <div>
+                        <span>메모리</span>
+                        <ContainerGraph jsonData={prodMemory} />
+                      </div>
+                    )}
+                    {index === 0 && prodCpu && (
+                      <div>
+                        <span>CPU</span>
+                        <ContainerGraph jsonData={prodCpu} />
+                      </div>
+                    )}
+                    {index === 1 && stagMemory && (
+                      <div>
+                        <span>메모리</span>
+                        <ContainerGraph jsonData={stagMemory} />
+                      </div>
+                    )}
+                    {index === 1 && stagCpu && (
+                      <div>
+                        <span>CPU</span>
+                        <ContainerGraph jsonData={stagCpu} />
+                      </div>
+                    )}
                   </div>
                 </ContainerBox>
               );
@@ -195,6 +259,19 @@ const ContainerBox = styled.div`
       }
       > span:nth-of-type(1) {
         font-size: 20px;
+      }
+    }
+  }
+  > div:nth-of-type(2) {
+    display: flex;
+    gap: 20px;
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      > span {
+        font-size: 14px;
+        color: ${theme.color.gray6};
       }
     }
   }
