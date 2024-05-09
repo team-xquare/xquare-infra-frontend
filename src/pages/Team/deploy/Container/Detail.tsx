@@ -1,15 +1,36 @@
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
 import { Tag } from '@/components/Team/Tag';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
 
 export const TeamDeployContainerDetail = () => {
+  const { deployUUID } = useParams();
+  const { messages } = useWebSocket({
+    url: `${import.meta.env.VITE_SERVER_SOCKET_URL}/logs?deployId=${deployUUID}&environment=prod`,
+  });
+
+  const [log, setLog] = useState<string[]>();
+  const logEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    console.log(messages);
+
+    setLog(messages);
+  }, [messages]);
+
+  useEffect(() => {
+    console.log(log);
+  }, [log]);
+
   return (
     <Wrapper>
       <TitleContainer>
         <TeamName>에일리언즈</TeamName>
         <Title>
           컨테이너 dms-backend
-          <Tag tag={'활성' as any} />
+          <Tag tag={'AVAILABLE'} />
         </Title>
         <Describtion>
           <div>team-aliens/DMS-Backend</div>
@@ -20,7 +41,16 @@ export const TeamDeployContainerDetail = () => {
       <LogContainer>
         <Label>로그</Label>
         <Log>
-          <div></div>
+          <div>
+            {log && (
+              <>
+                {log.map((item, index) => (
+                  <LogText key={index}>{item}</LogText>
+                ))}
+                <div ref={logEndRef} />
+              </>
+            )}
+          </div>
         </Log>
       </LogContainer>
     </Wrapper>
@@ -100,9 +130,12 @@ const Log = styled.div`
   height: 332px;
   border-radius: 10px;
   border: 1px solid ${theme.color.gray4};
+  overflow-y: auto;
   > div:nth-of-type(1) {
     width: 100%;
     height: 36px;
     border-bottom: 1px solid ${theme.color.gray4};
   }
 `;
+
+const LogText = styled.pre``;
