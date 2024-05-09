@@ -12,7 +12,6 @@ type DateValueMap = {
   [dateString: string]: string;
 };
 
-// 숫자 키를 가지며, 그 값이 DateValueMap 타입인 객체를 정의합니다.
 type JsonData = {
   [key: number]: DateValueMap;
 };
