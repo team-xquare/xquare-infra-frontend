@@ -78,7 +78,7 @@ export const TeamContainer = () => {
                 <div>
                   <div>
                     {ele.name}
-                    <Tag tag={ele.env} />
+                    <Tag tag={ele.env as any} />
                     <Tag tag={ele.container as any} />
                   </div>
                   <div>
