@@ -28,3 +28,4 @@ jobs:
           yarn_workspace: .
           buildargs: |
             VITE_SERVER_BASE_URL=${{ secrets.VITE_SERVER_BASE_URL }}
+            VITE_SERVER_SOCKET_URL=${{ secrets.VITE_SERVER_SOCKET_URL }}
