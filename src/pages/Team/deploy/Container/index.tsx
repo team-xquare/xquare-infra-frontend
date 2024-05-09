@@ -5,8 +5,10 @@ import { Tag } from '@/components/Team/Tag';
 import { XButton } from '@/components/common/XButton';
 import { ContainerAllType } from '@/utils/types/containerType';
 import { getAllContainer, getCPU, getMemory } from '@/utils/apis/container';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ContainerGraph } from '@/components/graph/ContainerGraph';
+import { DeployDetailType } from '@/utils/types/deploy';
+import { getDetailDeploy } from '@/utils/apis/deploy';
 
 type DateValueMap = {
   [dateString: string]: string;
@@ -17,49 +19,61 @@ type JsonData = {
 };
 
 export const TeamDeployContainer = () => {
-  const { deployUUID } = useParams();
-  const [data, setData] = useState<ContainerAllType[]>();
+  const link = useNavigate();
+  const { teamUUID, deployUUID } = useParams();
+  const [containerData, setContainerData] = useState<ContainerAllType[]>();
   const [prodCpu, setProdCpu] = useState<JsonData>();
   const [prodMemory, setProdMemory] = useState<JsonData>();
   const [stagCpu, setStagCpu] = useState<JsonData>();
   const [stagMemory, setStagMemory] = useState<JsonData>();
+  const [deployData, setDeployData] = useState<DeployDetailType>();
+
+  useEffect(() => {
+    if (!deployUUID) return;
+
+    getDetailDeploy(deployUUID).then((res) => {
+      setDeployData(res.data);
+    });
+  }, []);
 
   useEffect(() => {
     if (!deployUUID) return;
 
     getAllContainer(deployUUID).then((res) => {
-      setData(res.data);
+      setContainerData(res.data);
     });
   }, []);
 
   useEffect(() => {
-    if (!deployUUID || !data) return;
-    getCPU(deployUUID, data[0].container_environment).then((res) => {
+    if (!deployUUID || !containerData) return;
+    getCPU(deployUUID, containerData[0].container_environment).then((res) => {
       setProdCpu(res.data);
-      console.log(res.data);
     });
-    if (!data[1]) return;
-    getCPU(deployUUID, data[1].container_environment).then((res) => {
+    if (!containerData[1]) return;
+    getCPU(deployUUID, containerData[1].container_environment).then((res) => {
       setStagCpu(res.data);
     });
-  }, [data]);
+  }, [containerData]);
 
   useEffect(() => {
-    if (!deployUUID || !data) return;
-    getMemory(deployUUID, data[0].container_environment).then((res) => {
+    if (!deployUUID || !containerData) return;
+    getMemory(deployUUID, containerData[0].container_environment).then((res) => {
       setProdMemory(res.data);
-      console.log(res.data);
     });
-    if (!data[1]) return;
-    getMemory(deployUUID, data[1].container_environment).then((res) => {
+    if (!containerData[1]) return;
+    getMemory(deployUUID, containerData[1].container_environment).then((res) => {
       setStagMemory(res.data);
     });
-  }, [data]);
+  }, [containerData]);
 
   return (
     <Wrapper>
       <TitleContainer>
-        <TeamName>에일리언즈 / dms-frontend</TeamName>
+        {deployData && (
+          <TeamName>
+            {deployData.team_name_ko} / {deployData.deploy_name}
+          </TeamName>
+        )}
         <Title>프로젝트 배포</Title>
         <Describtion>프로젝트를 배포하기 위한 정보를 관리합니다.</Describtion>
       </TitleContainer>
@@ -72,13 +86,18 @@ export const TeamDeployContainer = () => {
           재발급
         </XButton>
       </UtilContainer>
-      {data ? (
+      {containerData ? (
         <>
           <Label>컨테이너</Label>
           <ContainerBoxContainer>
-            {data.map((item, index) => {
+            {containerData.map((item, index) => {
               return (
-                <ContainerBox key={index}>
+                <ContainerBox
+                  key={index}
+                  onClick={() => {
+                    link(`/team/${teamUUID}/deploy/${deployUUID}/container/detail`);
+                  }}
+                >
                   <div>
                     <div>
                       {item.container_name}
@@ -227,6 +246,7 @@ const ContainerBoxContainer = styled.div`
 `;
 
 const ContainerBox = styled.div`
+  cursor: pointer;
   width: 100%;
   max-width: 1120px;
   height: 170px;
