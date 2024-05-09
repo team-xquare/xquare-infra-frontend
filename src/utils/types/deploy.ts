@@ -13,6 +13,7 @@ export type DeployAllType = {
 };
 
 export type DeployDetailType = {
+  deploy_name: string;
   team_name_en: string;
   team_name_ko: string;
   one_line_description: string;
