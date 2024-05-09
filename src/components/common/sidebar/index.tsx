@@ -21,7 +21,8 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
   const params: any = useParams();
   const navigate = useNavigate();
   const raw_pathname = rawPath(pathname);
-  const { back, menu: menus } = menuList[raw_pathname];
+  const menuData = menuList[raw_pathname] || { back: undefined, menu: [] }; // 데이터가 없는 경우를 대비한 기본값 설정
+  const { back, menu: menus } = menuData; // 이제 여기서 구조 분해 할당을 사용합니다.
 
   return (
     <Wrapper isOpen={isOpen}>
