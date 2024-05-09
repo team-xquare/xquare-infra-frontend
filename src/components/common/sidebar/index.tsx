@@ -37,12 +37,13 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
       )}
       <ContentContainer>
         <MenuContainer>
-          {menus?.map((i: any) => (
+          {menus?.map((item: any, index: number) => (
             <Menu
-              icon={i.icon}
-              text={i.name}
+              key={index}
+              icon={item.icon}
+              text={item.name}
               isOpen={isOpen}
-              onClick={() => navigate(i.link.replaceAll('-team-', params?.teamUUID))}
+              onClick={() => navigate(item.link.replaceAll('-team-', params?.teamUUID))}
             />
           ))}
         </MenuContainer>
