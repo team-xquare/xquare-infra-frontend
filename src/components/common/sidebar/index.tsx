@@ -1,255 +1,108 @@
-import styled from '@emotion/styled';
-import { Dispatch, SetStateAction } from 'react';
-import { Icon } from '@iconify/react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-
-type MenuType = {
-  icon: string;
-  name: string;
-  link: string;
-};
-
-type MenusType = {
-  path: string;
-  back: undefined | string;
-  menu: MenuType[];
-};
-
-const menu: MenusType[] = [
-  {
-    path: '/team',
-    back: undefined,
-    menu: [
-      { icon: 'ph:circles-four-light', name: '팀', link: '/team' },
-      { icon: 'icon-park-outline:people', name: '계정', link: '' },
-    ],
-  },
-  {
-    path: '/team/create',
-    back: undefined,
-    menu: [
-      { icon: 'ph:circles-four-light', name: '팀', link: '/team' },
-      { icon: 'icon-park-outline:people', name: '계정', link: '' },
-    ],
-  },
-  {
-    path: '/team/:id/manage',
-    back: undefined,
-    menu: [
-      { icon: 'ph:circles-four-light', name: '팀 관리', link: '' },
-      { icon: 'icon-park-outline:people', name: '배포', link: `/team/-team-/deploy` },
-    ],
-  },
-  {
-    path: '/team/:id/deploy',
-    back: '/team/-team-/manage',
-    menu: [
-      { icon: 'ph:circles-four-light', name: '팀 관리', link: '' },
-      { icon: 'icon-park-outline:people', name: '배포', link: `/team/-team-/deploy` },
-    ],
-  },
-];
+import { default as styled } from '@emotion/styled';
+import { Dispatch, SetStateAction } from 'react';
+import { menu as menuList } from './menus';
+import { Icon } from '@iconify/react';
+import { Menu } from './Menu';
 
 interface PropType {
-  isOpen: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  isOpen: boolean;
 }
 
-export const Sidebar = ({ isOpen, setOpen }: PropType) => {
-  const { pathname }: any = useLocation();
-  const raw_pathname = pathname
+const rawPath = (url: string) =>
+  url
     .split('/')
     .map((i: any) => (i.includes('-') ? ':id' : i))
     .join('/');
-  const currentMenu = menu?.find((item) => item.path === raw_pathname);
-  const link = useNavigate();
+
+export const Sidebar = ({ isOpen, setOpen }: PropType) => {
+  const { pathname }: any = useLocation();
   const params: any = useParams();
+  const navigate = useNavigate();
+  const raw_pathname = rawPath(pathname);
+  const { back, menu: menus } = menuList[raw_pathname];
 
   return (
     <Wrapper isOpen={isOpen}>
-      <div>
+      {back && (
         <BackContainer isOpen={isOpen}>
           <div>
-            <div>
-              <Icon icon="iconamoon:arrow-left-2-bold" width={28} height={28} />
-            </div>
-            <span>돌아가기</span>
+            <Icon icon="iconamoon:arrow-left-2-bold" width={28} height={28} />
           </div>
-        </BackContainer>
-        <Container>
-          {currentMenu &&
-            currentMenu.menu.map((menuItem, index) => (
-              <Menu
-                key={index}
-                isOpen={isOpen}
-                onClick={() => {
-                  link(menuItem.link.replaceAll('-team-', params?.teamUUID));
-                }}
-              >
-                <div>
-                  <div>
-                    <Icon icon={menuItem.icon} width={24} height={24} />
-                  </div>
-                  <span>{menuItem.name}</span>
-                </div>
-              </Menu>
-            ))}
-        </Container>
-      </div>
 
-      <BottomMenu
-        isOpen={isOpen}
-        onClick={() => {
-          setOpen(!isOpen);
-        }}
-      >
-        <div>
-          <div>
-            <Icon icon={'ep:d-arrow-left'} width={24} height={24} />
-          </div>
-          <span>사이드바 축소</span>
-        </div>
-      </BottomMenu>
+          <span>돌아가기</span>
+        </BackContainer>
+      )}
+      <ContentContainer>
+        <MenuContainer>
+          {menus?.map((i: any) => (
+            <Menu
+              icon={i.icon}
+              text={i.name}
+              isOpen={isOpen}
+              onClick={() => navigate(i.link.replaceAll('-team-', params?.teamUUID))}
+            />
+          ))}
+        </MenuContainer>
+        <Menu icon="ep:d-arrow-left" text="사이드바 축소" rotate isOpen={isOpen} onClick={() => setOpen(!isOpen)} />
+      </ContentContainer>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div<{ isOpen: boolean }>`
-  width: ${({ isOpen }) => (isOpen ? '260px' : '60px')};
-  transition: 0.4s ease-in-out;
-  height: calc(100vh - 80px);
-  background-color: white;
-  border-right: 1px #dddddd solid;
-  z-index: 10;
-  left: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 0 30px 0;
+  position: fixed;
+  width: ${({ isOpen }) => (isOpen ? 260 : 85)}px;
+  transition: 0.4s ease-in-out;
+  height: calc(100vh - 80px);
+  z-index: 20;
+  background: #ffffff;
+  border-right: 1px solid #dddddd;
 `;
 
 const BackContainer = styled.div<{ isOpen: boolean }>`
+  gap: 15px;
   display: flex;
-  transition: 0.4s ease-in-out;
   align-items: center;
-  width: ${({ isOpen }) => (isOpen ? '260px' : '60px')};
-  padding: 15px 10px 15px 10px;
-  border-bottom: 1px solid #dddddd;
+  cursor: pointer;
   overflow: hidden;
-  > div {
-    width: 240px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    > div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 40px;
-      height: 40px;
-    }
-    > span {
-      font-size: 18px;
-      width: 180px;
-      transition: 0.4s ease-in-out;
-      overflow: hidden;
-      word-break: keep-all;
-      white-space: nowrap;
-      text-align: start;
-      margin-left: 10px;
-    }
+  user-select: none;
+  padding: 20px 25px;
+  border-bottom: 1px solid #dddddd;
+  width: ${({ isOpen }) => (isOpen ? 260 : 85)}px;
+  transition:
+    background-color 0.1s linear,
+    width 0.4s ease-in-out;
+  & > div {
+    width: 28px;
+    height: 28px;
+  }
+  & > span {
+    width: 100px;
+    font-size: 20px;
+    overflow: hidden;
+    word-break: keep-all;
+    white-space: nowrap;
+  }
+  &:hover {
+    background-color: #dddddd;
   }
 `;
 
-const Container = styled.div`
+const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding-top: 30px;
+  justify-content: space-between;
+  padding: 30px 15px;
+  height: 100%;
 `;
 
-const Menu = styled.div<{ isOpen: boolean }>`
-  cursor: pointer;
-  width: ${({ isOpen }) => (isOpen ? '235px' : '60px')};
-  padding: 10px;
-  height: 60px;
-  border-radius: 20px;
+const MenuContainer = styled.div`
   display: flex;
-  align-items: center;
-  align-self: center;
-  overflow: hidden;
-  transition:
-    background-color 0.1s linear,
-    width 0.4s ease-in-out;
-  &:hover {
-    background-color: #f0e6ff;
-  }
-  > div {
-    width: 240px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    > div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 40px;
-      height: 40px;
-      flex: none;
-      transition: 0.4s ease-in-out;
-    }
-    > span {
-      font-size: 18px;
-      width: 180px;
-      transition: 0.4s ease-in-out;
-      overflow: hidden;
-      word-break: keep-all;
-      white-space: nowrap;
-      text-align: start;
-      margin-left: 10px;
-    }
-  }
-`;
-
-const BottomMenu = styled.div<{ isOpen: boolean }>`
-  cursor: pointer;
-  width: ${({ isOpen }) => (isOpen ? '235px' : '60px')};
-  padding: 10px;
-  height: 60px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  transition:
-    background-color 0.1s linear,
-    width 0.4s ease-in-out;
-  &:hover {
-    background-color: #f0e6ff;
-  }
-  > div {
-    width: 240px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    > div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 40px;
-      height: 40px;
-      flex: none;
-      transition: 0.4s ease-in-out;
-      ${({ isOpen }) => (isOpen ? `transform: rotate(0deg)` : `transform: rotate(180deg)`)};
-    }
-    > span {
-      font-size: 18px;
-      width: 180px;
-      transition: 0.4s ease-in-out;
-      overflow: hidden;
-      word-break: keep-all;
-      white-space: nowrap;
-      text-align: start;
-      margin-left: 10px;
-    }
-  }
+  flex-direction: column;
+  gap: 10px;
 `;
