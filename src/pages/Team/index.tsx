@@ -4,24 +4,32 @@ import { Icon } from '@iconify/react';
 import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
 import { SearchBar } from '@/components/common/SearchBar';
-import { useEffect, useState } from 'react';
-import { teamCheck } from '@/utils/apis/team';
+// import { useEffect, useState } from 'react';
+// import { teamCheck } from '@/utils/apis/team';
 import { useNavigate } from 'react-router-dom';
 import { TeamCheckType } from '@/utils/types/teamType';
+import { useCustomQuery } from '@/hooks/useCustomQueries';
 
 export const Team = () => {
-  const [teamList, setTeamList] = useState<TeamCheckType>({ team_list: [] });
+  // const [teamList, setTeamList] = useState<TeamCheckType>({ team_list: [] });
   const link = useNavigate();
 
-  useEffect(() => {
-    teamCheck()
-      .then((res) => {
-        setTeamList(res.data);
-      })
-      .catch(() => {
-        alert('오류가 발생했습니다');
-      });
-  }, []);
+  const { data: teamList }: TeamCheckType = useCustomQuery({
+    queryKey: ['team-list'],
+    url: '/team/my-team',
+    select: (res) => res?.data.team_list,
+  });
+
+  // console.log(data);
+  // useEffect(() => {
+  //   teamCheck()
+  //     .then((res) => {
+  //       setTeamList(res.data);
+  //     })
+  //     .catch(() => {
+  //       alert('오류가 발생했습니다');
+  //     });
+  // }, []);
 
   return (
     <Wrapper>
@@ -43,24 +51,22 @@ export const Team = () => {
         </XButton>
       </UtilContainer>
       <ContainerWrapper>
-        {teamList.team_list.length > 0 ? (
-          teamList.team_list.map((element: any, index: any) => {
-            return (
-              <div
-                onClick={() => {
-                  link(`/team/${element.team_id}/manage`);
-                }}
-              >
-                <TeamContainer
-                  key={index}
-                  name={element.team_name_ko}
-                  admin={element.administrator_name}
-                  deploy={element.deploy_list}
-                  tag={element.team_type}
-                />
-              </div>
-            );
-          })
+        {teamList?.length > 0 ? (
+          teamList?.map((element: any, index: number) => (
+            <div
+              onClick={() => {
+                link(`/team/${element.team_id}/manage`);
+              }}
+              key={index}
+            >
+              <TeamContainer
+                name={element.team_name_ko}
+                admin={element.administrator_name}
+                deploy={element.deploy_list}
+                tag={element.team_type}
+              />
+            </div>
+          ))
         ) : (
           <TipBox>아직 생성하거나 속한 팀이 없습니다!</TipBox>
         )}
