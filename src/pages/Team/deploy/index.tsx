@@ -97,6 +97,7 @@ const UtilContainer = styled.div`
 
 const DeployBoxContainer = styled.div`
   width: 100%;
+  max-width: 1120px;
   display: flex;
   flex-direction: column;
   gap: 14px;
