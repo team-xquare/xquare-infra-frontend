@@ -15,14 +15,8 @@ export const TeamDeployContainerDetail = () => {
   const logEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log(messages);
-
     setLog(messages);
   }, [messages]);
-
-  useEffect(() => {
-    console.log(log);
-  }, [log]);
 
   return (
     <Wrapper>
@@ -41,12 +35,14 @@ export const TeamDeployContainerDetail = () => {
       <LogContainer>
         <Label>로그</Label>
         <Log>
+          <div></div>
           <div>
             {log && (
               <>
-                {log.map((item, index) => (
-                  <LogText key={index}>{item}</LogText>
-                ))}
+                {log.map((item, index) => {
+                  if (item === '') return;
+                  return <LogText key={index}>{item}</LogText>;
+                })}
                 <div ref={logEndRef} />
               </>
             )}
@@ -130,11 +126,28 @@ const Log = styled.div`
   height: 332px;
   border-radius: 10px;
   border: 1px solid ${theme.color.gray4};
-  overflow-y: auto;
+  overflow-y: hidden;
   > div:nth-of-type(1) {
     width: 100%;
     height: 36px;
     border-bottom: 1px solid ${theme.color.gray4};
+  }
+  > div:nth-of-type(2) {
+    height: 296px;
+    overflow-y: auto;
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: ${theme.color.gray5};
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: ${theme.color.gray6};
+    }
   }
 `;
 
