@@ -58,6 +58,9 @@ export const Team = () => {
                 link(`/team/${element.team_id}/manage`);
               }}
               key={index}
+              style={{
+                cursor: 'pointer',
+              }}
             >
               <TeamContainer
                 name={element.team_name_ko}
