@@ -52,6 +52,8 @@ export const TeamContainer = ({ name, admin, tag, deploy }: TeamContainerType) =
 };
 
 const Wrapper = styled.div`
+  user-select: none;
+  cursor: pointer;
   width: 100%;
   height: 134px;
   padding: 20px 40px;
@@ -69,5 +71,9 @@ const Wrapper = styled.div`
     align-items: center;
     color: ${theme.color.gray8};
     font-weight: 500;
+  }
+  transition: 0.1s ease-in-out;
+  &:hover {
+    border: 1.5px ${theme.color.gray9} solid;
   }
 `;
