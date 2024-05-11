@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Params, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { default as styled } from '@emotion/styled';
 import { Dispatch, SetStateAction } from 'react';
 import { menu as menuList } from './menus';
@@ -16,6 +16,12 @@ const rawPath = (url: string) =>
     .map((i: any) => (i.includes('-') ? ':id' : i))
     .join('/');
 
+const replaceIDs = (url: string, params: any) =>
+  url
+    .replaceAll('-team-', params?.teamUUID)
+    .replaceAll('-deploy-', params?.deployUUID)
+    .replaceAll('-container-', params?.containerUUID);
+
 export const Sidebar = ({ isOpen, setOpen }: PropType) => {
   const { pathname }: any = useLocation();
   const params: any = useParams();
@@ -27,7 +33,7 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
   return (
     <Wrapper isOpen={isOpen}>
       {back && (
-        <BackContainer isOpen={isOpen}>
+        <BackContainer isOpen={isOpen} onClick={() => navigate(replaceIDs(back, params))}>
           <div>
             <Icon icon="iconamoon:arrow-left-2-bold" width={28} height={28} />
           </div>
@@ -43,7 +49,7 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
               icon={item.icon}
               text={item.name}
               isOpen={isOpen}
-              onClick={() => navigate(item.link.replaceAll('-team-', params?.teamUUID))}
+              onClick={() => navigate(replaceIDs(item.link, params))}
             />
           ))}
         </MenuContainer>
