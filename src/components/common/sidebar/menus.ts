@@ -51,13 +51,17 @@ export const menu: MenusType = {
     back: '/team/-team-/deploy/-deploy-/container',
     menu: [
       {
-        icon: 'ph:circles-four-light',
+        icon: 'f7:shippingbox',
         name: '컨테이너 상태',
         link: 'team/-team-/deploy/-deploy-/container/-container-',
       },
-      { icon: 'f7:shippingbox', name: '배포 내역', link: `team/-team-/deploy/-deploy-/container/-container-/history` },
       {
-        icon: 'f7:shippingbox',
+        icon: 'ph:list-bold',
+        name: '배포 내역',
+        link: `team/-team-/deploy/-deploy-/container/-container-/history`,
+      },
+      {
+        icon: 'uil:analytics',
         name: '요청 통계',
         link: `team/-team-/deploy/-deploy-/container/-container-/analytics`,
       },
