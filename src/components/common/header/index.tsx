@@ -33,7 +33,6 @@ export const Header = () => {
           <>
             <LeftSide scroll={scroll}>
               <img src={LogoImg} />
-              <span>Xquare Infra</span>
             </LeftSide>
             <Center>
               <span>소개</span>
@@ -55,7 +54,7 @@ export const Header = () => {
           </>
         ) : (
           <>
-            <LeftSide2>
+            <LeftSide2 onClick={() => navigate('/')}>
               <img src={LogoImg} />
               <span>Xquare Infra</span>
             </LeftSide2>
@@ -127,6 +126,8 @@ const LeftSide = styled.div<{ scroll: number }>`
 
 const LeftSide2 = styled.div`
   width: 300px;
+  cursor: pointer;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: start;
