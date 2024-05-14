@@ -41,6 +41,8 @@ export const Login = () => {
             .catch(() => {
               alert('회원가입이 도중 문제가 발생했습니다.\n다시 시도해주세요.');
             });
+        } else if (err.response.status === 500) {
+          onLogin();
         }
       });
   };
