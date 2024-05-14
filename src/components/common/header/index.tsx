@@ -54,7 +54,15 @@ export const Header = () => {
           </>
         ) : (
           <>
-            <LeftSide2 onClick={() => navigate('/')}>
+            <LeftSide2
+              onClick={() => {
+                if (_pathname === '' || _pathname === 'login') {
+                  navigate('/');
+                } else {
+                  navigate('/team');
+                }
+              }}
+            >
               <img src={LogoImg} />
               <span>Xquare Infra</span>
             </LeftSide2>
