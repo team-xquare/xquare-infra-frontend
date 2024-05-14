@@ -45,7 +45,7 @@ export const TeamDeployContainer = () => {
   }, []);
 
   useEffect(() => {
-    if (!deployUUID || !containerData) return;
+    if (!deployUUID || !containerData || containerData.length > 0) return;
     getCPU(deployUUID, containerData[0].container_environment).then((res) => {
       setProdCpu(res.data);
     });
@@ -56,7 +56,7 @@ export const TeamDeployContainer = () => {
   }, [containerData]);
 
   useEffect(() => {
-    if (!deployUUID || !containerData) return;
+    if (!deployUUID || !containerData || containerData.length > 0) return;
     getMemory(deployUUID, containerData[0].container_environment).then((res) => {
       setProdMemory(res.data);
     });
