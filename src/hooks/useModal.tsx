@@ -11,8 +11,8 @@ export type useModalReturnType = {
     height,
     children,
   }: {
-    width: number;
-    height: number;
+    width: number | string;
+    height: number | string;
     children: React.ReactNode;
   }) => JSX.Element;
 };
@@ -33,7 +33,15 @@ export const useModal = ({ defaultVisible = false }: useModalProps = {}): useMod
   }, []);
 
   const ModalWrapper = useCallback(
-    ({ width, height, children }: { width: number; height: number; children: React.ReactNode }): JSX.Element => {
+    ({
+      width,
+      height,
+      children,
+    }: {
+      width: number | string;
+      height: number | string;
+      children: React.ReactNode;
+    }): JSX.Element => {
       const onClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -72,9 +80,9 @@ const ModalBackground = styled.div`
   align-items: center;
 `;
 
-const Wrapper = styled.div<{ width: number; height: number }>`
-  width: ${({ width }) => width}px;
-  height: ${({ height }) => height}px;
+const Wrapper = styled.div<{ width: number | string; height: number | string }>`
+  width: ${({ width }) => (typeof width === 'number' ? `${width}px` : `${width}`)};
+  height: ${({ height }) => (typeof height === 'number' ? `${height}px` : `${height}`)};
   background-color: ${theme.color.gray1};
   border-radius: 8px;
   ${theme.effect.shadow3};
