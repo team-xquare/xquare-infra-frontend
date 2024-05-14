@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Input } from '@/components/common/Input';
 import { XButton } from '@/components/common/XButton';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { login, signup } from '@/utils/apis/auth';
 import { Cookie } from '@/utils/cookie';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { SignInType } from '@/utils/types/authType';
 export const Login = () => {
   const link = useNavigate();
   const [data, setData] = useState<SignInType>({ account_id: '', password: '' });
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const { account_id, password } = data;
 
@@ -19,6 +20,18 @@ export const Login = () => {
       ...data,
       [name]: value,
     });
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, target: string) => {
+    if (e.key === 'Enter') {
+      console.log(passwordRef);
+
+      if (target === 'account_id') {
+        passwordRef.current?.focus();
+      } else if (target === 'password' && account_id) {
+        onLogin();
+      }
+    }
   };
 
   const onLogin = () => {
@@ -51,8 +64,24 @@ export const Login = () => {
     <Wrapper>
       <Title>Xquare에 로그인</Title>
       <InputContainer>
-        <Input label="아이디" width={326} value={account_id} onChange={onChange} name="account_id" />
-        <Input label="암호" width={326} type="password" value={password} onChange={onChange} name="password" />
+        <Input
+          label="아이디"
+          width={326}
+          value={account_id}
+          onChange={onChange}
+          onKeyDown={(e) => onKeyDown(e, 'account_id')}
+          name="account_id"
+        />
+        <Input
+          label="암호"
+          width={326}
+          type="password"
+          value={password}
+          onChange={onChange}
+          onKeyDown={(e) => onKeyDown(e, 'password')}
+          name="password"
+          ref={passwordRef}
+        />
       </InputContainer>
       <ButtonContainer>
         <XButton width={100} height={50} onClick={onLogin}>
