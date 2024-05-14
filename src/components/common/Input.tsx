@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, useState } from 'react';
+import { InputHTMLAttributes, useState, forwardRef } from 'react';
 import styled from '@emotion/styled';
 import EyeImg from '@/assets/Eye.svg';
 import EyeCloseImg from '@/assets/EyeClose.svg';
@@ -6,36 +6,35 @@ import { theme } from '@/style/theme';
 
 interface InputType extends InputHTMLAttributes<HTMLInputElement> {
   width: number;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   label?: string;
 }
 
-export const Input = ({
-  width,
-  label,
-  onChange = () => {
-    console.log('change!');
-  },
-  ...props
-}: InputType) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+export const Input = forwardRef<HTMLInputElement, InputType>(
+  ({ width, label, onChange = () => console.log('change!'), ...props }, ref) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  return (
-    <Wrapper width={width} label={label}>
-      {label && <Label>{label}</Label>}
-      <InputBox {...props} onChange={onChange} type={props.type === 'password' && isOpen ? 'text' : props.type} />
-      {props.type === 'password' && (
-        <ViewInput
-          onClick={() => {
-            setIsOpen(!isOpen);
-          }}
-        >
-          <img src={isOpen ? EyeImg : EyeCloseImg} />
-        </ViewInput>
-      )}
-    </Wrapper>
-  );
-};
+    return (
+      <Wrapper width={width} label={label}>
+        {label && <Label>{label}</Label>}
+        <InputBox
+          {...props}
+          onChange={onChange}
+          type={props.type === 'password' && isOpen ? 'text' : props.type}
+          ref={ref}
+        />
+        {props.type === 'password' && (
+          <ViewInput
+            onClick={() => {
+              setIsOpen(!isOpen);
+            }}
+          >
+            <img src={isOpen ? EyeImg : EyeCloseImg} alt="View password" />
+          </ViewInput>
+        )}
+      </Wrapper>
+    );
+  },
+);
 
 const Wrapper = styled.div<{ width: number; label?: string }>`
   width: ${({ width }) => `${width}px`};
