@@ -21,9 +21,15 @@ export const TeamDeployContainerDetail = () => {
   useEffect(() => {
     if (logInnerContainerRef.current) {
       const { current: logInnerContainer } = logInnerContainerRef;
-      requestAnimationFrame(() => {
-        logInnerContainer.scrollTop = logInnerContainer.scrollHeight;
-      });
+
+      const isScrolledToBottom =
+        logInnerContainer.scrollHeight - logInnerContainer.scrollTop === logInnerContainer.clientHeight;
+
+      if (isScrolledToBottom) {
+        requestAnimationFrame(() => {
+          logInnerContainer.scrollTop = logInnerContainer.scrollHeight;
+        });
+      }
     }
   }, [log]);
 
