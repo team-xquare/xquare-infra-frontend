@@ -11,12 +11,21 @@ export const TeamDeployContainerDetail = () => {
     url: `${import.meta.env.VITE_SERVER_SOCKET_URL}/logs?deployId=${deployUUID}&environment=prod`,
   });
 
-  const [log, setLog] = useState<string[]>();
-  const logEndRef = useRef<HTMLDivElement>(null);
+  const [log, setLog] = useState<string[]>([]);
+  const logInnerContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLog(messages);
   }, [messages]);
+
+  useEffect(() => {
+    if (logInnerContainerRef.current) {
+      const { current: logInnerContainer } = logInnerContainerRef;
+      requestAnimationFrame(() => {
+        logInnerContainer.scrollTop = logInnerContainer.scrollHeight;
+      });
+    }
+  }, [log]);
 
   return (
     <Wrapper>
@@ -36,14 +45,13 @@ export const TeamDeployContainerDetail = () => {
         <Label>로그</Label>
         <Log>
           <div></div>
-          <div>
-            {log && (
+          <div ref={logInnerContainerRef}>
+            {log.length > 0 && (
               <>
                 {log.map((item, index) => {
-                  if (item === '') return;
+                  if (item === '') return null;
                   return <LogText key={index}>{item}</LogText>;
                 })}
-                <div ref={logEndRef} />
               </>
             )}
           </div>
@@ -135,6 +143,7 @@ const Log = styled.div`
   > div:nth-of-type(2) {
     height: 296px;
     overflow-y: auto;
+    padding: 20px 0 20px 0;
 
     ::-webkit-scrollbar {
       width: 8px;
@@ -151,4 +160,6 @@ const Log = styled.div`
   }
 `;
 
-const LogText = styled.pre``;
+const LogText = styled.pre`
+  padding: 0 20px 0 20px;
+`;
