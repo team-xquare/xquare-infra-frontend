@@ -1,4 +1,4 @@
-import { Params, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { default as styled } from '@emotion/styled';
 import { Dispatch, SetStateAction } from 'react';
 import { menu as menuList } from './menus';
@@ -27,8 +27,8 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
   const params: any = useParams();
   const navigate = useNavigate();
   const raw_pathname = rawPath(pathname);
-  const menuData = menuList[raw_pathname] || { back: undefined, menu: [] }; // 데이터가 없는 경우를 대비한 기본값 설정
-  const { back, menu: menus } = menuData; // 이제 여기서 구조 분해 할당을 사용합니다.
+  const menuData = menuList[raw_pathname] || { back: undefined, menu: [] };
+  const { back, menu: menus } = menuData;
 
   return (
     <Wrapper isOpen={isOpen}>

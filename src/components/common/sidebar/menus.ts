@@ -28,7 +28,7 @@ const deploy_inside = {
   back: '/team/-team-/deploy',
   menu: [
     { icon: 'material-symbols:file-copy-outline', name: '배포 관리', link: '/team/-team-/deploy/-deploy-' },
-    { icon: 'f7:shippingbox', name: '컨테이너', link: `/team/-team-/deploy` },
+    { icon: 'f7:shippingbox', name: '컨테이너', link: `/team/-team-/deploy/-deploy-/container` },
   ],
 };
 
@@ -47,24 +47,34 @@ export const menu: MenusType = {
   '/team/:id/container': deploy,
   '/team/:id/deploy/:id': deploy_inside,
   '/team/:id/deploy/:id/container': deploy_inside,
-  '/team/:id/deploy/:id/container/:id': {
+  '/team/:id/deploy/:id/container/detail': {
     back: '/team/-team-/deploy/-deploy-/container',
     menu: [
       {
         icon: 'f7:shippingbox',
         name: '컨테이너 상태',
-        link: 'team/-team-/deploy/-deploy-/container/-container-',
-      },
-      {
-        icon: 'ph:list-bold',
-        name: '배포 내역',
-        link: `team/-team-/deploy/-deploy-/container/-container-/history`,
-      },
-      {
-        icon: 'uil:analytics',
-        name: '요청 통계',
-        link: `team/-team-/deploy/-deploy-/container/-container-/analytics`,
+        link: '/team/-team-/deploy/-deploy-/container/detail',
       },
     ],
   },
+  // '/team/:id/deploy/:id/container/:id': {
+  //   back: '/team/-team-/deploy/-deploy-/container',
+  //   menu: [
+  //     {
+  //       icon: 'f7:shippingbox',
+  //       name: '컨테이너 상태',
+  //       link: '/team/-team-/deploy/-deploy-/container/-container-',
+  //     },
+  //     {
+  //       icon: 'ph:list-bold',
+  //       name: '배포 내역',
+  //       link: `/team/-team-/deploy/-deploy-/container/-container-/history`,
+  //     },
+  //     {
+  //       icon: 'uil:analytics',
+  //       name: '요청 통계',
+  //       link: `/team/-team-/deploy/-deploy-/container/-container-/analytics`,
+  //     },
+  //   ],
+  // },
 };
