@@ -9,6 +9,7 @@ export type DeployListType = {
 };
 
 export type DeployAllType = {
+  team_name_ko: string;
   deploy_list: DeployListType[];
 };
 

@@ -23,7 +23,9 @@ export const TeamDeployInformation = () => {
       {data && (
         <>
           <TitleContainer>
-            <TeamName>{data.team_name_en} / projectName</TeamName>
+            <TeamName>
+              {data.team_name_ko} / {data.team_name_en}
+            </TeamName>
             <Title>배포 관리</Title>
             <Describtion>프로젝트에 대한 정보를 관리합니다.</Describtion>
           </TitleContainer>

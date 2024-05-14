@@ -25,7 +25,7 @@ export const TeamDeploy = () => {
   return (
     <Wrapper>
       <TitleContainer>
-        <TeamName>에일리언즈</TeamName>
+        <TeamName>{data && data.team_name_ko}</TeamName>
         <Title>배포</Title>
         <Describtion>프로젝트를 등록하고 해당 프로젝트에 대한 배포 액션을 설정할 수 있습니다.</Describtion>
         <UtilContainer>
