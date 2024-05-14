@@ -228,16 +228,18 @@ export const TeamManage = () => {
               <div>팀원</div>
               <div>
                 <SearchBar width={336} placeholder="팀원 검색" />
-                <XButton
-                  width={88}
-                  height={50}
-                  buttonStyle="solid"
-                  onClick={() => {
-                    onShow('memberAdd');
-                  }}
-                >
-                  팀원 추가
-                </XButton>
+                {data.is_admin && (
+                  <XButton
+                    width={88}
+                    height={50}
+                    buttonStyle="solid"
+                    onClick={() => {
+                      onShow('memberAdd');
+                    }}
+                  >
+                    팀원 추가
+                  </XButton>
+                )}
               </div>
               <MemberBoxContainer>
                 {data.member_list.map((member, index) => {
