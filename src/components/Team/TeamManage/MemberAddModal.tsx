@@ -64,5 +64,6 @@ export const BottomContainer = styled.div`
   > div:first-child {
     font-size: 18px;
     font-weight: 500;
+    height: 21px;
   }
 `;

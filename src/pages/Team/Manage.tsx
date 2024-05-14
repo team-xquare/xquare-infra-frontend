@@ -135,7 +135,18 @@ export const TeamManage = () => {
                       })}
                 </MemberAddModal.MiddleContainer>
                 <MemberAddModal.BottomContainer>
-                  <div>홍길동, 이름김, 테스트 등 3명</div>
+                  <div>
+                    {selectedStudent &&
+                      selectedStudent.map((student, index) => {
+                        return (
+                          <>
+                            {index <= 2 && <>{student.split(' ')[1]}</>}
+                            {index < selectedStudent.length - 1 && index <= 1 && <>, </>}
+                          </>
+                        );
+                      })}
+                    {selectedStudent.length > 3 && <> 등 {selectedStudent.length - 3}명</>}
+                  </div>
                   <XButton buttonStyle="solid" width={100} height={50} onClick={onMemberAdd}>
                     팀원 추가
                   </XButton>
