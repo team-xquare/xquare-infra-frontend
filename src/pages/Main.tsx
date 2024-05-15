@@ -4,9 +4,18 @@ import { SecondContainer } from '@/components/Main/SecondContainer';
 import { ThirdContainer } from '@/components/Main/ThirdContainer';
 import { Button } from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Cookie } from '@/utils/cookie';
 
 export const Main = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const data = Cookie.get('accessToken');
+    if (data) {
+      navigate('/team');
+    }
+  });
   return (
     <Wrapper>
       <FirstContainer />
