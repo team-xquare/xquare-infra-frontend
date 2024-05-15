@@ -46,22 +46,22 @@ export const TeamDeployContainer = () => {
 
   useEffect(() => {
     if (!deployUUID || !containerData || containerData.length > 0) return;
-    getCPU(deployUUID, containerData[0].container_environment).then((res) => {
+    getCPU(deployUUID, containerData[0]?.container_environment).then((res) => {
       setProdCpu(res.data);
     });
     if (!containerData[1]) return;
-    getCPU(deployUUID, containerData[1].container_environment).then((res) => {
+    getCPU(deployUUID, containerData[1]?.container_environment).then((res) => {
       setStagCpu(res.data);
     });
   }, [containerData]);
 
   useEffect(() => {
-    if (!deployUUID || !containerData || containerData.length > 0) return;
-    getMemory(deployUUID, containerData[0].container_environment).then((res) => {
+    if (!deployUUID || !containerData || containerData?.length > 0) return;
+    getMemory(deployUUID, containerData[0]?.container_environment).then((res) => {
       setProdMemory(res.data);
     });
     if (!containerData[1]) return;
-    getMemory(deployUUID, containerData[1].container_environment).then((res) => {
+    getMemory(deployUUID, containerData[1]?.container_environment).then((res) => {
       setStagMemory(res.data);
     });
   }, [containerData]);
@@ -86,7 +86,7 @@ export const TeamDeployContainer = () => {
           재발급
         </XButton>
       </UtilContainer>
-      {containerData ? (
+      {containerData && containerData.length > 0 ? (
         <>
           <Label>컨테이너</Label>
           <ContainerBoxContainer>
