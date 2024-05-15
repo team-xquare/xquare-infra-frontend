@@ -16,22 +16,13 @@ export const TeamDeployContainerDetail = () => {
 
   useEffect(() => {
     setLog(messages);
-  }, [messages]);
-
-  useEffect(() => {
     if (logInnerContainerRef.current) {
       const { current: logInnerContainer } = logInnerContainerRef;
-
-      const isScrolledToBottom =
-        logInnerContainer.scrollHeight - logInnerContainer.scrollTop === logInnerContainer.clientHeight;
-
-      if (isScrolledToBottom) {
-        requestAnimationFrame(() => {
-          logInnerContainer.scrollTop = logInnerContainer.scrollHeight;
-        });
-      }
+      requestAnimationFrame(() => {
+        logInnerContainer.scrollTop = logInnerContainer.scrollHeight;
+      });
     }
-  }, [log]);
+  }, [messages]);
 
   return (
     <Wrapper>
@@ -52,7 +43,7 @@ export const TeamDeployContainerDetail = () => {
         <Log>
           <div></div>
           <div ref={logInnerContainerRef}>
-            {log.length > 0 && (
+            {log?.length > 0 && (
               <>
                 {log.map((item, index) => {
                   if (item === '') return null;
@@ -81,7 +72,6 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 80px;
 `;
 
 const TeamName = styled.div`
@@ -137,7 +127,7 @@ const Label = styled.label`
 
 const Log = styled.div`
   width: 100%;
-  height: 332px;
+  height: 500px;
   border-radius: 10px;
   border: 1px solid ${theme.color.gray4};
   overflow-y: hidden;
@@ -147,9 +137,9 @@ const Log = styled.div`
     border-bottom: 1px solid ${theme.color.gray4};
   }
   > div:nth-of-type(2) {
-    height: 296px;
+    height: 465px;
     overflow-y: auto;
-    padding: 20px 0 20px 0;
+    padding: 20px 0 20px;
 
     ::-webkit-scrollbar {
       width: 8px;
