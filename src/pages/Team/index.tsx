@@ -4,15 +4,14 @@ import { Icon } from '@iconify/react';
 import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
 import { SearchBar } from '@/components/common/SearchBar';
-// import { useEffect, useState } from 'react';
-// import { teamCheck } from '@/utils/apis/team';
 import { useNavigate } from 'react-router-dom';
 import { TeamCheckType } from '@/utils/types/teamType';
 import { useCustomQuery } from '@/hooks/useCustomQueries';
+import { useState } from 'react';
 
 export const Team = () => {
-  // const [teamList, setTeamList] = useState<TeamCheckType>({ team_list: [] });
   const link = useNavigate();
+  const [selected, setSelected] = useState(0);
 
   const { data: teamList }: TeamCheckType = useCustomQuery({
     queryKey: ['team-list'],
@@ -20,16 +19,7 @@ export const Team = () => {
     select: (res) => res?.data.team_list,
   });
 
-  // console.log(data);
-  // useEffect(() => {
-  //   teamCheck()
-  //     .then((res) => {
-  //       setTeamList(res.data);
-  //     })
-  //     .catch(() => {
-  //       alert('오류가 발생했습니다');
-  //     });
-  // }, []);
+  const count = Math.ceil(teamList?.length / 3) || 1;
 
   return (
     <Wrapper>
@@ -52,7 +42,7 @@ export const Team = () => {
       </UtilContainer>
       <ContainerWrapper>
         {teamList?.length > 0 ? (
-          teamList?.map((element: any, index: number) => (
+          teamList?.slice(selected * 3, selected * 3 + 3).map((element: any, index: number) => (
             <div
               onClick={() => {
                 link(`/team/${element.team_id}/manage`);
@@ -74,6 +64,13 @@ export const Team = () => {
           <TipBox>아직 생성하거나 속한 팀이 없습니다!</TipBox>
         )}
       </ContainerWrapper>
+      <PaginationContainer>
+        {Array.from(new Array(count).keys()).map((i) => (
+          <Pagination selected={i === selected} key={i} onClick={() => setSelected(i)}>
+            {(i + 1).toString().padStart(2, '0')}
+          </Pagination>
+        ))}
+      </PaginationContainer>
     </Wrapper>
   );
 };
@@ -83,6 +80,18 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+const Pagination = styled.span<{ selected: Boolean }>`
+  font-weight: ${({ selected }) => (selected ? 'bold' : 'regular')};
+  color: ${({ selected }) => (selected ? 'black' : 'gray')};
+  cursor: pointer;
+  transition: 0.1s ease-in-out;
 `;
 
 const TitleContainer = styled.div`
@@ -127,6 +136,7 @@ const TipBox = styled.div`
 const ContainerWrapper = styled.div`
   width: 100%;
   max-width: 1120px;
+  height: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
