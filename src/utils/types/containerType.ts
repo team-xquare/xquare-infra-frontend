@@ -9,3 +9,13 @@ export type ContainerAllType = {
   domain: string;
   last_deploy: string;
 };
+
+export type ContainerDetailType = {
+  team_name_en: string;
+  team_name_ko: string;
+  deploy_name: string;
+  repository: string;
+  domain: string;
+  last_deploy: string;
+  container_status: ContainerStatusType;
+};
