@@ -6,6 +6,13 @@ import { Button } from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Cookie } from '@/utils/cookie';
+import * as ChannelService from '@channel.io/channel-web-sdk-loader';
+
+ChannelService.loadScript();
+
+ChannelService.boot({
+    "pluginKey": `${import.meta.env.CHANNEL_TALK_PLUGIN_KEY}`, // fill your plugin key
+});
 
 export const Main = () => {
   const navigate = useNavigate();
