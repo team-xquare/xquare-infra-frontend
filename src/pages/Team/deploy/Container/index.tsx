@@ -45,25 +45,27 @@ export const TeamDeployContainer = () => {
   }, []);
 
   useEffect(() => {
-    if (!deployUUID || !containerData || containerData.length > 0) return;
-    getCPU(deployUUID, containerData[0]?.container_environment).then((res) => {
-      setProdCpu(res.data);
-    });
-    if (!containerData[1]) return;
-    getCPU(deployUUID, containerData[1]?.container_environment).then((res) => {
-      setStagCpu(res.data);
-    });
-  }, [containerData]);
-
-  useEffect(() => {
-    if (!deployUUID || !containerData || containerData?.length > 0) return;
-    getMemory(deployUUID, containerData[0]?.container_environment).then((res) => {
-      setProdMemory(res.data);
-    });
-    if (!containerData[1]) return;
-    getMemory(deployUUID, containerData[1]?.container_environment).then((res) => {
-      setStagMemory(res.data);
-    });
+    if (!deployUUID || !containerData || containerData.length > 0) {
+      containerData?.forEach((item) => {
+        if (item.container_environment === 'prod' && deployUUID) {
+          getCPU(deployUUID, 'prod').then((res) => {
+            setProdCpu(res.data);
+          });
+          getMemory(deployUUID, 'prod').then((res) => {
+            setProdMemory(res.data);
+          });
+          return;
+        } else if (item.container_environment === 'stag' && deployUUID) {
+          getCPU(deployUUID, 'stag').then((res) => {
+            setStagCpu(res.data);
+          });
+          getMemory(deployUUID, 'stag').then((res) => {
+            setStagMemory(res.data);
+          });
+          return;
+        }
+      });
+    }
   }, [containerData]);
 
   return (
@@ -95,7 +97,7 @@ export const TeamDeployContainer = () => {
                 <ContainerBox
                   key={index}
                   onClick={() => {
-                    link(`/team/${teamUUID}/deploy/${deployUUID}/container/detail`);
+                    link(`/team/${teamUUID}/deploy/${deployUUID}/container/${item.container_environment}`);
                   }}
                 >
                   <div>
