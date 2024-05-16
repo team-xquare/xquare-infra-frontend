@@ -4,15 +4,26 @@ import { Tag } from '@/components/Team/Tag';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
+import { ContainerDetailType } from '@/utils/types/containerType';
+import { getDetailContainer } from '@/utils/apis/container';
 
 export const TeamDeployContainerDetail = () => {
-  const { deployUUID } = useParams();
+  const { deployUUID, env } = useParams();
   const { messages } = useWebSocket({
-    url: `${import.meta.env.VITE_SERVER_SOCKET_URL}/logs?deployId=${deployUUID}&environment=prod`,
+    url: `${import.meta.env.VITE_SERVER_SOCKET_URL}/logs?deployId=${deployUUID}&environment=${env}`,
   });
 
   const [log, setLog] = useState<string[]>([]);
+  const [data, setData] = useState<ContainerDetailType>();
   const logInnerContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (deployUUID && env) {
+      getDetailContainer(deployUUID, env).then((res) => {
+        setData(res.data);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     setLog(messages);
@@ -27,15 +38,17 @@ export const TeamDeployContainerDetail = () => {
   return (
     <Wrapper>
       <TitleContainer>
-        <TeamName>에일리언즈</TeamName>
+        <TeamName>{data?.team_name_ko}</TeamName>
         <Title>
-          컨테이너 dms-backend
+          컨테이너 {data?.deploy_name}
           <Tag tag={'AVAILABLE'} />
         </Title>
         <Describtion>
-          <div>team-aliens/DMS-Backend</div>
-          <div>https://prod-server.xquare.app/dms</div>
-          <div>마지막 배포: 2023-03-06 17:57</div>
+          <div>
+            {data?.team_name_en}/{data?.deploy_name}
+          </div>
+          <div>{data?.domain}</div>
+          <div>마지막 배포: {data?.last_deploy}</div>
         </Describtion>
       </TitleContainer>
       <LogContainer>
