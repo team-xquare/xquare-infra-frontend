@@ -11,35 +11,35 @@ import * as ChannelService from '@channel.io/channel-web-sdk-loader';
 ChannelService.loadScript();
 
 ChannelService.boot({
-    "pluginKey": `${import.meta.env.CHANNEL_TALK_PLUGIN_KEY}`, // fill your plugin key
+    "pluginKey": "46f7ede7-4e67-4236-baee-f778890e24c8", // fill your plugin key
 });
 
 export const Main = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    const data = Cookie.get('accessToken');
-    if (data) {
-      navigate('/team');
-    }
-  });
-  return (
-    <Wrapper>
-      <FirstContainer />
-      <SecondContainer />
-      <ThirdContainer />
-      <SubFooter>
-        <div>FREE USE</div>
-        <div>
-          대마고 학생이라면 <b>‘스퀘어 인프라’</b> 를<br />
-          <b>무료</b>로 사용할 수 있습니다.
-        </div>
-        <Button width={188} height={56} buttonColor="white" buttonStyle="solid" onClick={() => navigate('/login')}>
-          무료로 사용하기
-        </Button>
-      </SubFooter>
-    </Wrapper>
-  );
+    useEffect(() => {
+        const data = Cookie.get('accessToken');
+        if (data) {
+            navigate('/team');
+        }
+    });
+    return (
+        <Wrapper>
+            <FirstContainer />
+            <SecondContainer />
+            <ThirdContainer />
+            <SubFooter>
+                <div>FREE USE</div>
+                <div>
+                    대마고 학생이라면 <b>‘스퀘어 인프라’</b> 를<br />
+                    <b>무료</b>로 사용할 수 있습니다.
+                </div>
+                <Button width={188} height={56} buttonColor="white" buttonStyle="solid" onClick={() => navigate('/login')}>
+                    무료로 사용하기
+                </Button>
+            </SubFooter>
+        </Wrapper>
+    );
 };
 
 const Wrapper = styled.div`
