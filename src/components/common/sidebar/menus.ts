@@ -47,23 +47,13 @@ export const menu: MenusType = {
   '/team/:id/container': deploy,
   '/team/:id/deploy/:id': deploy_inside,
   '/team/:id/deploy/:id/container': deploy_inside,
-  // '/team/:id/deploy/:id/container/detail': {
-  //   back: '/team/-team-/deploy/-deploy-/container',
-  //   menu: [
-  //     {
-  //       icon: 'f7:shippingbox',
-  //       name: '컨테이너 상태',
-  //       link: '/team/-team-/deploy/-deploy-/container/detail',
-  //     },
-  //   ],
-  // },
-  '/team/:id/deploy/:id/container/detail': {
+  '/team/:id/deploy/:id/container/:env': {
     back: '/team/-team-/deploy/-deploy-/container',
     menu: [
       {
         icon: 'f7:shippingbox',
         name: '컨테이너 상태',
-        link: '/team/-team-/deploy/-deploy-/container/detail',
+        link: '/team/-team-/deploy/-deploy-/container/-env-',
       },
       {
         icon: 'ph:list-bold',

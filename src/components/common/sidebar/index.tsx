@@ -13,14 +13,19 @@ interface PropType {
 const rawPath = (url: string) =>
   url
     .split('/')
-    .map((i: any) => (i.includes('-') ? ':id' : i))
+    .map((i: any) => {
+      if (i.includes('-')) return ':id';
+      else if (i === 'stag' || i === 'prod') return ':env';
+      else return i;
+    })
     .join('/');
 
 const replaceIDs = (url: string, params: any) =>
   url
     .replaceAll('-team-', params?.teamUUID)
     .replaceAll('-deploy-', params?.deployUUID)
-    .replaceAll('-container-', params?.containerUUID);
+    .replaceAll('-container-', params?.containerUUID)
+    .replaceAll('-env-', params?.env);
 
 export const Sidebar = ({ isOpen, setOpen }: PropType) => {
   const { pathname }: any = useLocation();
