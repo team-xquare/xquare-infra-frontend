@@ -48,7 +48,7 @@ export const Header = () => {
                   navigate('/login');
                 }}
               >
-                무료로 시작하기
+                시작하기
               </Button>
             </RightSide>
           </>
