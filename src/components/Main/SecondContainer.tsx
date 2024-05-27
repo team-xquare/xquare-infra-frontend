@@ -21,27 +21,27 @@ export const SecondContainer = () => {
           </div>
         </DescriptionBox>
         <DescriptionBox>
-          <div>실시간 모니터링</div>
+          <div>손쉬운 배포</div>
           <div>
-            스퀘어는 배포한 애플리케이션을 실시간으로
+            스퀘어는 Github Action, Dockerfile을
             <br />
-            지표를 수집하고 제공합니다.
+            통해 간단한 설정만으로 배포할 수 있습니다.
           </div>
         </DescriptionBox>
         <DescriptionBox>
-          <div>실시간 모니터링</div>
+          <div>환경변수 관리</div>
           <div>
-            스퀘어는 배포한 애플리케이션을 실시간으로
+            기존 설정하기 어렵고 가시성이 부족했던
             <br />
-            지표를 수집하고 제공합니다.
+            환경변수를 간단하게 관리할 수 있습니다.
           </div>
         </DescriptionBox>
         <DescriptionBox>
-          <div>실시간 모니터링</div>
+          <div>팀원 관리</div>
           <div>
-            스퀘어는 배포한 애플리케이션을 실시간으로
+            동아리, 팀, 개인 프로젝트 단위로 팀을 생성하고
             <br />
-            지표를 수집하고 제공합니다.
+            손쉽게 팀원을 추가하여 관리할 수 있습니다.
           </div>
         </DescriptionBox>
       </RightBox>
