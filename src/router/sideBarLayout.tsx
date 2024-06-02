@@ -40,7 +40,7 @@ const Content = styled.div<{ isOpen: boolean }>`
   transition: 0.4s ease-in-out;
   padding: 0 50px 0 ${({ isOpen }) => (isOpen ? 310 : 110)}px;
   display: flex;
-  height: calc(100vh - 80px + 100px);
+  min-height: calc(100vh - 80px + 100px);
 `;
 
 const FooterContainer = styled.div<{ isOpen: boolean }>`
