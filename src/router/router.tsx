@@ -13,6 +13,7 @@ import { TeamDeployContainer } from '@/pages/Team/deploy/Container';
 import { TeamDeployContainerDetail } from '@/pages/Team/deploy/Container/Detail';
 import { Login } from '@/pages/Login';
 import { SideBarLayout } from './sideBarLayout';
+import { TeamDeployContainerTraces } from '@/pages/Team/deploy/Container/Traces';
 
 export const Router = createBrowserRouter([
   {
@@ -45,7 +46,13 @@ export const Router = createBrowserRouter([
                         path: 'container',
                         children: [
                           { index: true, element: <TeamDeployContainer /> },
-                          { path: ':env', element: <TeamDeployContainerDetail /> },
+                          {
+                            path: ':env',
+                            children: [
+                              { index: true, element: <TeamDeployContainerDetail /> },
+                              { path: 'traces', element: <TeamDeployContainerTraces /> },
+                            ],
+                          },
                         ],
                       },
                     ],
