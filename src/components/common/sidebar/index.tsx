@@ -42,21 +42,22 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
           <div>
             <Icon icon="iconamoon:arrow-left-2-bold" width={28} height={28} />
           </div>
-
           <span>돌아가기</span>
         </BackContainer>
       )}
       <ContentContainer>
         <MenuContainer>
-          {menus?.map((item: any, index: number) => (
-            <Menu
-              key={index}
-              icon={item.icon}
-              text={item.name}
-              isOpen={isOpen}
-              onClick={() => navigate(replaceIDs(item.link, params))}
-            />
-          ))}
+          {menus?.map((item: any, index: number) => {
+            return (
+              <Menu
+                key={index}
+                icon={item.icon}
+                text={item.name}
+                isOpen={isOpen}
+                onClick={() => navigate(replaceIDs(item.link, params))}
+              />
+            );
+          })}
         </MenuContainer>
         <Menu icon="ep:d-arrow-left" text="사이드바 축소" rotate isOpen={isOpen} onClick={() => setOpen(!isOpen)} />
       </ContentContainer>
