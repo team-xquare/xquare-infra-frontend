@@ -52,12 +52,32 @@ export const menu: MenusType = {
       {
         icon: 'ph:list-bold',
         name: '배포 내역',
-        link: `/team/-team-/deploy/-deploy-/container/-container-/history`,
+        link: `/team/-team-/deploy/-deploy-/container/-env-/history`,
       },
       {
         icon: 'uil:analytics',
         name: '요청 통계',
-        link: `/team/-team-/deploy/-deploy-/container/-container-/analytics`,
+        link: `/team/-team-/deploy/-deploy-/container/-env-/traces`,
+      },
+    ],
+  },
+  '/team/:id/deploy/:id/container/:env/traces': {
+    back: '/team/-team-/deploy/-deploy-/container',
+    menu: [
+      {
+        icon: 'f7:shippingbox',
+        name: '컨테이너 상태',
+        link: '/team/-team-/deploy/-deploy-/container/-env-',
+      },
+      {
+        icon: 'ph:list-bold',
+        name: '배포 내역',
+        link: `/team/-team-/deploy/-deploy-/container/-env-/history`,
+      },
+      {
+        icon: 'uil:analytics',
+        name: '요청 통계',
+        link: `/team/-team-/deploy/-deploy-/container/-env-/traces`,
       },
     ],
   },
