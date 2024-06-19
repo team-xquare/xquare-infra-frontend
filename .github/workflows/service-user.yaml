@@ -30,3 +30,4 @@ jobs:
             VITE_SERVER_BASE_URL=${{ secrets.VITE_SERVER_BASE_URL }}
             VITE_SERVER_SOCKET_URL=${{ secrets.VITE_SERVER_SOCKET_URL }}
             CHANNEL_TALK_PLUGIN_KEY=${{ secrets.CHANNEL_TALK_PLUGIN_KEY }}
+            VITE_SERVER_GRAFANA_URL=${{ secrets.VITE_SERVER_GRAFANA_URL }}
