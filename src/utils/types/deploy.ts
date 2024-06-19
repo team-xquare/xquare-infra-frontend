@@ -21,6 +21,7 @@ export type DeployDetailType = {
   repository: string;
   project_root_dir: string;
   deploy_status: DeployStatusType;
+  github_full_url: string;
 };
 
 export type DeployCreateType = {
