@@ -6,16 +6,20 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { ContainerDetailType } from '@/utils/types/containerType';
 import { getDetailContainer } from '@/utils/apis/container';
+import { Icon } from '@iconify/react';
 
 export const TeamDeployContainerDetail = () => {
+  const [isDark, setIsDark] = useState<boolean>(false);
+  const [isFull, setIsFull] = useState<boolean>(false);
   const { deployUUID, env } = useParams();
   const { messages } = useWebSocket({
     url: `${import.meta.env.VITE_SERVER_SOCKET_URL}/logs?deployId=${deployUUID}&environment=${env}`,
   });
-
   const [log, setLog] = useState<string[]>([]);
   const [data, setData] = useState<ContainerDetailType>();
   const logInnerContainerRef = useRef<HTMLDivElement>(null);
+
+  const bodySelector = document.querySelector('body');
 
   useEffect(() => {
     if (deployUUID && env) {
@@ -37,6 +41,47 @@ export const TeamDeployContainerDetail = () => {
 
   return (
     <Wrapper>
+      {isFull && (
+        <LogModalContainer>
+          <Log isDark={isDark} isFull={isFull}>
+            <div>
+              <span
+                onClick={() => {
+                  setIsDark(!isDark);
+                }}
+              >
+                <Icon
+                  icon={isDark ? 'material-symbols-light:dark-mode' : 'tabler:sun-filled'}
+                  color={isDark ? 'white' : 'black'}
+                />
+              </span>
+              <span
+                onClick={() => {
+                  setIsFull(false);
+                  if (!bodySelector) return;
+                  bodySelector.style.overflowY = 'none';
+                }}
+              >
+                <Icon icon={'maki:cross'} color={isDark ? 'white' : 'black'} />
+              </span>
+            </div>
+            <div ref={logInnerContainerRef}>
+              {log?.length > 0 && (
+                <>
+                  {log.map((item, index) => {
+                    if (item === '') return null;
+                    return (
+                      <LogText key={index} isDark={isDark}>
+                        {item}
+                      </LogText>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+          </Log>
+        </LogModalContainer>
+      )}
       <TitleContainer>
         <TeamName>{data?.team_name_ko}</TeamName>
         <Title>
@@ -52,20 +97,48 @@ export const TeamDeployContainerDetail = () => {
         </Describtion>
       </TitleContainer>
       <LogContainer>
-        <Label>로그</Label>
-        <Log>
-          <div></div>
-          <div ref={logInnerContainerRef}>
-            {log?.length > 0 && (
-              <>
-                {log.map((item, index) => {
-                  if (item === '') return null;
-                  return <LogText key={index}>{item}</LogText>;
-                })}
-              </>
-            )}
-          </div>
-        </Log>
+        {!isFull && (
+          <>
+            <Label isFull={isFull}>로그</Label>
+            <Log isDark={isDark} isFull={isFull}>
+              <div>
+                <span
+                  onClick={() => {
+                    setIsDark(!isDark);
+                  }}
+                >
+                  <Icon
+                    icon={isDark ? 'material-symbols-light:dark-mode' : 'tabler:sun-filled'}
+                    color={isDark ? 'white' : 'black'}
+                  />
+                </span>
+                <span
+                  onClick={() => {
+                    setIsFull(true);
+                    if (!bodySelector) return;
+                    bodySelector.style.overflowY = 'hidden';
+                  }}
+                >
+                  <Icon icon={'icon-park-outline:internal-expansion'} color={isDark ? 'white' : 'black'} />
+                </span>
+              </div>
+              <div ref={logInnerContainerRef}>
+                {log?.length > 0 && (
+                  <>
+                    {log.map((item, index) => {
+                      if (item === '') return null;
+                      return (
+                        <LogText key={index} isDark={isDark}>
+                          {item}
+                        </LogText>
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+            </Log>
+          </>
+        )}
       </LogContainer>
     </Wrapper>
   );
@@ -125,9 +198,19 @@ const LogContainer = styled.div`
   max-width: 1120px;
 `;
 
-const Label = styled.label`
+const LogModalContainer = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+`;
+
+const Label = styled.label<{ isFull: boolean }>`
   width: 100%;
   height: 22px;
+  display: ${({ isFull }) => (isFull ? 'none' : null)};
   cursor: default;
   font-size: 14px;
   font-weight: 400;
@@ -138,19 +221,31 @@ const Label = styled.label`
   margin-left: 6px;
 `;
 
-const Log = styled.div`
+const Log = styled.div<{ isDark: boolean; isFull: boolean }>`
   width: 100%;
-  height: 500px;
+  height: ${({ isFull }) => (isFull ? '100%' : '500px')};
   border-radius: 10px;
   border: 1px solid ${theme.color.gray4};
   overflow-y: hidden;
+  background-color: ${({ isDark }) => (isDark ? '#333333' : 'white')};
   > div:nth-of-type(1) {
     width: 100%;
-    height: 36px;
+    height: ${({ isFull }) => (isFull ? '50px' : '36px')};
     border-bottom: 1px solid ${theme.color.gray4};
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding-right: 20px;
+    gap: 20px;
+    span {
+      cursor: pointer;
+      & :hover {
+        background-color: lightgray;
+      }
+    }
   }
   > div:nth-of-type(2) {
-    height: 465px;
+    height: ${({ isFull }) => (isFull ? 'calc(100% - 50px)' : '464px')};
     overflow-y: auto;
     padding: 20px 0 20px;
 
@@ -169,6 +264,8 @@ const Log = styled.div`
   }
 `;
 
-const LogText = styled.pre`
+const LogText = styled.pre<{ isDark: boolean }>`
   padding: 0 20px 0 20px;
+  font-variant-numeric: tabular-nums;
+  color: ${({ isDark }) => (isDark ? '#CCCCCC' : theme.color.gray9)};
 `;
