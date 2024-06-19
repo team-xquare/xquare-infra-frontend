@@ -7,7 +7,7 @@ import { ContainerAllType } from '@/utils/types/containerType';
 import { getAllContainer, getCPU, getMemory } from '@/utils/apis/container';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ContainerGraph } from '@/components/graph/ContainerGraph';
-import { DeployDetailType } from '@/utils/types/deploy';
+import { DeployDetailType } from '@/utils/types/deployType';
 import { getDetailDeploy } from '@/utils/apis/deploy';
 
 type DateValueMap = {
