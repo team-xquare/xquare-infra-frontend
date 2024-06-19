@@ -4,24 +4,41 @@ import { TraceType } from '@/utils/types/traceType';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 
-const getCurrentTimeFromStamp = (timestamp: number) => {
+interface ExtendedDateTimeFormatOptions extends Intl.DateTimeFormatOptions {
+  millisecond?: '2-digit' | '3-digit';
+}
+
+const getCurrentTimeFromStamp = (timestampNano: string) => {
   try {
-    const myDate = new Date(timestamp / 1000000);
-    const options: Intl.DateTimeFormatOptions = {
+    // Convert nanoseconds to seconds
+    const timestampSeconds = parseInt(timestampNano, 10) / 1_000_000_000;
+    const myDate = new Date(timestampSeconds * 1000);
+    const options: ExtendedDateTimeFormatOptions = {
       timeZone: 'Asia/Seoul',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
+      month: 'short',
+      day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
+      millisecond: '3-digit',
+      hour12: false,
     };
-    return myDate.toLocaleString('ko-KR', options).split(', ');
+    const formattedDateTime = myDate.toLocaleString('en-US', options);
+    const [dateTimeString, milliseconds] = formattedDateTime.split('.');
+    if (milliseconds) {
+      return `${dateTimeString}.${milliseconds.padStart(3, '0')}`;
+    } else {
+      return formattedDateTime;
+    }
   } catch (error) {
     console.error('Error getting current time from timestamp:', error);
-    return ['Invalid timestamp'];
+    return 'Invalid timestamp';
   }
 };
+
+const startTimeUnixNano = '1718630443155390045';
+const currentTime = getCurrentTimeFromStamp(startTimeUnixNano);
+console.log(currentTime); // Output: 2023년 4월 25일 21:07:23.155
 
 export const TeamDeployContainerTraces = () => {
   const [traces, setTraces] = useState<TraceType[]>();
@@ -36,22 +53,32 @@ export const TeamDeployContainerTraces = () => {
     <Wrapper>
       <TracesContainer>
         <TraceLabel>
-          <div>DATE</div>
-          <div>RESOURCE</div>
-          <div>DURATION</div>
-          <div>METHOD</div>
-          <div>STATUS CODE</div>
+          <DateLabel>DATE</DateLabel>
+          <ResourceLabel>RESOURCE</ResourceLabel>
+          <DurationLabel>DURATION</DurationLabel>
+          <MethodLabel>METHOD</MethodLabel>
+          <StatusCodeLabel>STATUS CODE</StatusCodeLabel>
         </TraceLabel>
         {traces &&
-          traces.map((trace, _) => {
-            const currentTime = getCurrentTimeFromStamp(parseInt(trace.startTimeUnixNano));
+          traces.map((trace, index) => {
+            const currentTime = getCurrentTimeFromStamp(trace.startTimeUnixNano);
             return (
-              <TraceItem>
-                <div>{currentTime}</div>
-                <div>{trace.rootTraceName}</div>
-                <div>{trace.durationMs}ms</div>
-                <div>{trace.rootTraceName.split(' ')[0]}</div>
-                <div>{}</div>
+              <TraceItem key={index}>
+                <DateItem>{currentTime}</DateItem>
+                <ResourceItem>{trace.rootTraceName}</ResourceItem>
+                <DurationItem>{trace.durationMs}ms</DurationItem>
+                <MethodItem>{trace.rootTraceName.split(' ')[0]}</MethodItem>
+                <StatusCodeItem>
+                  {/* {
+                    trace.spanSet.spans[0].attributes.filter((attribute) => attribute.key === 'http.status_code')[0]
+                      .value.intValue
+                  } */}
+
+                  {
+                    trace.spanSet.spans[0].attributes.filter((attr) => attr.key === 'http.status_code')[0].value
+                      .intValue
+                  }
+                </StatusCodeItem>
               </TraceItem>
             );
           })}
@@ -84,43 +111,81 @@ const TraceLabel = styled.div`
   font-weight: 600;
   display: flex;
   height: 52px;
-  > div:nth-of-type(1) {
-    width: 290px;
-    padding-left: 40px;
-  }
-  > div:nth-of-type(2) {
-    width: 382px;
-  }
-  > div:nth-of-type(3) {
-    width: 160px;
-  }
-  > div:nth-of-type(4) {
-    width: 326px;
-  }
-  > div:nth-of-type(5) {
-    width: 386px;
-  }
+  background-color: ${theme.color.gray2};
+  border-bottom: 1px solid ${theme.color.gray4};
+`;
+
+const DateLabel = styled.div`
+  width: 290px;
+  padding-left: 40px;
+  display: flex;
+  align-items: center;
+`;
+
+const ResourceLabel = styled.div`
+  width: 382px;
+  display: flex;
+  align-items: center;
+`;
+
+const DurationLabel = styled.div`
+  width: 160px;
+  display: flex;
+  align-items: center;
+`;
+
+const MethodLabel = styled.div`
+  width: 326px;
+  display: flex;
+  align-items: center;
+`;
+
+const StatusCodeLabel = styled.div`
+  width: 386px;
+  display: flex;
+  align-items: center;
 `;
 
 const TraceItem = styled.div`
   width: 100%;
   color: ${theme.color.gray8};
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 300;
   display: flex;
-  > div:nth-of-type(1) {
-    width: 290px;
+  border-bottom: 1px solid ${theme.color.gray4};
+  &:last-child {
+    border-bottom: none;
   }
-  > div:nth-of-type(2) {
-    width: 382px;
-  }
-  > div:nth-of-type(3) {
-    width: 160px;
-  }
-  > div:nth-of-type(4) {
-    width: 326px;
-  }
-  > div:nth-of-type(5) {
-    width: 386px;
-  }
+`;
+
+const DateItem = styled.div`
+  width: 290px;
+  padding-left: 40px;
+  display: flex;
+  align-items: center;
+`;
+
+const ResourceItem = styled.div`
+  width: 382px;
+  display: flex;
+  align-items: center;
+`;
+
+const DurationItem = styled.div`
+  width: 160px;
+  display: flex;
+  align-items: center;
+`;
+
+const MethodItem = styled.div`
+  width: 326px;
+  display: flex;
+  align-items: center;
+`;
+
+const StatusCodeItem = styled.div`
+  width: 386px;
+  display: flex;
+  align-items: center;
+  padding-left: 30px;
 `;
