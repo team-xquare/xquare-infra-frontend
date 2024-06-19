@@ -18,4 +18,5 @@ export type ContainerDetailType = {
   domain: string;
   last_deploy: string;
   container_status: ContainerStatusType;
+  container_name: string;
 };
