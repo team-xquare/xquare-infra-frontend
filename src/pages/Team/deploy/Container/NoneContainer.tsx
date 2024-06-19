@@ -8,7 +8,7 @@ import ExamImg3Src from '@/assets/example/ExamImg3.png';
 import { getDetailDeploy } from '@/utils/apis/deploy';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { DeployDetailType } from '@/utils/types/deploy';
+import { DeployDetailType } from '@/utils/types/deployType';
 import { checkFileExists } from '@/utils/apis/github';
 import { Input } from '@/components/common/Input';
 import { Radio } from '@/components/common/Radio';

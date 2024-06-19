@@ -1,6 +1,6 @@
 import { theme } from '@/style/theme';
 import { ContainerEnvType, ContainerStatusType } from '@/utils/types/containerType';
-import { DeployStatusType } from '@/utils/types/deploy';
+import { DeployStatusType } from '@/utils/types/deployType';
 import { TeamType } from '@/utils/types/teamType';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';

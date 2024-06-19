@@ -1,4 +1,4 @@
-import {DeployCreateType, DeployDetailType} from '../types/deploy';
+import { DeployCreateType, DeployDetailType } from '../types/deployType';
 import { instance } from './axios';
 
 const router = 'deploy';

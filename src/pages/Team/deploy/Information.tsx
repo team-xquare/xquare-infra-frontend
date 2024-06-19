@@ -4,7 +4,7 @@ import { Tag } from '@/components/Team/Tag';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getDetailDeploy } from '@/utils/apis/deploy';
-import { DeployDetailType } from '@/utils/types/deploy';
+import { DeployDetailType } from '@/utils/types/deployType';
 
 export const TeamDeployInformation = () => {
   const { deployUUID } = useParams();

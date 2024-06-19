@@ -5,7 +5,7 @@ import { Input } from '@/components/common/Input';
 import { SelectBar } from '@/components/common/SelectBar';
 import { XButton } from '@/components/common/XButton';
 import { useNavigate, useParams } from 'react-router-dom';
-import { DeployCreateType, DeployType } from '@/utils/types/deploy';
+import { DeployCreateType, DeployType } from '@/utils/types/deployType';
 import { deployCreate } from '@/utils/apis/deploy';
 
 const selectType: string[] = ['사용하지 않음', '사용함'];
