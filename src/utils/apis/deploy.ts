@@ -1,4 +1,4 @@
-import { DeployCreateType } from '../types/deploy';
+import {DeployCreateType, DeployDetailType} from '../types/deploy';
 import { instance } from './axios';
 
 const router = 'deploy';
@@ -12,5 +12,5 @@ export const getAllDeploy = async (teamUUID: string) => {
 };
 
 export const getDetailDeploy = async (deployId: string) => {
-  return await instance.get(`${router}/${deployId}`);
+  return await instance.get<DeployDetailType>(`${router}/${deployId}`);
 };
