@@ -1,4 +1,3 @@
-import { Input } from '@/components/common/Input';
 import { XButton } from '@/components/common/XButton';
 import { theme } from '@/style/theme';
 import styled from '@emotion/styled';
@@ -6,12 +5,84 @@ import { LayoutBox } from '@/components/common/LayoutBox';
 import ExamImg1Src from '@/assets/example/ExamImg1.png';
 import ExamImg2Src from '@/assets/example/ExamImg2.png';
 import ExamImg3Src from '@/assets/example/ExamImg3.png';
+import { getDetailDeploy } from '@/utils/apis/deploy';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { DeployDetailType } from '@/utils/types/deployType';
+import { checkFileExists } from '@/utils/apis/github';
+import { Input } from '@/components/common/Input';
+import { Radio } from '@/components/common/Radio';
 
 export const TeamDeployNoneContainer = () => {
+  const { deployUUID } = useParams();
+  const [data, setData] = useState<DeployDetailType>();
+  const [usePrefix, setUsePrefix] = useState(true);
+  const [configName, setConfigName] = useState(data?.deploy_name);
+  const [configPort, setConfigPort] = useState('8080');
+  const [configPrefix, setConfigPrefix] = useState('/' + data?.deploy_name);
+  const [configDomainProd, setConfigDomainProd] = useState(data?.deploy_name + '.xquare.app');
+  const [configDomainStag, setConfigDomainStag] = useState(data?.deploy_name + '-stag.xquare.app');
+  const [isCreatedConfig, setIsCreatedConfig] = useState<boolean | null>(false);
+
+  const handleOptionChange = (option: boolean) => {
+    setUsePrefix(option);
+  };
+
+  useEffect(() => {
+    if (!deployUUID) return;
+
+    getDetailDeploy(deployUUID).then((res) => {
+      setData(res.data);
+      setConfigName(res.data?.deploy_name);
+      setConfigPrefix(`/${res.data?.deploy_name}`);
+      setConfigDomainProd(`${res.data?.deploy_name}.xquare.app`);
+      setConfigDomainStag(`${res.data?.deploy_name}-stag.xquare.app`);
+    });
+  }, [deployUUID]);
+
+  const handlePortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfigPort(e.target.value);
+  };
+
+  const handleCreateConfigFile = () => {
+    const branchName = prompt('Branch 이름을 입력해 주세요');
+    if (!branchName) return;
+
+    const content = usePrefix
+      ? `config:\n  name: ${configName}\n  port: ${configPort}\n  prefix: ${configPrefix}`
+      : `config:\n  name: dms\n  port: ${configPort}\n  domain:\n    prod: ${configDomainProd}\n    stag: ${configDomainStag}`;
+    const encodedContent = encodeURIComponent(content);
+    const url = `${data?.github_full_url}/new/${branchName}?filename=.xquare/config.yaml&value=${encodedContent}`;
+
+    window.open(url, '_blank');
+  };
+
+  const handleCheckFile = async () => {
+    const branchName = prompt('Branch 이름을 입력해 주세요');
+    if (!branchName) return;
+
+    const filePath = '.xquare/config.yaml';
+    try {
+      const fileExists = await checkFileExists(
+        data?.github_full_url.split('https://github.com/')[1] ?? '',
+        branchName,
+        filePath,
+      );
+      if (fileExists) {
+        setIsCreatedConfig(true);
+      } else {
+        setIsCreatedConfig(false);
+      }
+    } catch (error) {
+      console.error('Error checking file existence:', error);
+      setIsCreatedConfig(null);
+    }
+  };
+
   return (
     <LayoutBox width="100%" flex="column" align="center" gap={48} height="4728px">
       <LayoutBox width="100%" max={1120} flex="column" gap={4}>
-        <TeamName>에일리언즈</TeamName>
+        <TeamName>{data?.team_name_ko}</TeamName>
         <Title>컨테이너</Title>
         <Describtion>정의한 배포에 대한 컨테이너를 인프라에 생성, 관리합니다.</Describtion>
         <Text>
@@ -26,8 +97,8 @@ export const TeamDeployNoneContainer = () => {
           <LayoutBox flex="column" gap={20}>
             <Text>프로젝트 레포지토리 정보가 정상적으로 등록되었습니다!</Text>
             <LayoutBox align="center" gap={20}>
-              <WrapperBox width={496} heigth={72} radius={10}>
-                https://github.com/team-aliens/DMS-Backend
+              <WrapperBox height={72} radius={10} style={{ paddingLeft: '30px' }}>
+                {data?.github_full_url}
               </WrapperBox>
               <XButton width={80} height={58}>
                 재확인
@@ -43,29 +114,90 @@ export const TeamDeployNoneContainer = () => {
             <SecondStepContainer>
               <Text>아래 정보를 입력하여 설정 파일을 생성해보세요!</Text>
               <LayoutBox justify="space-between">
-                <WrapperBox width={440} heigth={160} radius={20}></WrapperBox>
+                <WrapperBox
+                  width={440}
+                  height={200}
+                  radius={20}
+                  style={{ justifyContent: 'left', paddingLeft: '30px' }}
+                >
+                  <pre>
+                    {usePrefix ? (
+                      <>
+                        <div>config:</div>
+                        <div>&nbsp;&nbsp;name: {configName}</div>
+                        <div>&nbsp;&nbsp;port: {configPort}</div>
+                        <div>&nbsp;&nbsp;prefix:{' ' + configPrefix}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div>config:</div>
+                        <div>&nbsp;&nbsp;name: {data?.deploy_name}</div>
+                        <div>
+                          &nbsp;&nbsp;port: <StyledInput type="text" value={configPort} onChange={handlePortChange} />
+                        </div>
+                        <div>&nbsp;&nbsp;domain:</div>
+                        <div>
+                          &nbsp;&nbsp;&nbsp;&nbsp;prod:{' '}
+                          <StyledInput
+                            type="text"
+                            value={configDomainProd}
+                            onChange={(e) => setConfigDomainProd(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          &nbsp;&nbsp;&nbsp;&nbsp;stag:{' '}
+                          <StyledInput
+                            type="text"
+                            value={configDomainStag}
+                            onChange={(e) => setConfigDomainStag(e.target.value)}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </pre>
+                </WrapperBox>
                 <LayoutBox flex="column" gap={20}>
-                  <Input width={328} height={48} label="요청을 받을 포트" />
-                  <LayoutBox flex="column" gap={6}>
+                  <Input
+                    width={328}
+                    height={48}
+                    value={configPort}
+                    onChange={handlePortChange}
+                    label="요청을 받을 포트"
+                  />
+                  <LayoutBox flex="column" gap={10}>
                     <Text>배포 URL 설정</Text>
                     <LayoutBox gap={20}>
-                      <XButton buttonStyle="solid" width={114} height={56}>
+                      <Radio isChecked={usePrefix} onChange={() => handleOptionChange(true)} isBold>
                         prefix 사용
-                      </XButton>
-                      <XButton buttonStyle="ghost" width={244} height={56}>
+                      </Radio>
+                      <Radio isChecked={!usePrefix} onChange={() => handleOptionChange(false)} isBold>
                         xquare.app 하위 도메인 사용
-                      </XButton>
+                      </Radio>
                     </LayoutBox>
                   </LayoutBox>
                 </LayoutBox>
               </LayoutBox>
             </SecondStepContainer>
             <LayoutBox align="center" gap={20}>
-              <WrapperBox width={260} heigth={72} radius={10}>
-                Config 파일 생성 완료
+              <WrapperBox height={72} radius={10}>
+                {(() => {
+                  switch (isCreatedConfig) {
+                    case null:
+                      return '파일 확인 중 오류가 발생했습니다.';
+                    case true:
+                      return 'Config 파일이 생성되었습니다!';
+                    case false:
+                      return 'Config 파일이 생성되지 않았습니다.';
+                    default:
+                      return '';
+                  }
+                })()}
               </WrapperBox>
-              <XButton width={80} height={58}>
-                재확인
+              <XButton width={80} height={58} onClick={handleCreateConfigFile}>
+                생성
+              </XButton>
+              <XButton width={80} height={58} onClick={handleCheckFile} buttonStyle="ghost">
+                확인
               </XButton>
             </LayoutBox>
           </LayoutBox>
@@ -76,7 +208,7 @@ export const TeamDeployNoneContainer = () => {
           <LayoutBox flex="column" gap={20}>
             <Text>GitHub repository에 Dockerfile을 생성합니다.</Text>
             <LayoutBox align="center" gap={20}>
-              <WrapperBox width={260} heigth={72} radius={10}>
+              <WrapperBox height={72} radius={10}>
                 Dockerfile 생성 완료
               </WrapperBox>
               <XButton width={80} height={58}>
@@ -115,7 +247,7 @@ export const TeamDeployNoneContainer = () => {
             </div>
             <LayoutBox gap={10} flex="column">
               <LayoutBox align="end" gap={10}>
-                <Input width={426} height={46} label="배포 키" />
+                <Input width={426} height={46} placeholder="배포 키" />
                 <XButton width={80} height={46}>
                   발급받기
                 </XButton>
@@ -132,7 +264,7 @@ export const TeamDeployNoneContainer = () => {
               <Text>.github/workflows 경로 아래에 배포에 대한 Git Action을 작성합니다.</Text>
               <Text>xquare action을 넣을 job 아래에 OIDC 권한을 허용해줍니다.</Text>
             </div>
-            <WrapperBox width={880} heigth={378} radius={20}></WrapperBox>
+            <WrapperBox width={880} height={378} radius={20}></WrapperBox>
             <Text>자신의 프로젝트에 대한 이미지를 빌드하기 전 필요한 필요한 동작이 있다면 추가합니다.</Text>
             <SixthStepContainer></SixthStepContainer>
           </LayoutBox>
@@ -187,9 +319,11 @@ const NumberBox = styled.div`
   font-weight: 500;
 `;
 
-const WrapperBox = styled.div<{ width: number; heigth: number; radius: number }>`
-  width: ${({ width }) => `${width}px`};
-  height: ${({ heigth }) => `${heigth}px`};
+const WrapperBox = styled.div<{ width?: number; height?: number; radius?: number }>`
+  width: ${({ width }) => width + 'px'};
+  height: ${({ height }) => height + 'px'};
+  padding: 0 30px 0 30px;
+  height: ${({ height }) => `${height}px`};
   border-radius: ${({ radius }) => `${radius}px`};
   background-color: ${theme.color.gray2};
   display: flex;
@@ -207,7 +341,7 @@ const SecondStepContainer = styled.div`
   padding: 20px 46px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 20px;
 `;
 
 const SixthStepContainer = styled.div`
@@ -219,4 +353,13 @@ const SixthStepContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 40px;
+`;
+
+const StyledInput = styled.input`
+  width: 200px;
+  height: 24px;
+  font-size: 16px;
+  border: 1px solid ${theme.color.gray5};
+  border-radius: 4px;
+  padding: 4px;
 `;
