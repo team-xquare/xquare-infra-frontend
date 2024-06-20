@@ -53,8 +53,8 @@ export const TeamDeployContainerTraces = () => {
   }, []);
 
   useEffect(() => {
-    let currentTime = Math.floor(Date.now() / 1000);
-    const oneHourAgo = currentTime - 3600;
+    let currentTime = Math.floor(Date.now() / 1000) - 5;
+    const oneHourAgo = currentTime - 3605;
 
     if (container?.container_name) {
       console.log(oneHourAgo, currentTime);
@@ -69,7 +69,7 @@ export const TeamDeployContainerTraces = () => {
           .then((res) => {
             console.log(res.data.traces);
             setTraces((prevTraces) => {
-              return [...(prevTraces || []), ...res.data.traces];
+              return [...res.data.traces, ...(prevTraces || [])];
             });
           })
           .catch((err) => {
