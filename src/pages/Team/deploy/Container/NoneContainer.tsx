@@ -23,6 +23,7 @@ export const TeamDeployNoneContainer = () => {
   const [configDomainProd, setConfigDomainProd] = useState(data?.deploy_name + '.xquare.app');
   const [configDomainStag, setConfigDomainStag] = useState(data?.deploy_name + '-stag.xquare.app');
   const [isCreatedConfig, setIsCreatedConfig] = useState<boolean | null>(false);
+  const [isCreatedDocker, setIsCreatedDocker] = useState<boolean | null>(false);
 
   const handleOptionChange = (option: boolean) => {
     setUsePrefix(option);
@@ -57,7 +58,7 @@ export const TeamDeployNoneContainer = () => {
     window.open(url, '_blank');
   };
 
-  const handleCheckFile = async () => {
+  const handleCheckConfigFile = async () => {
     const branchName = prompt('Branch 이름을 입력해 주세요');
     if (!branchName) return;
 
@@ -76,6 +77,28 @@ export const TeamDeployNoneContainer = () => {
     } catch (error) {
       console.error('Error checking file existence:', error);
       setIsCreatedConfig(null);
+    }
+  };
+
+  const handleCheckDockerFile = async () => {
+    const branchName = prompt('Branch 이름을 입력해 주세요');
+    if (!branchName) return;
+
+    const filePath = 'Dockerfile';
+    try {
+      const fileExists = await checkFileExists(
+        data?.github_full_url.split('https://github.com/')[1] ?? '',
+        branchName,
+        filePath,
+      );
+      if (fileExists) {
+        setIsCreatedDocker(true);
+      } else {
+        setIsCreatedDocker(false);
+      }
+    } catch (error) {
+      console.error('Error checking file existence:', error);
+      setIsCreatedDocker(null);
     }
   };
 
@@ -196,7 +219,7 @@ export const TeamDeployNoneContainer = () => {
               <XButton width={80} height={58} onClick={handleCreateConfigFile}>
                 생성
               </XButton>
-              <XButton width={80} height={58} onClick={handleCheckFile} buttonStyle="ghost">
+              <XButton width={80} height={58} onClick={handleCheckConfigFile} buttonStyle="ghost">
                 확인
               </XButton>
             </LayoutBox>
@@ -209,10 +232,21 @@ export const TeamDeployNoneContainer = () => {
             <Text>GitHub repository에 Dockerfile을 생성합니다.</Text>
             <LayoutBox align="center" gap={20}>
               <WrapperBox height={72} radius={10}>
-                Dockerfile 생성 완료
+                {(() => {
+                  switch (isCreatedDocker) {
+                    case null:
+                      return '파일 확인 중 오류가 발생했습니다.';
+                    case true:
+                      return 'docker 파일이 생성되었습니다!';
+                    case false:
+                      return 'docker 파일이 생성되지 않았습니다.';
+                    default:
+                      return '';
+                  }
+                })()}
               </WrapperBox>
-              <XButton width={80} height={58}>
-                재확인
+              <XButton width={80} height={58} onClick={handleCheckDockerFile}>
+                확인
               </XButton>
             </LayoutBox>
           </LayoutBox>
