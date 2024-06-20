@@ -403,12 +403,3 @@ const SixthStepContainer = styled.div`
   flex-direction: column;
   gap: 40px;
 `;
-
-const StyledInput = styled.input`
-  width: 200px;
-  height: 24px;
-  font-size: 16px;
-  border: 1px solid ${theme.color.gray5};
-  border-radius: 4px;
-  padding: 4px;
-`;
