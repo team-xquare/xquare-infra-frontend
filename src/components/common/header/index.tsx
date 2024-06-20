@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { css } from '@emotion/react';
 import { theme } from '@/style/theme';
 import { Cookie } from '@/utils/cookie';
+import { usePathChangeEffect } from '@/hooks/usePathChangeEffect';
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -13,6 +14,13 @@ export const Header = () => {
   const { pathname } = useLocation();
   const _pathname: string = pathname.substring(1);
   const email = Cookie.get('email');
+
+  usePathChangeEffect(() => {
+    const body = document.querySelector('body');
+    if (body) {
+      body.style.overflowY = 'auto';
+    }
+  });
 
   useEffect(() => {
     const handleScroll = () => {
