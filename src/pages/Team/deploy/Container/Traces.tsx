@@ -63,7 +63,7 @@ export const TeamDeployContainerTraces = () => {
       });
 
       const interval = setInterval(() => {
-        const newCurrentTime = Math.floor(Date.now() / 1000);
+        const newCurrentTime = Math.floor(Date.now() / 1000) - 5;
         console.log(currentTime, newCurrentTime);
         getTrace(container.container_name, currentTime, newCurrentTime)
           .then((res) => {
