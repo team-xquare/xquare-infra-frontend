@@ -59,7 +59,7 @@ export const TeamDeployContainerDetail = () => {
                 onClick={() => {
                   setIsFull(false);
                   if (!bodySelector) return;
-                  bodySelector.style.overflowY = 'none';
+                  bodySelector.style.overflowY = 'auto';
                 }}
               >
                 <Icon icon={'maki:cross'} color={isDark ? 'white' : 'black'} />
