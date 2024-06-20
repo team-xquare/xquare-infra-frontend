@@ -53,13 +53,32 @@ export const TeamDeployContainerTraces = () => {
   }, []);
 
   useEffect(() => {
-    const currentTime = Math.floor(Date.now() / 1000);
+    let currentTime = Math.floor(Date.now() / 1000);
     const oneHourAgo = currentTime - 3600;
 
     if (container?.container_name) {
+      console.log(oneHourAgo, currentTime);
       getTrace(container.container_name, oneHourAgo, currentTime).then((res) => {
         setTraces(res.data.traces);
       });
+
+      const interval = setInterval(() => {
+        const newCurrentTime = Math.floor(Date.now() / 1000);
+        console.log(currentTime, newCurrentTime);
+        getTrace(container.container_name, currentTime, newCurrentTime)
+          .then((res) => {
+            console.log(res.data.traces);
+            setTraces((prevTraces) => {
+              return [...(prevTraces || []), ...res.data.traces];
+            });
+          })
+          .catch((err) => {
+            console.error('Error fetching traces:', err);
+          });
+        currentTime = newCurrentTime;
+      }, 1000);
+
+      return () => clearInterval(interval);
     }
   }, [container]);
 
@@ -172,24 +191,28 @@ const DateItem = styled.div`
   padding-left: 40px;
   display: flex;
   align-items: center;
+  font-variant-numeric: tabular-nums;
 `;
 
 const ResourceItem = styled.div`
   width: 382px;
   display: flex;
   align-items: center;
+  font-variant-numeric: tabular-nums;
 `;
 
 const DurationItem = styled.div`
   width: 160px;
   display: flex;
   align-items: center;
+  font-variant-numeric: tabular-nums;
 `;
 
 const MethodItem = styled.div`
   width: 326px;
   display: flex;
   align-items: center;
+  font-variant-numeric: tabular-nums;
 `;
 
 const StatusCodeItem = styled.div`
@@ -197,4 +220,5 @@ const StatusCodeItem = styled.div`
   display: flex;
   align-items: center;
   padding-left: 30px;
+  font-variant-numeric: tabular-nums;
 `;
