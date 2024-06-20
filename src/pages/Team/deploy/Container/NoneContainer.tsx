@@ -45,6 +45,10 @@ export const TeamDeployNoneContainer = () => {
     setConfigPort(e.target.value);
   };
 
+  const handlePrefixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfigPrefix(e.target.value);
+  };
+
   const handleCreateConfigFile = () => {
     const branchName = prompt('Branch 이름을 입력해 주세요');
     if (!branchName) return;
@@ -154,27 +158,11 @@ export const TeamDeployNoneContainer = () => {
                     ) : (
                       <>
                         <div>config:</div>
-                        <div>&nbsp;&nbsp;name: {data?.deploy_name}</div>
-                        <div>
-                          &nbsp;&nbsp;port: <StyledInput type="text" value={configPort} onChange={handlePortChange} />
-                        </div>
+                        <div>&nbsp;&nbsp;name: {configName}</div>
+                        <div>&nbsp;&nbsp;port: {configPort}</div>
                         <div>&nbsp;&nbsp;domain:</div>
-                        <div>
-                          &nbsp;&nbsp;&nbsp;&nbsp;prod:{' '}
-                          <StyledInput
-                            type="text"
-                            value={configDomainProd}
-                            onChange={(e) => setConfigDomainProd(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          &nbsp;&nbsp;&nbsp;&nbsp;stag:{' '}
-                          <StyledInput
-                            type="text"
-                            value={configDomainStag}
-                            onChange={(e) => setConfigDomainStag(e.target.value)}
-                          />
-                        </div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;prod:{' ' + configDomainProd}</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;stag:{' ' + configDomainStag}</div>
                       </>
                     )}
                   </pre>
@@ -198,6 +186,34 @@ export const TeamDeployNoneContainer = () => {
                       </Radio>
                     </LayoutBox>
                   </LayoutBox>
+                  {usePrefix ? (
+                    <>
+                      <Input
+                        width={328}
+                        height={48}
+                        value={configPrefix}
+                        onChange={handlePrefixChange}
+                        label="prefix"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        width={328}
+                        height={48}
+                        value={configDomainProd}
+                        onChange={(e) => setConfigDomainProd(e.target.value)}
+                        label="prod domain"
+                      />
+                      <Input
+                        width={328}
+                        height={48}
+                        value={configDomainStag}
+                        onChange={(e) => setConfigDomainStag(e.target.value)}
+                        label="stag domain"
+                      />
+                    </>
+                  )}
                 </LayoutBox>
               </LayoutBox>
             </SecondStepContainer>
@@ -369,7 +385,6 @@ const WrapperBox = styled.div<{ width?: number; height?: number; radius?: number
 
 const SecondStepContainer = styled.div`
   width: 956px;
-  height: 300px;
   border-radius: 6px;
   border: 1px solid ${theme.color.gray5};
   padding: 20px 46px;
