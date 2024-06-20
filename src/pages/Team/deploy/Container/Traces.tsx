@@ -3,9 +3,9 @@ import { getTrace } from '@/utils/apis/trace';
 import { TraceType } from '@/utils/types/traceType';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
-import {useParams} from "react-router-dom";
-import {getDetailContainer} from "@/utils/apis/container";
-import {ContainerDetailType} from "@/utils/types/containerType";
+import { useParams } from 'react-router-dom';
+import { getDetailContainer } from '@/utils/apis/container';
+import { ContainerDetailType } from '@/utils/types/containerType';
 
 interface ExtendedDateTimeFormatOptions extends Intl.DateTimeFormatOptions {
   millisecond?: '2-digit' | '3-digit';
@@ -13,7 +13,6 @@ interface ExtendedDateTimeFormatOptions extends Intl.DateTimeFormatOptions {
 
 const getCurrentTimeFromStamp = (timestampNano: string) => {
   try {
-    // Convert nanoseconds to seconds
     const timestampSeconds = parseInt(timestampNano, 10) / 1_000_000_000;
     const myDate = new Date(timestampSeconds * 1000);
     const options: ExtendedDateTimeFormatOptions = {
@@ -26,7 +25,7 @@ const getCurrentTimeFromStamp = (timestampNano: string) => {
       millisecond: '3-digit',
       hour12: false,
     };
-    const formattedDateTime = myDate.toLocaleString('ko-KR', options);
+    const formattedDateTime = myDate.toLocaleString('en-US', options);
     const [dateTimeString, milliseconds] = formattedDateTime.split('.');
     if (milliseconds) {
       return `${dateTimeString}.${milliseconds.padStart(3, '0')}`;
@@ -39,15 +38,11 @@ const getCurrentTimeFromStamp = (timestampNano: string) => {
   }
 };
 
-const startTimeUnixNano = '1718630443155390045';
-const currentTime = getCurrentTimeFromStamp(startTimeUnixNano);
-console.log(currentTime); // Output: 2023년 4월 25일 21:07:23.155
-
 export const TeamDeployContainerTraces = () => {
+  const [container, setData] = useState<ContainerDetailType>();
   const [traces, setTraces] = useState<TraceType[]>();
 
   const { deployUUID, env } = useParams();
-  const [container, setData] = useState<ContainerDetailType>();
 
   useEffect(() => {
     if (deployUUID && env) {
@@ -55,17 +50,17 @@ export const TeamDeployContainerTraces = () => {
         setData(res.data);
       });
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-      const currentTime = Math.floor(Date.now() / 1000); // 현재 시간 (Unix 시간)
-      const oneHourAgo = currentTime - 3600; // 1시간 전 (Unix 시간)
+    const currentTime = Math.floor(Date.now() / 1000);
+    const oneHourAgo = currentTime - 3600;
 
-      if (container?.container_name) { // container_name이 undefined가 아닌 경우에만 실행
-        getTrace(container.container_name, oneHourAgo, currentTime).then((res) => {
-          setTraces(res.data.traces);
-        })
-      }
+    if (container?.container_name) {
+      getTrace(container.container_name, oneHourAgo, currentTime).then((res) => {
+        setTraces(res.data.traces);
+      });
+    }
   }, [container]);
 
   return (
@@ -88,11 +83,6 @@ export const TeamDeployContainerTraces = () => {
                 <DurationItem>{trace.durationMs}ms</DurationItem>
                 <MethodItem>{trace.rootTraceName.split(' ')[0]}</MethodItem>
                 <StatusCodeItem>
-                  {/* {
-                    trace.spanSet.spans[0].attributes.filter((attribute) => attribute.key === 'http.status_code')[0]
-                      .value.intValue
-                  } */}
-
                   {
                     trace.spanSet.spans[0].attributes.filter((attr) => attr.key === 'http.status_code')[0].value
                       .intValue
