@@ -55,8 +55,8 @@ export const menu: MenusType = {
         link: `/team/-team-/deploy/-deploy-/container/-env-/history`,
       },
       {
-        icon: 'uil:analytics',
-        name: '요청 통계',
+        icon: 'ic:outline-cloud',
+        name: 'Traces',
         link: `/team/-team-/deploy/-deploy-/container/-env-/traces`,
       },
     ],
@@ -75,8 +75,8 @@ export const menu: MenusType = {
         link: `/team/-team-/deploy/-deploy-/container/-env-/history`,
       },
       {
-        icon: 'uil:analytics',
-        name: '요청 통계',
+        icon: 'ic:outline-cloud',
+        name: 'Traces',
         link: `/team/-team-/deploy/-deploy-/container/-env-/traces`,
       },
     ],
