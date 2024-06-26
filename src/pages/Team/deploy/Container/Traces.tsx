@@ -39,6 +39,7 @@ const getCurrentTimeFromStamp = (timestampNano: string) => {
 };
 
 export const TeamDeployContainerTraces = () => {
+  const [selectedTrace, setSelectedTrace] = useState<string | null>(null);
   const [container, setData] = useState<ContainerDetailType>();
   const [traces, setTraces] = useState<TraceType[]>();
 
@@ -57,17 +58,14 @@ export const TeamDeployContainerTraces = () => {
     const oneHourAgo = currentTime - 3605;
 
     if (container?.container_name) {
-      console.log(oneHourAgo, currentTime);
       getTrace(container.container_name, oneHourAgo, currentTime).then((res) => {
         setTraces(res.data.traces);
       });
 
       const interval = setInterval(() => {
         const newCurrentTime = Math.floor(Date.now() / 1000) - 5;
-        console.log(currentTime, newCurrentTime);
         getTrace(container.container_name, currentTime, newCurrentTime)
           .then((res) => {
-            console.log(res.data.traces);
             setTraces((prevTraces) => {
               return [...res.data.traces, ...(prevTraces || [])];
             });
@@ -83,37 +81,56 @@ export const TeamDeployContainerTraces = () => {
   }, [container]);
 
   return (
-    <Wrapper>
-      <TracesContainer>
-        <TraceLabel>
-          <DateLabel>DATE</DateLabel>
-          <ResourceLabel>RESOURCE</ResourceLabel>
-          <DurationLabel>DURATION</DurationLabel>
-          <MethodLabel>METHOD</MethodLabel>
-          <StatusCodeLabel>STATUS CODE</StatusCodeLabel>
-        </TraceLabel>
-        {traces &&
-          traces.map((trace, index) => {
-            const currentTime = getCurrentTimeFromStamp(trace.startTimeUnixNano);
-            return (
-              <TraceItem key={index}>
-                <DateItem>{currentTime}</DateItem>
-                <ResourceItem>{trace.rootTraceName}</ResourceItem>
-                <DurationItem>{trace.durationMs}ms</DurationItem>
-                <MethodItem>{trace.rootTraceName.split(' ')[0]}</MethodItem>
-                <StatusCodeItem>
-                  {
-                    trace.spanSet.spans[0].attributes.filter((attr) => attr.key === 'http.status_code')[0].value
-                      .intValue
-                  }
-                </StatusCodeItem>
-              </TraceItem>
-            );
-          })}
-      </TracesContainer>
-    </Wrapper>
+    <>
+      <TraceInformation selectedTrace={selectedTrace}>{selectedTrace}</TraceInformation>
+      <Wrapper>
+        <TracesContainer>
+          <TraceLabel>
+            <DateLabel>DATE</DateLabel>
+            <ResourceLabel>RESOURCE</ResourceLabel>
+            <DurationLabel>DURATION</DurationLabel>
+            <MethodLabel>METHOD</MethodLabel>
+            <StatusCodeLabel>STATUS CODE</StatusCodeLabel>
+          </TraceLabel>
+          {traces &&
+            traces.map((trace, index) => {
+              const currentTime = getCurrentTimeFromStamp(trace.startTimeUnixNano);
+              return (
+                <TraceItem
+                  key={index}
+                  onClick={() => {
+                    setSelectedTrace(trace.traceID === selectedTrace ? null : trace.traceID);
+                  }}
+                >
+                  <DateItem>{currentTime}</DateItem>
+                  <ResourceItem>{trace.rootTraceName}</ResourceItem>
+                  <DurationItem>{trace.durationMs}ms</DurationItem>
+                  <MethodItem>{trace.rootTraceName.split(' ')[0]}</MethodItem>
+                  <StatusCodeItem>
+                    {
+                      trace.spanSet.spans[0].attributes.filter((attr) => attr.key === 'http.status_code')[0].value
+                        .intValue
+                    }
+                  </StatusCodeItem>
+                </TraceItem>
+              );
+            })}
+        </TracesContainer>
+      </Wrapper>
+    </>
   );
 };
+
+const TraceInformation = styled.div<{ selectedTrace: string | null }>`
+  position: fixed;
+  bottom: 0;
+  right: ${({ selectedTrace }) => (Boolean(selectedTrace) ? '0' : '-1500px')};
+  border-left: 1px solid ${theme.color.gray4};
+  width: 1500px;
+  height: calc(100vh - 80px);
+  background-color: ${theme.color.gray1};
+  transition: right 0.7s ease-in-out;
+`;
 
 const Wrapper = styled.div`
   width: 100%;
@@ -151,27 +168,31 @@ const DateLabel = styled.div`
 `;
 
 const ResourceLabel = styled.div`
-  width: 382px;
+  width: 800px;
   display: flex;
   align-items: center;
 `;
 
 const DurationLabel = styled.div`
-  width: 160px;
+  width: 150px;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const MethodLabel = styled.div`
-  width: 326px;
+  width: 150px;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const StatusCodeLabel = styled.div`
-  width: 386px;
+  width: 190px;
+  padding-right: 40px;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const TraceItem = styled.div`
@@ -181,8 +202,14 @@ const TraceItem = styled.div`
   font-weight: 300;
   display: flex;
   border-bottom: 1px solid ${theme.color.gray4};
+  background-color: ${theme.color.gray1};
+  transition: 0.1s linear;
+  cursor: pointer;
   &:last-child {
     border-bottom: none;
+  }
+  &:hover {
+    background-color: #eaf6fc;
   }
 `;
 
@@ -195,30 +222,32 @@ const DateItem = styled.div`
 `;
 
 const ResourceItem = styled.div`
-  width: 382px;
+  width: 800px;
   display: flex;
   align-items: center;
   font-variant-numeric: tabular-nums;
 `;
 
 const DurationItem = styled.div`
-  width: 160px;
+  width: 150px;
   display: flex;
   align-items: center;
+  justify-content: center;
   font-variant-numeric: tabular-nums;
 `;
 
 const MethodItem = styled.div`
-  width: 326px;
+  width: 150px;
   display: flex;
   align-items: center;
-  font-variant-numeric: tabular-nums;
+  justify-content: center;
 `;
 
 const StatusCodeItem = styled.div`
-  width: 386px;
+  width: 190px;
+  padding-right: 40px;
   display: flex;
   align-items: center;
-  padding-left: 30px;
+  justify-content: center;
   font-variant-numeric: tabular-nums;
 `;
