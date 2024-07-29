@@ -1,7 +1,7 @@
 import { DeployCreateType } from '../types/deployType';
 import { instance } from './axios';
 
-const router = 'deploy';
+const router = 'v1/deploy';
 
 export const deployCreate = async (teamUUID: string, data: DeployCreateType) => {
   return await instance.post(`${router}?team_id=${teamUUID}`, data);

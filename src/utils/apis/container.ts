@@ -1,7 +1,7 @@
 import { ContainerEnvType } from '../types/containerType';
 import { instance } from './axios';
 
-const router = 'container';
+const router = 'v1/container';
 
 export const getAllContainer = async (deployUUID: string) => {
   return await instance.get(`${router}?deployId=${deployUUID}`);

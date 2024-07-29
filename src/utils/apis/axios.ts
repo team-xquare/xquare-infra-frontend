@@ -22,27 +22,29 @@ instance.interceptors.response.use(
   (res) => {
     return res;
   },
-  // (err) => {
-  //   const {
-  //     response: { status },
-  //   } = err;
-  //   if (status === 403 || status === 401) {
-  //     alert('다시 로그인 ㄱㄱ');
-  //     // const token = Cookie.get('refreshToken');
-  //     // reissue(token)
-  //     //   .then((res) => {
-  //     //     Cookie.set('accessToken', res.data.access_token);
-  //     //     Cookie.set('refreshToken', res.data.refresh_token);
-  //     //     window.location.reload();
-  //     //   })
-  //     //   .catch(() => {
-  //     //     Cookie.remove('accessToken');
-  //     //     Cookie.remove('refreshToken');
-  //     //     window.location.href = '/signin';
-  //     //   });
-  //   } else {
-  //     // toast.error('오류가 발생헀습니다');
-  //     return Promise.reject(err);
-  //   }
-  // },
+  (err) => {
+    const {
+      response: { status },
+    } = err;
+    if (status === 403 || status === 401) {
+      Cookie.remove('accessToken');
+      Cookie.remove('refreshToken');
+      window.location.href = '';
+      // const token = Cookie.get('refreshToken');
+      // reissue(token)
+      //   .then((res) => {
+      //     Cookie.set('accessToken', res.data.access_token);
+      //     Cookie.set('refreshToken', res.data.refresh_token);
+      //     window.location.reload();
+      //   })
+      //   .catch(() => {
+      //     Cookie.remove('accessToken');
+      //     Cookie.remove('refreshToken');
+      //     window.location.href = '/signin';
+      //   });
+    } else {
+      // toast.error('오류가 발생헀습니다');
+      return Promise.reject(err);
+    }
+  },
 );

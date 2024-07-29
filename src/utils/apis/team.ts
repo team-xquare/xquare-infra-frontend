@@ -1,7 +1,7 @@
 import { TeamCreateType } from '../types/teamType';
 import { instance } from './axios';
 
-const router = 'team';
+const router = 'v1/team';
 
 export const teamCheck = async () => {
   return await instance.get(`${router}/my-team`);
