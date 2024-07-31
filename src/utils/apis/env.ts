@@ -7,5 +7,5 @@ export const getEnv = async (deployUUID: string, env: string) => {
 };
 
 export const patchEnv = async (deployUUID: string, env: string, data: Record<string, string>) => {
-  return await instance.get(`${router}?deployId=${deployUUID}&environment=${env}`, data);
+  return await instance.patch(`${router}?deployId=${deployUUID}&environment=${env}`, data);
 };
