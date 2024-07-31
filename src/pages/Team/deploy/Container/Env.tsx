@@ -3,13 +3,14 @@ import { Input } from '@/components/common/Input';
 import { XButton } from '@/components/common/XButton';
 import { theme } from '@/style/theme';
 import { getDetailContainer } from '@/utils/apis/container';
-import { getEnv } from '@/utils/apis/env';
+import { getEnv, patchEnv } from '@/utils/apis/env';
 import { ContainerDetailType } from '@/utils/types/containerType';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import EyeImg from '@/assets/Eye.svg';
 import EyeCloseImg from '@/assets/EyeClose.svg';
+import DeleteImg from '@/assets/Delete.svg';
 
 export const TeamDeployContainerEnv = () => {
   const { deployUUID, env } = useParams();
@@ -68,11 +69,44 @@ export const TeamDeployContainerEnv = () => {
     });
   };
 
+  const handleDeleteEnv = (keyToDelete: string) => {
+    setEnvList((prevEnvList) => {
+      const newEnvList = { ...prevEnvList };
+      delete newEnvList[keyToDelete];
+      return newEnvList;
+    });
+    setOpenStates((prevOpenStates) => {
+      const newOpenStates = { ...prevOpenStates };
+      delete newOpenStates[keyToDelete];
+      return newOpenStates;
+    });
+  };
+
   const toggleOpen = (key: string) => {
     setOpenStates((prevOpenStates) => ({
       ...prevOpenStates,
       [key]: !prevOpenStates[key],
     }));
+  };
+
+  const onSubmit = () => {
+    if (!deployUUID || !env || !envList) return;
+
+    patchEnv(deployUUID, env, envList).then(() => {
+      alert('배포 버튼을 클릭하여 수동으로 배포해주세요');
+      getEnv(deployUUID, env)
+        .then((res) => {
+          setEnvList(res.data);
+          setOriginEnv(res.data);
+          setOpenStates(Object.keys(res.data).reduce((acc, key) => ({ ...acc, [key]: false }), {}));
+          setIsEdit(false);
+        })
+        .catch(() => {
+          alert('오류가 생겼습니다');
+          setIsEdit(false);
+          setEnvList(originEnv);
+        });
+    });
   };
 
   return (
@@ -103,7 +137,10 @@ export const TeamDeployContainerEnv = () => {
               </div>
               <div>
                 {isEdit ? (
-                  <Input width={740} value={value} onChange={(e) => handleEnvChange(key, e.target.value, false)} />
+                  <>
+                    <Input width={740} value={value} onChange={(e) => handleEnvChange(key, e.target.value, false)} />
+                    <img src={DeleteImg} style={{ cursor: 'pointer' }} onClick={() => handleDeleteEnv(key)} />
+                  </>
                 ) : (
                   <>
                     <img
@@ -125,14 +162,7 @@ export const TeamDeployContainerEnv = () => {
       </EnvContainerWrapper>
       {isEdit && (
         <ButtonContainer>
-          <XButton
-            width={58}
-            height={50}
-            onClick={() => {
-              setIsEdit(false);
-              setEnvList(originEnv);
-            }}
-          >
+          <XButton width={58} height={50} onClick={onSubmit}>
             저장
           </XButton>
         </ButtonContainer>
