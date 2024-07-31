@@ -15,7 +15,7 @@ export const TeamDeploy = () => {
 
   const { data } = useCustomQuery({
     queryKey: ['teamUUID'],
-    url: `/deploy/all?teamId=${teamUUID}`,
+    url: `/v1/deploy/all?teamId=${teamUUID}`,
     select: (res) => res.data,
   });
   const count = Math.ceil(data?.deploy_list.length / 4) || 1;

@@ -1,6 +1,6 @@
 import { instance } from './axios';
 
-const router = '//container/environment-variable';
+const router = 'v1/container/environment-variable';
 
 export const getEnv = async (deployUUID: string, env: string) => {
   return await instance.get(`${router}?deployId=${deployUUID}&environment=${env}`);
