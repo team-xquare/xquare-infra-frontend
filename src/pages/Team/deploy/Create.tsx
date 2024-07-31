@@ -40,7 +40,7 @@ export const TeamDeployCreate = () => {
     console.log(data);
 
     deployCreate(teamUUID, data).then((res) => {
-      link(`/team/${teamUUID}/deploy/${res.data.deploy_id}`);
+      link(`v1/team/${teamUUID}/deploy/${res.data.deploy_id}`);
     });
   };
 
