@@ -16,7 +16,7 @@ ChannelService.boot({
 
 export const Main = () => {
   const navigate = useNavigate();
-  console.log('deploy test!!!');
+  console.log('deploy test!!!!');
 
   useEffect(() => {
     const data = Cookie.get('accessToken');
