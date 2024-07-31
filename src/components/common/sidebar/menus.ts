@@ -32,6 +32,32 @@ const deploy_inside = {
   ],
 };
 
+const container_inside = {
+  back: '/team/-team-/deploy/-deploy-/container',
+  menu: [
+    {
+      icon: 'f7:shippingbox',
+      name: '컨테이너 상태',
+      link: '/team/-team-/deploy/-deploy-/container/-env-',
+    },
+    {
+      icon: 'ph:list-bold',
+      name: '배포 내역',
+      link: `/team/-team-/deploy/-deploy-/container/-env-/history`,
+    },
+    {
+      icon: 'ic:outline-cloud',
+      name: 'Traces',
+      link: `/team/-team-/deploy/-deploy-/container/-env-/traces`,
+    },
+    {
+      icon: 'uil:setting',
+      name: '환경변수',
+      link: `/team/-team-/deploy/-deploy-/container/-env-/env`,
+    },
+  ],
+};
+
 export const menu: MenusType = {
   '/team': team,
   '/team/create': team,
@@ -41,44 +67,8 @@ export const menu: MenusType = {
   // '/team/:id/container': deploy,
   '/team/:id/deploy/:id': deploy_inside,
   '/team/:id/deploy/:id/container': deploy_inside,
-  '/team/:id/deploy/:id/container/:env': {
-    back: '/team/-team-/deploy/-deploy-/container',
-    menu: [
-      {
-        icon: 'f7:shippingbox',
-        name: '컨테이너 상태',
-        link: '/team/-team-/deploy/-deploy-/container/-env-',
-      },
-      {
-        icon: 'ph:list-bold',
-        name: '배포 내역',
-        link: `/team/-team-/deploy/-deploy-/container/-env-/history`,
-      },
-      {
-        icon: 'ic:outline-cloud',
-        name: 'Traces',
-        link: `/team/-team-/deploy/-deploy-/container/-env-/traces`,
-      },
-    ],
-  },
-  '/team/:id/deploy/:id/container/:env/traces': {
-    back: '/team/-team-/deploy/-deploy-/container',
-    menu: [
-      {
-        icon: 'f7:shippingbox',
-        name: '컨테이너 상태',
-        link: '/team/-team-/deploy/-deploy-/container/-env-',
-      },
-      {
-        icon: 'ph:list-bold',
-        name: '배포 내역',
-        link: `/team/-team-/deploy/-deploy-/container/-env-/history`,
-      },
-      {
-        icon: 'ic:outline-cloud',
-        name: 'Traces',
-        link: `/team/-team-/deploy/-deploy-/container/-env-/traces`,
-      },
-    ],
-  },
+  '/team/:id/deploy/:id/container/:env': container_inside,
+  '/team/:id/deploy/:id/container/:env/traces': container_inside,
+  '/team/:id/deploy/:id/container/:env/env': container_inside,
+  '/team/:id/deploy/:id/container/:env/history': container_inside,
 };
