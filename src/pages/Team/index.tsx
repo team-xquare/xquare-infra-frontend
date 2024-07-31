@@ -15,7 +15,7 @@ export const Team = () => {
 
   const { data: teamList }: TeamCheckType = useCustomQuery({
     queryKey: ['team-list'],
-    url: 'v1/team/my-team',
+    url: '/team/my-team',
     select: (res) => res?.data.team_list,
   });
 
