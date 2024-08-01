@@ -54,7 +54,7 @@ export const TeamDeployContainerHistory = () => {
     }
   }, [deployUUID, env]);
 
-  if (data?.is_v2)
+  if (!data?.is_v2)
     return (
       <Wrapper>
         <div style={{ fontSize: '48px', color: theme.color.gray9, fontWeight: '700', paddingTop: '200px' }}>
