@@ -19,4 +19,5 @@ export type ContainerDetailType = {
   last_deploy: string;
   container_status: ContainerStatusType;
   container_name: string;
+  is_v2: boolean;
 };
