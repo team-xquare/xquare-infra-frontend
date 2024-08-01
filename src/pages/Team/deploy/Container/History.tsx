@@ -12,13 +12,14 @@ import LongArrowImg from '@/assets/LongArrow.svg';
 import { UnknownIcon } from '@/assets/UnknownIcon';
 import { PassedIcon } from '@/assets/PassedIcon';
 import { FailedIcon } from '@/assets/FailedIcon';
-import { BuildingIcon } from '@/assets/BuildingIcon';
+// import { BuildingIcon } from '@/assets/BuildingIcon';
+import { Loader } from '@/components/Loader';
 
 const Stage = ({ name, status }: StageType) => {
   const onIcon = () => {
     switch (status) {
       case 'Building':
-        return <BuildingIcon size={24} color={theme.color.mainDark1} />;
+        return <Loader />;
       case 'Failed':
         return <FailedIcon size={24} color={theme.color.errorDark1} />;
       case 'Passed':
@@ -53,12 +54,13 @@ export const TeamDeployContainerHistory = () => {
     }
   }, [deployUUID, env]);
 
-  if (!data?.is_v2)
+  if (data?.is_v2)
     return (
       <Wrapper>
         <div style={{ fontSize: '48px', color: theme.color.gray9, fontWeight: '700', paddingTop: '200px' }}>
           배포 내역을 조회할 수 없습니다
         </div>
+        <Loader />
       </Wrapper>
     );
 
