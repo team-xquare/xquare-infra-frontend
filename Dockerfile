@@ -40,7 +40,6 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # 3000포트 열기
 EXPOSE 3000
-
 # Nginx 시작
 CMD ["nginx", "-g", "daemon off;"]
 
