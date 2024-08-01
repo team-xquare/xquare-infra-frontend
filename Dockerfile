@@ -43,3 +43,5 @@ EXPOSE 3000
 
 # Nginx 시작
 CMD ["nginx", "-g", "daemon off;"]
+
+
