@@ -265,7 +265,9 @@ const Log = styled.div<{ isDark: boolean; isFull: boolean }>`
 `;
 
 const LogText = styled.pre<{ isDark: boolean }>`
-  padding: 0 20px 0 20px;
+  padding: 0 20px;
   font-variant-numeric: tabular-nums;
   color: ${({ isDark }) => (isDark ? '#CCCCCC' : theme.color.gray9)};
+  font-family: 'JetBrains Mono';
+  font-weight: 500;
 `;
