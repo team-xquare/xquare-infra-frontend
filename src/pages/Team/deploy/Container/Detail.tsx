@@ -270,4 +270,5 @@ const LogText = styled.pre<{ isDark: boolean }>`
   color: ${({ isDark }) => (isDark ? '#CCCCCC' : theme.color.gray9)};
   font-family: 'JetBrains Mono';
   font-weight: 500;
+  font-size: 12px;
 `;
