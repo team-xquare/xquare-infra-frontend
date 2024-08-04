@@ -2,6 +2,14 @@ import { Global, css } from '@emotion/react';
 
 const style = css`
   @font-face {
+    font-family: 'JetBrains Mono';
+    src: url('https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&family=JetBrains+Mono:wght@800&display=swap')
+      format('woff');
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  @font-face {
     font-family: 'Pretendard';
     font-weight: 900;
     font-style: normal;
