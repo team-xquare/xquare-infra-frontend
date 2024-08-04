@@ -9,7 +9,7 @@ type LayoutBoxPropsType = {
   align?: 'start' | 'end' | 'center';
   gap?: number;
   max?: number;
-  children: ReactNode;
+  children?: ReactNode;
 };
 
 export const LayoutBox = ({ width, height, flex, justify, align, gap, children, max }: LayoutBoxPropsType) => {
