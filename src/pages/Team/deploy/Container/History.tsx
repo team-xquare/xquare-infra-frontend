@@ -60,7 +60,6 @@ export const TeamDeployContainerHistory = () => {
         <div style={{ fontSize: '48px', color: theme.color.gray9, fontWeight: '700', paddingTop: '200px' }}>
           배포 내역을 조회할 수 없습니다
         </div>
-        <Loader />
       </Wrapper>
     );
 
