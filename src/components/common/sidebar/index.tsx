@@ -16,6 +16,7 @@ const rawPath = (url: string) =>
     .map((i: any) => {
       if (i.includes('-')) return ':id';
       else if (i === 'stag' || i === 'prod') return ':env';
+      else if (i > 0) return ':pipelineCounter';
       else return i;
     })
     .join('/');
@@ -36,7 +37,12 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
   const { back, menu: menus } = menuData;
 
   return (
-    <Wrapper isOpen={isOpen}>
+    <Wrapper
+      isOpen={isOpen}
+      onClick={() => {
+        console.log(raw_pathname);
+      }}
+    >
       {back && (
         <BackContainer isOpen={isOpen} onClick={() => navigate(replaceIDs(back, params))}>
           <div>
