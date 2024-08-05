@@ -1,333 +1,370 @@
-import { XButton } from '@/components/common/XButton';
-import { theme } from '@/style/theme';
-import styled from '@emotion/styled';
-import { LayoutBox } from '@/components/common/LayoutBox';
-import ExamImg1Src from '@/assets/example/ExamImg1.png';
-import ExamImg2Src from '@/assets/example/ExamImg2.png';
-import ExamImg3Src from '@/assets/example/ExamImg3.png';
 import { getDetailDeploy } from '@/utils/apis/deploy';
-import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { DeployDetailType } from '@/utils/types/deployType';
-import { checkFileExists } from '@/utils/apis/github';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import styled from '@emotion/styled';
+import { theme } from '@/style/theme';
+import { LayoutBox } from '@/components/common/LayoutBox';
 import { Input } from '@/components/common/Input';
-import { Radio } from '@/components/common/Radio';
+import { SelectBar } from '@/components/common/SelectBar';
+import { XButton } from '@/components/common/XButton';
+import { nodeVersion, jdkVersion } from '@/assets/versions';
+import {
+  writeContainerConfig,
+  writeContainerGradle,
+  writeContainerNginx,
+  writeContainerNode,
+} from '@/utils/apis/container';
+
+const renderTypeList = ['csr', 'ssr'];
+const frameworkList = ['spring boot', 'node'];
 
 export const TeamDeployNoneContainer = () => {
-  const { deployUUID } = useParams();
-  const [data, setData] = useState<DeployDetailType>();
-  const [usePrefix, setUsePrefix] = useState(true);
-  const [configName, setConfigName] = useState(data?.deploy_name);
-  const [configPort, setConfigPort] = useState('8080');
-  const [configPrefix, setConfigPrefix] = useState('/' + data?.deploy_name);
-  const [configDomainProd, setConfigDomainProd] = useState(data?.deploy_name + '.xquare.app');
-  const [configDomainStag, setConfigDomainStag] = useState(data?.deploy_name + '-stag.xquare.app');
-  const [isCreatedConfig, setIsCreatedConfig] = useState<boolean | null>(false);
-  const [isCreatedDocker, setIsCreatedDocker] = useState<boolean | null>(false);
+  const { deployUUID, env } = useParams();
+  const [deployData, setDeployData] = useState<DeployDetailType>();
 
-  const handleOptionChange = (option: boolean) => {
-    setUsePrefix(option);
-  };
+  // 공통 상태
+  const [deployType, setDeployType] = useState<'frontend' | 'backend'>('frontend');
+  const [renderType, setRenderType] = useState<'csr' | 'ssr'>('csr');
+  const [framework, setFramework] = useState<'spring boot' | 'node'>('node');
+
+  // stag 환경 상태
+  const [stagPort, setStagPort] = useState<string>('');
+  const [stagBranch, setStagBranch] = useState<string>('');
+  const [stagDomain, setStagDomain] = useState<string>('');
+
+  // prod 환경 상태
+  const [prodPort, setProdPort] = useState<string>('');
+  const [prodBranch, setProdBranch] = useState<string>('');
+  const [prodDomain, setProdDomain] = useState<string>('');
+
+  // 빌드 관련 상태
+  const [selectedNodeVersion, setSelectedNodeVersion] = useState<string>(nodeVersion[0]);
+  const [selectedJdkVersion, setSelectedJdkVersion] = useState<string>(jdkVersion[0]);
+  const [buildCommand, setBuildCommand] = useState<string>('');
+  const [outputDir, setOutputDir] = useState<string>('');
 
   useEffect(() => {
     if (!deployUUID) return;
 
     getDetailDeploy(deployUUID).then((res) => {
-      setData(res.data);
-      setConfigName(res.data?.deploy_name);
-      setConfigPrefix(`/${res.data?.deploy_name}`);
-      setConfigDomainProd(`${res.data?.deploy_name}.xquare.app`);
-      setConfigDomainStag(`${res.data?.deploy_name}-stag.xquare.app`);
+      setDeployData(res.data);
     });
-  }, [deployUUID]);
+  }, []);
 
-  const handlePortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConfigPort(e.target.value);
-  };
+  const generateRequestData = (): {
+    stag: { branch: string; container_port: string; domain: string };
+    prod: { branch: string; container_port: string; domain: string };
+    language: string;
+    node_version?: string;
+    build_commands?: string[];
+    command?: string;
+    output_dir?: string;
+    jdk_version?: string;
+  } => {
+    const commonData = {
+      stag: {
+        branch: stagBranch,
+        container_port: stagPort,
+        domain: `${stagDomain}.xquare.app`,
+      },
+      prod: {
+        branch: prodBranch,
+        container_port: prodPort,
+        domain: `${prodDomain}.xquare.app`,
+      },
+      language: deployType === 'frontend' || framework === 'node' ? 'javascript' : 'java',
+    };
 
-  const handlePrefixChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConfigPrefix(e.target.value);
-  };
-
-  const handleCreateConfigFile = () => {
-    const branchName = prompt('Branch 이름을 입력해 주세요');
-    if (!branchName) return;
-
-    const content = usePrefix
-      ? `config:\n  name: ${configName}\n  port: ${configPort}\n  prefix: ${configPrefix}`
-      : `config:\n  name: dms\n  port: ${configPort}\n  domain:\n    prod: ${configDomainProd}\n    stag: ${configDomainStag}`;
-    const encodedContent = encodeURIComponent(content);
-    const url = `${data?.github_full_url}/new/${branchName}?filename=.xquare/config.yaml&value=${encodedContent}`;
-
-    window.open(url, '_blank');
-  };
-
-  const handleCheckConfigFile = async () => {
-    const branchName = prompt('Branch 이름을 입력해 주세요');
-    if (!branchName) return;
-
-    const filePath = '.xquare/config.yaml';
-    try {
-      const fileExists = await checkFileExists(
-        data?.github_full_url.split('https://github.com/')[1] ?? '',
-        branchName,
-        filePath,
-      );
-      if (fileExists) {
-        setIsCreatedConfig(true);
+    let specificData = {};
+    if (deployType === 'frontend') {
+      specificData =
+        renderType === 'csr'
+          ? {
+              node_version: selectedNodeVersion,
+              build_commands: [buildCommand],
+              command: 'yarn dev',
+            }
+          : {
+              node_version: selectedNodeVersion,
+              build_commands: [buildCommand],
+              output_dir: outputDir,
+            };
+    } else {
+      // backend
+      if (framework === 'spring boot') {
+        specificData = {
+          jdk_version: selectedJdkVersion,
+          output_dir: '/build/libs/*.jar',
+          build_commands: [buildCommand || './gradlew build -x test'],
+        };
       } else {
-        setIsCreatedConfig(false);
+        // node
+        specificData = {
+          node_version: selectedNodeVersion,
+          build_commands: [buildCommand],
+          command: 'yarn dev',
+        };
       }
-    } catch (error) {
-      console.error('Error checking file existence:', error);
-      setIsCreatedConfig(null);
     }
+
+    return { ...commonData, ...specificData };
   };
 
-  const handleCheckDockerFile = async () => {
-    const branchName = prompt('Branch 이름을 입력해 주세요');
-    if (!branchName) return;
+  const onSubmit = () => {
+    const requestData = generateRequestData();
 
-    const filePath = 'Dockerfile';
-    try {
-      const fileExists = await checkFileExists(
-        data?.github_full_url.split('https://github.com/')[1] ?? '',
-        branchName,
-        filePath,
-      );
-      if (fileExists) {
-        setIsCreatedDocker(true);
-      } else {
-        setIsCreatedDocker(false);
+    if (!deployUUID) return;
+
+    writeContainerConfig(deployUUID, {
+      prod: requestData.prod,
+      stag: requestData.stag,
+      language: requestData.language,
+    });
+
+    const timeout = setTimeout(() => {
+      if (
+        deployType === 'backend' &&
+        framework === 'spring boot' &&
+        requestData.build_commands &&
+        requestData.jdk_version &&
+        requestData.output_dir
+      ) {
+        writeContainerGradle(deployUUID, 'prod', {
+          build_commands: requestData.build_commands,
+          jdk_version: requestData.jdk_version,
+          output_dir: requestData.output_dir,
+        });
+        writeContainerGradle(deployUUID, 'stag', {
+          build_commands: requestData.build_commands,
+          jdk_version: requestData.jdk_version,
+          output_dir: requestData.output_dir,
+        });
+      } else if (
+        (deployType === 'backend' &&
+          framework === 'node' &&
+          requestData.build_commands &&
+          requestData.command &&
+          requestData.node_version) ||
+        (deployType === 'frontend' &&
+          renderType === 'ssr' &&
+          requestData.build_commands &&
+          requestData.command &&
+          requestData.node_version)
+      ) {
+        writeContainerNode(deployUUID, 'prod', {
+          node_version: requestData.node_version,
+          build_commands: requestData.build_commands,
+          command: requestData.command,
+        });
+        writeContainerNode(deployUUID, 'stag', {
+          node_version: requestData.node_version,
+          build_commands: requestData.build_commands,
+          command: requestData.command,
+        });
+      } else if (
+        deployType === 'frontend' &&
+        renderType === 'csr' &&
+        requestData.build_commands &&
+        requestData.output_dir &&
+        requestData.node_version
+      ) {
+        writeContainerNginx(deployUUID, 'prod', {
+          node_version: requestData.node_version,
+          build_commands: requestData.build_commands,
+          output_dir: requestData.output_dir,
+        });
+        writeContainerNginx(deployUUID, 'stag', {
+          node_version: requestData.node_version,
+          build_commands: requestData.build_commands,
+          output_dir: requestData.output_dir,
+        });
       }
-    } catch (error) {
-      console.error('Error checking file existence:', error);
-      setIsCreatedDocker(null);
-    }
+    }, 1500);
   };
 
   return (
-    <LayoutBox width="100%" flex="column" align="center" gap={48} height="4728px">
-      <LayoutBox width="100%" max={1120} flex="column" gap={4}>
-        <TeamName>{data?.team_name_ko}</TeamName>
+    <Wrapper>
+      <TitleContainer>
+        {deployData && (
+          <TeamName>
+            {deployData.team_name_ko} / {deployData.deploy_name}
+          </TeamName>
+        )}
         <Title>컨테이너</Title>
         <Describtion>정의한 배포에 대한 컨테이너를 인프라에 생성, 관리합니다.</Describtion>
-        <Text>
-          GitHub Actions 워크플로우를 사용해 프로젝트를 Xquare 서버에 배포하고 관리할 수 있습니다.
-          <br />
-          아래 설명에 따라 워크플로우를 설정하여 서버를 배포해보세요.
-        </Text>
-      </LayoutBox>
-      <LayoutBox width="100%" max={1120} gap={40} flex="column">
+      </TitleContainer>
+      <StepContainerWrapper>
         <LayoutBox width="100%" align="start" gap={24}>
           <NumberBox>1</NumberBox>
-          <LayoutBox flex="column" gap={20}>
-            <Text>프로젝트 레포지토리 정보가 정상적으로 등록되었습니다!</Text>
-            <LayoutBox align="center" gap={20}>
-              <WrapperBox height={72} radius={10} style={{ paddingLeft: '30px' }}>
-                {data?.github_full_url}
-              </WrapperBox>
-              <XButton width={80} height={58}>
-                재확인
-              </XButton>
+          <LayoutBox flex="column" gap={6}>
+            <Text>아래 정보를 입력해 주세요!</Text>
+            <LayoutBox flex="row" gap={16}>
+              <DeployTypeBox isSelected={deployType === 'frontend'} onClick={() => setDeployType('frontend')}>
+                frontend
+              </DeployTypeBox>
+              <DeployTypeBox isSelected={deployType === 'backend'} onClick={() => setDeployType('backend')}>
+                backend
+              </DeployTypeBox>
             </LayoutBox>
           </LayoutBox>
         </LayoutBox>
-
         <LayoutBox width="100%" align="start" gap={24}>
           <NumberBox>2</NumberBox>
-          <LayoutBox flex="column" gap={20}>
-            <Text>레포지토리의 .xquare/config.yaml 경로에 배포를 위한 설정 파일을 등록해주세요.</Text>
-            <SecondStepContainer>
-              <Text>아래 정보를 입력하여 설정 파일을 생성해보세요!</Text>
-              <LayoutBox justify="space-between">
-                <WrapperBox
-                  width={440}
-                  height={200}
-                  radius={20}
-                  style={{ justifyContent: 'left', paddingLeft: '30px' }}
-                >
-                  <pre>
-                    {usePrefix ? (
-                      <>
-                        <div>config:</div>
-                        <div>&nbsp;&nbsp;name: {configName}</div>
-                        <div>&nbsp;&nbsp;port: {configPort}</div>
-                        <div>&nbsp;&nbsp;prefix:{' ' + configPrefix}</div>
-                      </>
-                    ) : (
-                      <>
-                        <div>config:</div>
-                        <div>&nbsp;&nbsp;name: {configName}</div>
-                        <div>&nbsp;&nbsp;port: {configPort}</div>
-                        <div>&nbsp;&nbsp;domain:</div>
-                        <div>&nbsp;&nbsp;&nbsp;&nbsp;prod:{' ' + configDomainProd}</div>
-                        <div>&nbsp;&nbsp;&nbsp;&nbsp;stag:{' ' + configDomainStag}</div>
-                      </>
-                    )}
-                  </pre>
-                </WrapperBox>
-                <LayoutBox flex="column" gap={20}>
+          <LayoutBox flex="column" gap={6}>
+            <Text>아래 정보를 입력해 주세요!</Text>
+            <LayoutBox flex="row" gap={60}>
+              <LayoutBox flex="column" gap={10}>
+                <Text>개발 환경(stag)</Text>
+                <Input
+                  width={328}
+                  height={46}
+                  placeholder="서비스 port"
+                  value={stagPort}
+                  onChange={(e) => setStagPort(e.target.value)}
+                />
+                <Input
+                  width={328}
+                  height={46}
+                  placeholder="Github Branch"
+                  value={stagBranch}
+                  onChange={(e) => setStagBranch(e.target.value)}
+                />
+                <LayoutBox flex="row" gap={10} align="center">
                   <Input
-                    width={328}
-                    height={48}
-                    value={configPort}
-                    onChange={handlePortChange}
-                    label="요청을 받을 포트"
+                    width={220}
+                    height={46}
+                    placeholder="your sub domain"
+                    value={stagDomain}
+                    onChange={(e) => setStagDomain(e.target.value)}
                   />
-                  <LayoutBox flex="column" gap={10}>
-                    <Text>배포 URL 설정</Text>
-                    <LayoutBox gap={20}>
-                      <Radio isChecked={usePrefix} onChange={() => handleOptionChange(true)} isBold>
-                        prefix 사용
-                      </Radio>
-                      <Radio isChecked={!usePrefix} onChange={() => handleOptionChange(false)} isBold>
-                        xquare.app 하위 도메인 사용
-                      </Radio>
-                    </LayoutBox>
-                  </LayoutBox>
-                  {usePrefix ? (
-                    <>
-                      <Input
-                        width={328}
-                        height={48}
-                        value={configPrefix}
-                        onChange={handlePrefixChange}
-                        label="prefix"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <Input
-                        width={328}
-                        height={48}
-                        value={configDomainProd}
-                        onChange={(e) => setConfigDomainProd(e.target.value)}
-                        label="prod domain"
-                      />
-                      <Input
-                        width={328}
-                        height={48}
-                        value={configDomainStag}
-                        onChange={(e) => setConfigDomainStag(e.target.value)}
-                        label="stag domain"
-                      />
-                    </>
-                  )}
+                  <Text>.xquare.app</Text>
                 </LayoutBox>
               </LayoutBox>
-            </SecondStepContainer>
-            <LayoutBox align="center" gap={20}>
-              <WrapperBox height={72} radius={10}>
-                {(() => {
-                  switch (isCreatedConfig) {
-                    case null:
-                      return '파일 확인 중 오류가 발생했습니다.';
-                    case true:
-                      return 'Config 파일이 생성되었습니다!';
-                    case false:
-                      return 'Config 파일이 생성되지 않았습니다.';
-                    default:
-                      return '';
-                  }
-                })()}
-              </WrapperBox>
-              <XButton width={80} height={58} onClick={handleCreateConfigFile}>
-                생성
-              </XButton>
-              <XButton width={80} height={58} onClick={handleCheckConfigFile} buttonStyle="ghost">
-                확인
-              </XButton>
+              <LayoutBox flex="column" gap={10}>
+                <Text>운영 환경(prod)</Text>
+                <Input
+                  width={328}
+                  height={46}
+                  placeholder="서비스 port"
+                  value={prodPort}
+                  onChange={(e) => setProdPort(e.target.value)}
+                />
+                <Input
+                  width={328}
+                  height={46}
+                  placeholder="Github Branch"
+                  value={prodBranch}
+                  onChange={(e) => setProdBranch(e.target.value)}
+                />
+                <LayoutBox flex="row" gap={10} align="center">
+                  <Input
+                    width={220}
+                    height={46}
+                    placeholder="your sub domain"
+                    value={prodDomain}
+                    onChange={(e) => setProdDomain(e.target.value)}
+                  />
+                  <Text>.xquare.app</Text>
+                </LayoutBox>
+              </LayoutBox>
             </LayoutBox>
           </LayoutBox>
         </LayoutBox>
-
         <LayoutBox width="100%" align="start" gap={24}>
           <NumberBox>3</NumberBox>
-          <LayoutBox flex="column" gap={20}>
-            <Text>GitHub repository에 Dockerfile을 생성합니다.</Text>
-            <LayoutBox align="center" gap={20}>
-              <WrapperBox height={72} radius={10}>
-                {(() => {
-                  switch (isCreatedDocker) {
-                    case null:
-                      return '파일 확인 중 오류가 발생했습니다.';
-                    case true:
-                      return 'docker 파일이 생성되었습니다!';
-                    case false:
-                      return 'docker 파일이 생성되지 않았습니다.';
-                    default:
-                      return '';
+          <LayoutBox flex="column" gap={6}>
+            <Text>본인의 프로젝트에 맞게 선택해 주세요.</Text>
+            <LayoutBox flex="column" gap={90}>
+              <div style={{ width: '180px' }}>
+                <SelectBar
+                  selectedIndex={
+                    deployType === 'frontend' ? renderTypeList.indexOf(renderType) : frameworkList.indexOf(framework)
                   }
-                })()}
-              </WrapperBox>
-              <XButton width={80} height={58} onClick={handleCheckDockerFile}>
-                확인
-              </XButton>
-            </LayoutBox>
-          </LayoutBox>
-        </LayoutBox>
-
-        <LayoutBox width="100%" align="start" gap={24}>
-          <NumberBox>4</NumberBox>
-          <LayoutBox flex="column" gap={20}>
-            <Text>Github Personal Access Token을 발급받습니다. repo 권한을 반드시 포함해야 합니다.</Text>
-            <LayoutBox flex="column" gap={40}>
-              <img src={ExamImg1Src} />
-              <div>
-                <Text>발급받은 Personal Access Token을 Github Actions Secret으로 등록합니다.</Text>
-                <Text>
-                  (Repository Setting {'>'} Secrets and variables {'>'} Actions)
-                </Text>
+                  onSelect={(index) => {
+                    if (index !== undefined) {
+                      if (deployType === 'frontend') {
+                        setRenderType(renderTypeList[index] as 'csr' | 'ssr');
+                      } else {
+                        setFramework(frameworkList[index] as 'spring boot' | 'node');
+                      }
+                    }
+                  }}
+                  values={deployType === 'frontend' ? renderTypeList : frameworkList}
+                  label={deployType === 'frontend' ? '렌더링 방식을 설정해 주세요.' : '프레임워크를 선택해주세요'}
+                />
               </div>
-              <img src={ExamImg2Src} />
+              <div style={{ width: '180px' }}>
+                <SelectBar
+                  selectedIndex={
+                    deployType === 'frontend' || framework === 'node'
+                      ? nodeVersion.indexOf(selectedNodeVersion)
+                      : jdkVersion.indexOf(selectedJdkVersion)
+                  }
+                  onSelect={(index) => {
+                    if (index !== undefined) {
+                      if (deployType === 'frontend' || framework === 'node') {
+                        setSelectedNodeVersion(nodeVersion[index]);
+                      } else {
+                        setSelectedJdkVersion(jdkVersion[index]);
+                      }
+                    }
+                  }}
+                  values={deployType === 'frontend' || framework === 'node' ? nodeVersion : jdkVersion}
+                  label={
+                    deployType === 'frontend' || framework === 'node'
+                      ? 'node 버전을 선택해주세요'
+                      : 'jdk 버전을 선택해주세요'
+                  }
+                />
+              </div>
+              <Input
+                width={328}
+                height={46}
+                placeholder={deployType === 'frontend' ? 'ex) yarn build' : 'ex) ./gradlew build -x test'}
+                label="빌드 명령어를 입력해주세요"
+                value={buildCommand}
+                onChange={(e) => setBuildCommand(e.target.value)}
+              />
+              {(deployType === 'backend' || (deployType === 'frontend' && renderType === 'ssr')) && (
+                <Input
+                  width={328}
+                  height={46}
+                  placeholder="ex) dist"
+                  label="build output directory를 설정해 주세요."
+                  value={outputDir}
+                  onChange={(e) => setOutputDir(e.target.value)}
+                />
+              )}
             </LayoutBox>
           </LayoutBox>
         </LayoutBox>
-
-        <LayoutBox width="100%" align="start" gap={24}>
-          <NumberBox>5</NumberBox>
-          <LayoutBox flex="column" gap={20}>
-            <div>
-              <Text>아래 버튼을 눌러 배포 키를 발급받습니다. 발급받은 배포 키는 한 번만 확인할 수 있습니다.</Text>
-              <Text>
-                발급받은 Access key를 Repository의 Secret으로 등록합니다. (Repository Setting {'>'} Secrets and
-                variables {'>'} Actions)
-              </Text>
-            </div>
-            <LayoutBox gap={10} flex="column">
-              <LayoutBox align="end" gap={10}>
-                <Input width={426} height={46} placeholder="배포 키" />
-                <XButton width={80} height={46}>
-                  발급받기
-                </XButton>
-              </LayoutBox>
-              <img src={ExamImg3Src} />
-            </LayoutBox>
-          </LayoutBox>
-        </LayoutBox>
-
-        <LayoutBox width="100%" align="start" gap={24}>
-          <NumberBox>6</NumberBox>
-          <LayoutBox flex="column" gap={20}>
-            <div>
-              <Text>.github/workflows 경로 아래에 배포에 대한 Git Action을 작성합니다.</Text>
-              <Text>xquare action을 넣을 job 아래에 OIDC 권한을 허용해줍니다.</Text>
-            </div>
-            <WrapperBox width={880} height={378} radius={20}></WrapperBox>
-            <Text>자신의 프로젝트에 대한 이미지를 빌드하기 전 필요한 필요한 동작이 있다면 추가합니다.</Text>
-            <SixthStepContainer></SixthStepContainer>
-          </LayoutBox>
-        </LayoutBox>
-
-        <LayoutBox width="100%" align="start" gap={24}>
-          <NumberBox>7</NumberBox>
-          <Text>배포 Action을 실행하여 애플리케이션을 배포합니다.</Text>
-        </LayoutBox>
-      </LayoutBox>
-    </LayoutBox>
+      </StepContainerWrapper>
+      <ButtonWrapper>
+        <XButton width={84} height={50} buttonStyle="solid" onClick={onSubmit}>
+          생성하기
+        </XButton>
+      </ButtonWrapper>
+    </Wrapper>
   );
 };
+
+const Wrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+`;
+
+const TitleContainer = styled.div`
+  width: 100%;
+  max-width: 1120px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 80px;
+`;
 
 const TeamName = styled.div`
   font-size: 20px;
@@ -345,7 +382,6 @@ const Describtion = styled.div`
   font-size: 24px;
   font-weight: 100;
   color: ${theme.color.gray8};
-  margin-bottom: 26px;
 `;
 
 const Text = styled.div`
@@ -369,37 +405,34 @@ const NumberBox = styled.div`
   font-weight: 500;
 `;
 
-const WrapperBox = styled.div<{ width?: number; height?: number; radius?: number }>`
-  width: ${({ width }) => width + 'px'};
-  height: ${({ height }) => height + 'px'};
-  padding: 0 30px 0 30px;
-  height: ${({ height }) => `${height}px`};
-  border-radius: ${({ radius }) => `${radius}px`};
-  background-color: ${theme.color.gray2};
+const StepContainerWrapper = styled.div`
+  max-width: 1120px;
+  padding-bottom: 40px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+`;
+
+const DeployTypeBox = styled.div<{ isSelected: boolean }>`
+  width: 160px;
+  height: 46px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.1s linear;
+  color: ${({ isSelected }) => (isSelected ? theme.color.mainDark1 : theme.color.gray5)};
+  background-color: ${({ isSelected }) => (isSelected ? theme.color.mainLight2 : theme.color.gray1)};
+  border: 1px solid ${({ isSelected }) => (isSelected ? theme.color.mainDark1 : theme.color.gray5)};
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
-  color: ${theme.color.gray7};
 `;
 
-const SecondStepContainer = styled.div`
-  width: 956px;
-  border-radius: 6px;
-  border: 1px solid ${theme.color.gray5};
-  padding: 20px 46px;
+const ButtonWrapper = styled.div`
+  max-width: 1120px;
+  width: 100%;
+  height: 50px;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const SixthStepContainer = styled.div`
-  width: 980px;
-  height: 1388px;
-  border-radius: 6px;
-  border: 1px solid ${theme.color.gray5};
-  padding: 20px 46px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
+  justify-content: end;
+  padding-bottom: 200px;
 `;
