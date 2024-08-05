@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import LogoImg from '@/assets/Logo.svg';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/common/Button';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { css } from '@emotion/react';
 import { theme } from '@/style/theme';
 import { Cookie } from '@/utils/cookie';
@@ -62,15 +62,8 @@ export const Header = () => {
           </>
         ) : (
           <>
-            <LeftSide2
-              onClick={() => {
-                if (_pathname === '' || _pathname === 'login') {
-                  navigate('/');
-                } else {
-                  navigate('/team');
-                }
-              }}
-            >
+            <LeftSide2>
+              <Link to={_pathname === '' || _pathname === 'login' ? '/' : '/team'}></Link>
               <img src={LogoImg} />
               <span>Xquare Infra</span>
             </LeftSide2>
