@@ -122,7 +122,7 @@ export const TeamDeployNoneContainer = () => {
       language: requestData.language,
     });
 
-    const timeout = setTimeout(() => {
+    setTimeout(() => {
       if (
         deployType === 'backend' &&
         framework === 'spring boot' &&
