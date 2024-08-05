@@ -7,7 +7,7 @@ import { ContainerDetailType } from '@/utils/types/containerType';
 import { HistoryType, StageType } from '@/utils/types/historyType';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import LongArrowImg from '@/assets/LongArrow.svg';
 import { UnknownIcon } from '@/assets/UnknownIcon';
 import { PassedIcon } from '@/assets/PassedIcon';
@@ -44,6 +44,8 @@ export const TeamDeployContainerHistory = () => {
   const [history, setHistory] = useState<HistoryType[]>([]);
 
   useEffect(() => {
+    console.log(env);
+
     if (deployUUID && env) {
       getDetailContainer(deployUUID, env).then((res) => {
         setData(res.data);
@@ -88,7 +90,9 @@ export const TeamDeployContainerHistory = () => {
               <DeployBox>
                 {item.stages.map((stage, stageIndex) => (
                   <React.Fragment key={stageIndex}>
-                    <Stage name={stage.name} status={stage.status} />
+                    <Link to={`${item.pipeline_name}/${item.pipeline_counter}/${stage.name}`}>
+                      <Stage name={stage.name} status={stage.status} />
+                    </Link>
                     {stageIndex < item.stages.length - 1 && <img src={LongArrowImg} />}
                   </React.Fragment>
                 ))}
@@ -176,6 +180,7 @@ const DeployBox = styled.div`
 `;
 
 const StageBox = styled.div`
+  cursor: pointer;
   width: 150px;
   height: 50px;
   border-radius: 8px;
