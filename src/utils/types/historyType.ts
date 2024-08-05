@@ -9,4 +9,6 @@ export type HistoryType = {
   scheduled_date: number;
   commit_message: string;
   stages: StageType[];
+  pipeline_name: string;
+  pipeline_counter: number;
 };

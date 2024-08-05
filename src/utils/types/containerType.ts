@@ -21,3 +21,11 @@ export type ContainerDetailType = {
   container_name: string;
   is_v2: boolean;
 };
+
+type ConfigType = {
+  branch: string;
+  container_port: string;
+  domain: string;
+};
+
+export type ConfigPostType = { stag: ConfigType; prod: ConfigType; language: string };
