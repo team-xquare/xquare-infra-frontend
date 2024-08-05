@@ -3,9 +3,17 @@ import { Global, css } from '@emotion/react';
 const style = css`
   @font-face {
     font-family: 'JetBrains Mono';
-    src: url('https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&family=JetBrains+Mono:wght@800&display=swap')
+    src: url('https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&family=JetBrains+Mono:wght@500&display=swap')
       format('woff');
     font-weight: 500;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    src: url('https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&family=JetBrains+Mono:wght@600&display=swap')
+      format('woff');
+    font-weight: 600;
     font-style: normal;
   }
 
@@ -60,6 +68,7 @@ const style = css`
     list-style: none;
     font-style: normal;
     font-family: 'Pretendard', sans-serif;
+    text-decoration: none;
   }
 
   body {
