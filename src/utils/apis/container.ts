@@ -1,4 +1,4 @@
-import { ConfigPostType, ContainerEnvType } from '../types/containerType';
+import { ConfigPostType } from '../types/containerType';
 import { instance } from './axios';
 
 const v1Router = 'v1/container';
