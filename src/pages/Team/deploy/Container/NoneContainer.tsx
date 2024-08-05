@@ -20,7 +20,7 @@ const renderTypeList = ['csr', 'ssr'];
 const frameworkList = ['spring boot', 'node'];
 
 export const TeamDeployNoneContainer = () => {
-  const { deployUUID, env } = useParams();
+  const { deployUUID } = useParams();
   const [deployData, setDeployData] = useState<DeployDetailType>();
 
   // 공통 상태
