@@ -55,6 +55,11 @@ const container_inside = {
       name: '환경변수',
       link: `/team/-team-/deploy/-deploy-/container/-env-/env`,
     },
+    {
+      icon: 'ri:notification-line',
+      name: 'Alert',
+      link: '/team/-team-/deploy/-deploy-/container/-env-/alert',
+    },
   ],
 };
 
@@ -76,6 +81,7 @@ export const menu: MenusType = {
   '/team/:id/deploy/:id/container/:env/traces': container_inside,
   '/team/:id/deploy/:id/container/:env/env': container_inside,
   '/team/:id/deploy/:id/container/:env/history': container_inside,
+  '/team/:id/deploy/:id/container/:env/alert': container_inside,
   '/team/:id/deploy/:id/container/:env/history/:id/:pipelineCounter/build': history,
   '/team/:id/deploy/:id/container/:env/history/:id/:pipelineCounter/deploy': history,
   // '/team/:id/deploy/:id/container/:env/history/build-xquare-infra-prod/57/build'
