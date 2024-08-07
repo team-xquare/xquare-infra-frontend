@@ -4,8 +4,24 @@ import { TraceType } from '@/utils/types/traceType';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getDetailContainer } from '@/utils/apis/container';
+import {
+  getDetailContainer,
+  getContainerRequest,
+  getContainerError,
+  getContainerLatency,
+} from '@/utils/apis/container';
 import { ContainerDetailType } from '@/utils/types/containerType';
+import { TraceRequestGraph } from '@/components/graph/TraceRequestGraph';
+import { TraceErrorGraph } from '@/components/graph/TraceErrorGraph';
+import { TraceLatencyGraph } from '@/components/graph/TraceLatencyGraph';
+
+interface DataPoint {
+  [timestamp: string]: string;
+}
+
+interface JsonData {
+  [key: string]: DataPoint;
+}
 
 interface ExtendedDateTimeFormatOptions extends Intl.DateTimeFormatOptions {
   millisecond?: '2-digit' | '3-digit';
@@ -42,6 +58,9 @@ export const TeamDeployContainerTraces = () => {
   const [selectedTrace, setSelectedTrace] = useState<string | null>(null);
   const [container, setData] = useState<ContainerDetailType>();
   const [traces, setTraces] = useState<TraceType[]>();
+  const [request, setRequest] = useState<JsonData>();
+  const [error, setError] = useState<JsonData>();
+  const [latency, setLatency] = useState<JsonData>();
 
   const { deployUUID, env } = useParams();
 
@@ -50,6 +69,34 @@ export const TeamDeployContainerTraces = () => {
       getDetailContainer(deployUUID, env).then((res) => {
         setData(res.data);
       });
+
+      getContainerRequest(deployUUID, env).then((res) => {
+        setRequest(res.data);
+      });
+
+      getContainerError(deployUUID, env).then((res) => {
+        setError(res.data);
+      });
+
+      Promise.all([
+        getContainerLatency(99, deployUUID, env),
+        getContainerLatency(95, deployUUID, env),
+        getContainerLatency(90, deployUUID, env),
+        getContainerLatency(75, deployUUID, env),
+        getContainerLatency(50, deployUUID, env),
+      ])
+        .then(([res99, res95, res90, res75, res50]) => {
+          setLatency({
+            1: res99.data[1],
+            2: res95.data[1],
+            3: res90.data[1],
+            4: res75.data[1],
+            5: res50.data[1],
+          });
+        })
+        .catch((error) => {
+          console.error('Error fetching latency data:', error);
+        });
     }
   }, []);
 
@@ -84,6 +131,20 @@ export const TeamDeployContainerTraces = () => {
     <>
       <TraceInformation selectedTrace={selectedTrace}>{selectedTrace}</TraceInformation>
       <Wrapper>
+        <GraphContainer>
+          <GraphBox>
+            <span>Requests</span>
+            {request && <TraceRequestGraph jsonData={request} />}
+          </GraphBox>
+          <GraphBox>
+            <span>Errors</span>
+            {error && <TraceErrorGraph jsonData={error} />}
+          </GraphBox>
+          <GraphBox>
+            <span>Latency</span>
+            {latency && <TraceLatencyGraph jsonData={latency} />}
+          </GraphBox>
+        </GraphContainer>
         <TracesContainer>
           <TraceLabel>
             <DateLabel>DATE</DateLabel>
@@ -250,4 +311,28 @@ const StatusCodeItem = styled.div`
   align-items: center;
   justify-content: center;
   font-variant-numeric: tabular-nums;
+`;
+
+const GraphContainer = styled.div`
+  width: 100%;
+  max-width: 1538px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+`;
+
+const GraphBox = styled.div`
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: 1px solid ${theme.color.gray4};
+  background-color: ${theme.color.gray1};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  > span {
+    font-size: 20px;
+    font-weight: 500;
+    color: ${theme.color.gray8};
+  }
 `;
