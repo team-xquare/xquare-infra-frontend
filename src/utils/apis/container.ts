@@ -63,3 +63,19 @@ export const writeContainerNginx = async (
 export const getStageLog = async (pipelineName: string, pipelineCounter: string, stageName: string) => {
   return await instance.get(`${v2Router}/${pipelineName}/${pipelineCounter}/stage/${stageName}`);
 };
+
+export const getContainerRequest = async (deployUUID: string, env: string) => {
+  return await instance.get(`${v2Router}/metrics/requests/rate?deployId=${deployUUID}&environment=${env}&timeRange=30`);
+};
+
+export const getContainerError = async (deployUUID: string, env: string) => {
+  return await instance.get(
+    `${v2Router}/metrics/http-errors/500/rate?deployId=${deployUUID}&environment=${env}&timeRange=30`,
+  );
+};
+
+export const getContainerLatency = async (percent: number, deployUUID: string, env: string) => {
+  return await instance.get(
+    `${v2Router}/metrics/latency/${percent}?deployId=${deployUUID}&environment=${env}&timeRange=30`,
+  );
+};
