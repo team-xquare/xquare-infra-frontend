@@ -14,6 +14,7 @@ export const Header = () => {
   const { pathname } = useLocation();
   const _pathname: string = pathname.substring(1);
   const email = Cookie.get('email');
+  const [clickCount, setClickCount] = useState<number>(0);
 
   usePathChangeEffect(() => {
     const body = document.querySelector('body');
@@ -33,6 +34,13 @@ export const Header = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (clickCount > 10) {
+      localStorage.setItem('critical', 'true');
+      alert('이스터에그 발견');
+    }
+  }, [clickCount]);
 
   return (
     <>
@@ -67,7 +75,13 @@ export const Header = () => {
               <img src={LogoImg} />
               <span>Xquare Infra</span>
             </LeftSide2>
-            <RightSide2>{email ? email : ''}</RightSide2>
+            <RightSide2
+              onClick={() => {
+                setClickCount((prev) => prev + 1);
+              }}
+            >
+              {email ? email : ''}
+            </RightSide2>
           </>
         )}
         <WrapperBackground scroll={_pathname === '' ? scroll : 0} />

@@ -120,6 +120,7 @@ export const TeamDeployNoneContainer = () => {
       prod: requestData.prod,
       stag: requestData.stag,
       language: requestData.language,
+      critical_service: Boolean(localStorage.getItem('critical')) ?? false,
     });
 
     setTimeout(() => {

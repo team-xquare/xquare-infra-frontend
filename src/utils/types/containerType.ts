@@ -28,4 +28,4 @@ type ConfigType = {
   domain: string;
 };
 
-export type ConfigPostType = { stag: ConfigType; prod: ConfigType; language: string };
+export type ConfigPostType = { stag: ConfigType; prod: ConfigType; language: string; critical_service: boolean };
