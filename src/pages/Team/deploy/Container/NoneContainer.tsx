@@ -95,7 +95,7 @@ export const TeamDeployNoneContainer = () => {
       if (framework === 'spring boot') {
         specificData = {
           jdk_version: selectedJdkVersion,
-          output_dir: '/build/libs/*.jar',
+          output_dir: outputDir,
           build_commands: [buildCommand || './gradlew build -x test'],
         };
       } else {
