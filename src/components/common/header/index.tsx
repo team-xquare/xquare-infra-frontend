@@ -70,12 +70,12 @@ export const Header = () => {
           </>
         ) : (
           <>
-            <LeftSide2>
-              <Link to={_pathname === '' || _pathname === 'login' ? '/' : '/team'}>
+            <Link to={_pathname === '' || _pathname === 'login' ? '/' : '/team'}>
+              <LeftSide2>
                 <img src={LogoImg} />
                 <span>Xquare Infra</span>
-              </Link>
-            </LeftSide2>
+              </LeftSide2>
+            </Link>
             <RightSide2
               onClick={() => {
                 setClickCount((prev) => prev + 1);
