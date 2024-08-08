@@ -315,10 +315,9 @@ const StatusCodeItem = styled.div`
 
 const GraphContainer = styled.div`
   width: 100%;
-  max-width: 1538px;
+  max-width: 1280px;
   display: flex;
-  justify-content: center;
-  gap: 20px;
+  justify-content: space-between;
 `;
 
 const GraphBox = styled.div`

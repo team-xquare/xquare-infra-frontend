@@ -45,7 +45,7 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
       }));
 
       const layout: Partial<Plotly.Layout> = {
-        width: 428,
+        width: 380,
         height: 180,
         margin: {
           l: 30,
