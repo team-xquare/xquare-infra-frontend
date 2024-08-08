@@ -87,11 +87,11 @@ export const TeamDeployContainerTraces = () => {
       ])
         .then(([res99, res95, res90, res75, res50]) => {
           setLatency({
-            1: res99.data[1],
-            2: res95.data[1],
-            3: res90.data[1],
-            4: res75.data[1],
-            5: res50.data[1],
+            99: res99.data[1],
+            95: res95.data[1],
+            90: res90.data[1],
+            75: res75.data[1],
+            50: res50.data[1],
           });
         })
         .catch((error) => {

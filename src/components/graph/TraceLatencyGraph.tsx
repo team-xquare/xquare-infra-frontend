@@ -20,7 +20,7 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
 
   useEffect(() => {
     if (chartRef.current && Object.keys(jsonData).length === 5) {
-      const timestamps = Object.keys(jsonData['1']).map((ts) => ts.substring(11, 16));
+      const timestamps = Object.keys(jsonData['99']).map((ts) => ts.substring(11, 16));
 
       const colors = [
         'rgb(0, 123, 255)', // 파랑
@@ -35,7 +35,7 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
         y: Object.values(jsonData[key]).map(Number),
         type: 'scatter' as const,
         mode: 'lines' as const,
-        name: `Dataset ${key}`,
+        name: `p${key}`,
         line: {
           color: colors[index],
           width: 2,
