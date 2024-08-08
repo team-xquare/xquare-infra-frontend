@@ -121,6 +121,8 @@ export const TeamDeployNoneContainer = () => {
       stag: requestData.stag,
       language: requestData.language,
       critical_service: Boolean(localStorage.getItem('critical')) ?? false,
+    }).then(() => {
+      alert('config 작성이 완료 되었습니다.');
     });
 
     setTimeout(() => {
@@ -135,11 +137,15 @@ export const TeamDeployNoneContainer = () => {
           build_commands: requestData.build_commands,
           jdk_version: requestData.jdk_version,
           output_dir: requestData.output_dir,
+        }).then(() => {
+          alert('prod gradle 작성이 완료 되었습니다.');
         });
         writeContainerGradle(deployUUID, 'stag', {
           build_commands: requestData.build_commands,
           jdk_version: requestData.jdk_version,
           output_dir: requestData.output_dir,
+        }).then(() => {
+          alert('stag gradle 작성이 완료 되었습니다.');
         });
       } else if (
         (deployType === 'backend' &&
@@ -157,11 +163,15 @@ export const TeamDeployNoneContainer = () => {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           command: requestData.command,
+        }).then(() => {
+          alert('prod node 작성이 완료 되었습니다.');
         });
         writeContainerNode(deployUUID, 'stag', {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           command: requestData.command,
+        }).then(() => {
+          alert('stag node 작성이 완료 되었습니다.');
         });
       } else if (
         deployType === 'frontend' &&
@@ -174,11 +184,15 @@ export const TeamDeployNoneContainer = () => {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           output_dir: requestData.output_dir,
+        }).then(() => {
+          alert('prod nginx 작성이 완료 되었습니다.');
         });
         writeContainerNginx(deployUUID, 'stag', {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           output_dir: requestData.output_dir,
+        }).then(() => {
+          alert('stag nginx 작성이 완료 되었습니다.');
         });
       }
     }, 1500);
