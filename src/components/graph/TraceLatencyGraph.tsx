@@ -14,8 +14,6 @@ interface PlotlyChartProps {
 }
 
 export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
-  console.log(jsonData);
-
   const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -91,5 +89,5 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
     }
   }, [jsonData]);
 
-  return <div ref={chartRef} />;
+  return <div ref={chartRef} style={{ position: 'relative', zIndex: '0' }} />;
 };

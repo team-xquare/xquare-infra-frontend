@@ -63,5 +63,5 @@ export const TraceErrorGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
     }
   }, [jsonData]);
 
-  return <div ref={chartRef} />;
+  return <div ref={chartRef} style={{ position: 'relative', zIndex: '0' }} />;
 };
