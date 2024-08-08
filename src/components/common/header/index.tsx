@@ -71,9 +71,10 @@ export const Header = () => {
         ) : (
           <>
             <LeftSide2>
-              <Link to={_pathname === '' || _pathname === 'login' ? '/' : '/team'}></Link>
-              <img src={LogoImg} />
-              <span>Xquare Infra</span>
+              <Link to={_pathname === '' || _pathname === 'login' ? '/' : '/team'}>
+                <img src={LogoImg} />
+                <span>Xquare Infra</span>
+              </Link>
             </LeftSide2>
             <RightSide2
               onClick={() => {
