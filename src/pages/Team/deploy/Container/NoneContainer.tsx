@@ -326,7 +326,7 @@ export const TeamDeployNoneContainer = () => {
                 value={buildCommand}
                 onChange={(e) => setBuildCommand(e.target.value)}
               />
-              {(deployType === 'backend' || (deployType === 'frontend' && renderType === 'ssr')) && (
+              {(deployType === 'backend' || (deployType === 'frontend' && renderType === 'csr')) && (
                 <Input
                   width={328}
                   height={46}
