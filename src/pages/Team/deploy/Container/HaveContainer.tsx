@@ -113,25 +113,25 @@ export const TeamDeployHaveContainer = () => {
                     </div>
                   </div>
                   <div>
-                    {index === 0 && stagMemory && Object.keys(stagMemory).length === 0 && (
+                    {index === 0 && stagMemory && Object.keys(stagMemory).length !== 0 && (
                       <div>
                         <span>메모리</span>
                         <ContainerGraph jsonData={stagMemory} />
                       </div>
                     )}
-                    {index === 0 && stagCpu && Object.keys(stagCpu).length === 0 && (
+                    {index === 0 && stagCpu && Object.keys(stagCpu).length !== 0 && (
                       <div>
                         <span>CPU</span>
                         <ContainerGraph jsonData={stagCpu} />
                       </div>
                     )}
-                    {index === 1 && prodMemory && Object.keys(prodMemory).length === 0 && (
+                    {index === 1 && prodMemory && Object.keys(prodMemory).length !== 0 && (
                       <div>
                         <span>메모리</span>
                         <ContainerGraph jsonData={prodMemory} />
                       </div>
                     )}
-                    {index === 1 && prodCpu && Object.keys(prodCpu).length === 0 && (
+                    {index === 1 && prodCpu && Object.keys(prodCpu).length !== 0 && (
                       <div>
                         <span>CPU</span>
                         <ContainerGraph jsonData={prodCpu} />
