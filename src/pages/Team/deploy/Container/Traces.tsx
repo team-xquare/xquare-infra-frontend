@@ -14,6 +14,7 @@ import { ContainerDetailType } from '@/utils/types/containerType';
 import { TraceRequestGraph } from '@/components/graph/TraceRequestGraph';
 import { TraceErrorGraph } from '@/components/graph/TraceErrorGraph';
 import { TraceLatencyGraph } from '@/components/graph/TraceLatencyGraph';
+// import { TraceInformation } from '@/components/Trace/TraceInformation';
 
 interface DataPoint {
   [timestamp: string]: string;
@@ -61,7 +62,6 @@ export const TeamDeployContainerTraces = () => {
   const [request, setRequest] = useState<JsonData>();
   const [error, setError] = useState<JsonData>();
   const [latency, setLatency] = useState<JsonData>();
-
   const { deployUUID, env } = useParams();
 
   useEffect(() => {
@@ -129,20 +129,20 @@ export const TeamDeployContainerTraces = () => {
 
   return (
     <>
-      <TraceInformation selectedTrace={selectedTrace}>{selectedTrace}</TraceInformation>
+      {/* <TraceInformation selectedTrace={selectedTrace} setSelectedTrace={setSelectedTrace} /> */}
       <Wrapper>
         <GraphContainer>
           <GraphBox>
             <span>Requests</span>
-            {request && <TraceRequestGraph jsonData={request} />}
+            {request && Object.keys(request).length !== 0 && <TraceRequestGraph jsonData={request} />}
           </GraphBox>
           <GraphBox>
             <span>Errors</span>
-            {error && <TraceErrorGraph jsonData={error} />}
+            {error && Object.keys(error).length !== 0 && <TraceErrorGraph jsonData={error} />}
           </GraphBox>
           <GraphBox>
             <span>Latency</span>
-            {latency && <TraceLatencyGraph jsonData={latency} />}
+            {latency && Object.keys(latency).length !== 0 && <TraceLatencyGraph jsonData={latency} />}
           </GraphBox>
         </GraphContainer>
         <TracesContainer>
@@ -181,17 +181,6 @@ export const TeamDeployContainerTraces = () => {
     </>
   );
 };
-
-const TraceInformation = styled.div<{ selectedTrace: string | null }>`
-  position: fixed;
-  bottom: 0;
-  right: ${({ selectedTrace }) => (Boolean(selectedTrace) ? '0' : '-1500px')};
-  border-left: 1px solid ${theme.color.gray4};
-  width: 1500px;
-  height: calc(100vh - 80px);
-  background-color: ${theme.color.gray1};
-  transition: right 0.7s ease-in-out;
-`;
 
 const Wrapper = styled.div`
   width: 100%;
