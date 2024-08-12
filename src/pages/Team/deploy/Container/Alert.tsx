@@ -2,8 +2,10 @@ import { DatabaseIcon } from '@/assets/DatabaseIcon';
 import { ErrorIcon } from '@/assets/ErrorIcon';
 import { InformationIcon } from '@/assets/InformationIcon';
 import { RocketIcon } from '@/assets/RocketIcon';
+import { XButton } from '@/components/common/XButton';
 import { theme } from '@/style/theme';
 import styled from '@emotion/styled';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type AlertType = {
   icon: React.ReactNode;
@@ -36,6 +38,9 @@ const AlertList: AlertType[] = [
 ];
 
 export const TeamDeployContainerAlert = () => {
+  const { teamUUID, deployUUID, env } = useParams();
+  const link = useNavigate();
+
   return (
     <Wrapper>
       <TitleContainer>
@@ -58,6 +63,17 @@ export const TeamDeployContainerAlert = () => {
           );
         })}
       </AlertContainer>
+      <BottomContainer>
+        <XButton
+          width={100}
+          height={50}
+          onClick={() => {
+            link(`/team/${teamUUID}/deploy/${deployUUID}/container/${env}/alertActive`);
+          }}
+        >
+          활성화 하기
+        </XButton>
+      </BottomContainer>
     </Wrapper>
   );
 };
@@ -160,4 +176,11 @@ const AlertBox = styled.div`
     color: ${theme.color.gray5};
     word-wrap: break-word;
   }
+`;
+
+const BottomContainer = styled.div`
+  width: 100%;
+  margin-top: 100px;
+  display: flex;
+  justify-content: center;
 `;

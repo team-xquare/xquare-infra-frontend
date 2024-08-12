@@ -79,3 +79,11 @@ export const getContainerLatency = async (percent: number, deployUUID: string, e
     `${v2Router}/metrics/latency/${percent}?deployId=${deployUUID}&environment=${env}&timeRange=30`,
   );
 };
+
+export const activeAlert = async (
+  deployUUID: string,
+  env: string,
+  data: { webhook_type: 'DISCORD' | 'SLACK'; webhook_url: string },
+) => {
+  return await instance.post(`${v2Router}/webhook?deployId=${deployUUID}&environment=${env}`, data);
+};
