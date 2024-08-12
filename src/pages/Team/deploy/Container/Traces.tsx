@@ -14,7 +14,7 @@ import { ContainerDetailType } from '@/utils/types/containerType';
 import { TraceRequestGraph } from '@/components/graph/TraceRequestGraph';
 import { TraceErrorGraph } from '@/components/graph/TraceErrorGraph';
 import { TraceLatencyGraph } from '@/components/graph/TraceLatencyGraph';
-// import { TraceInformation } from '@/components/Trace/TraceInformation';
+import { TraceInformation } from '@/components/Trace/TraceInformation';
 
 interface DataPoint {
   [timestamp: string]: string;
@@ -129,7 +129,7 @@ export const TeamDeployContainerTraces = () => {
 
   return (
     <>
-      {/* <TraceInformation selectedTrace={selectedTrace} setSelectedTrace={setSelectedTrace} /> */}
+      <TraceInformation selectedTrace={selectedTrace} setSelectedTrace={setSelectedTrace} />
       <Wrapper>
         <GraphContainer>
           <GraphBox>
@@ -142,7 +142,7 @@ export const TeamDeployContainerTraces = () => {
           </GraphBox>
           <GraphBox>
             <span>Latency</span>
-            {latency && Object.keys(latency).length !== 0 && <TraceLatencyGraph jsonData={latency} />}
+            {latency && Object.keys(latency).length === 5 && <TraceLatencyGraph jsonData={latency} />}
           </GraphBox>
         </GraphContainer>
         <TracesContainer>
