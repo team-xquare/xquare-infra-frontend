@@ -37,12 +37,7 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
   const { back, menu: menus } = menuData;
 
   return (
-    <Wrapper
-      isOpen={isOpen}
-      onClick={() => {
-        console.log(raw_pathname);
-      }}
-    >
+    <Wrapper isOpen={isOpen}>
       {back && (
         <BackContainer isOpen={isOpen} onClick={() => navigate(replaceIDs(back, params))}>
           <div>

@@ -44,8 +44,6 @@ export const TeamDeployContainerHistory = () => {
   const [history, setHistory] = useState<HistoryType[]>([]);
 
   useEffect(() => {
-    console.log(env);
-
     if (deployUUID && env) {
       getDetailContainer(deployUUID, env).then((res) => {
         setData(res.data);

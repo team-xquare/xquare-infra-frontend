@@ -16,8 +16,6 @@ ChannelService.boot({
 
 export const Main = () => {
   const navigate = useNavigate();
-  console.log('배포 확인용');
-
   useEffect(() => {
     const data = Cookie.get('accessToken');
 

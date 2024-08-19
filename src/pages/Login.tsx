@@ -24,8 +24,6 @@ export const Login = () => {
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, target: string) => {
     if (e.key === 'Enter') {
-      console.log(passwordRef);
-
       if (target === 'account_id') {
         passwordRef.current?.focus();
       } else if (target === 'password' && account_id) {
