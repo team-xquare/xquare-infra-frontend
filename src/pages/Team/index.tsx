@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { TeamCheckType } from '@/utils/types/teamType';
 import { useCustomQuery } from '@/hooks/useCustomQueries';
 import { useState } from 'react';
+import Skeleton from '@/components/common/Skeleton';
 
 export const Team = () => {
   const link = useNavigate();
@@ -41,36 +42,46 @@ export const Team = () => {
         </XButton>
       </UtilContainer>
       <ContainerWrapper>
-        {teamList?.length > 0 ? (
-          teamList?.slice(selected * 3, selected * 3 + 3).map((element: any, index: number) => (
-            <div
-              onClick={() => {
-                link(`/team/${element.team_id}/manage`);
-              }}
-              key={index}
-              style={{
-                cursor: 'pointer',
-              }}
-            >
-              <TeamContainer
-                name={element.team_name_ko}
-                admin={element.administrator_name}
-                deploy={element.deploy_list}
-                tag={element.team_type}
-              />
-            </div>
-          ))
+        {teamList ? (
+          teamList?.length > 0 ? (
+            teamList?.slice(selected * 3, selected * 3 + 3).map((element: any, index: number) => (
+              <div
+                onClick={() => {
+                  link(`/team/${element.team_id}/manage`);
+                }}
+                key={index}
+                style={{
+                  cursor: 'pointer',
+                }}
+              >
+                <TeamContainer
+                  name={element.team_name_ko}
+                  admin={element.administrator_name}
+                  deploy={element.deploy_list}
+                  tag={element.team_type}
+                />
+              </div>
+            ))
+          ) : (
+            <TipBox>아직 생성하거나 속한 팀이 없습니다!</TipBox>
+          )
         ) : (
-          <TipBox>아직 생성하거나 속한 팀이 없습니다!</TipBox>
+          <>
+            {Array.from({ length: 3 }).map((_, i) => {
+              return <Skeleton radius={6} height={134} key={i} />;
+            })}
+          </>
         )}
       </ContainerWrapper>
-      <PaginationContainer>
-        {Array.from(new Array(count).keys()).map((i) => (
-          <Pagination selected={i === selected} key={i} onClick={() => setSelected(i)}>
-            {(i + 1).toString().padStart(2, '0')}
-          </Pagination>
-        ))}
-      </PaginationContainer>
+      {teamList && (
+        <PaginationContainer>
+          {Array.from(new Array(count).keys()).map((i) => (
+            <Pagination selected={i === selected} key={i} onClick={() => setSelected(i)}>
+              {(i + 1).toString().padStart(2, '0')}
+            </Pagination>
+          ))}
+        </PaginationContainer>
+      )}
     </Wrapper>
   );
 };
