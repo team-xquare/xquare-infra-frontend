@@ -31,12 +31,12 @@ export const TeamDeployContainerDetail = () => {
 
   useEffect(() => {
     setLog(messages);
-    if (logInnerContainerRef.current) {
-      const { current: logInnerContainer } = logInnerContainerRef;
-      requestAnimationFrame(() => {
-        logInnerContainer.scrollTop = logInnerContainer.scrollHeight;
-      });
-    }
+    // if (logInnerContainerRef.current) {
+    //   const { current: logInnerContainer } = logInnerContainerRef;
+    //   requestAnimationFrame(() => {
+    //     logInnerContainer.scrollTop = logInnerContainer.scrollHeight;
+    //   });
+    // }
   }, [messages]);
 
   return (
