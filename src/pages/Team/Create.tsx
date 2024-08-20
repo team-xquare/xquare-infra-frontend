@@ -12,7 +12,7 @@ import { getUser } from '@/utils/apis/user';
 import { UserType } from '@/utils/types/userType';
 import { TeamCreateType, TeamType } from '@/utils/types/teamType';
 import { teamCreate } from '@/utils/apis/team';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 type ProjectType = '동아리' | '팀 프로젝트' | '개인 프로젝트' | '기타';
 const projectKinds: ProjectType[] = ['동아리', '팀 프로젝트', '개인 프로젝트', '기타'];
@@ -294,9 +294,11 @@ export const TeamCreate = () => {
           </TeamAddWrapper>
         </InputWrapper>
         <ButtonWrapper>
-          <XButton width={58} height={50} buttonStyle="ghost">
-            취소
-          </XButton>
+          <Link to={'/team'}>
+            <XButton width={58} height={50} buttonStyle="ghost">
+              취소
+            </XButton>
+          </Link>
           <XButton width={84} height={50} buttonStyle="solid" onClick={onSubmit}>
             생성하기
           </XButton>
