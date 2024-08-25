@@ -5,7 +5,6 @@ import { Team } from '@/pages/Team';
 import { TeamCreate } from '@/pages/Team/Create';
 import { Error } from '@/pages/Error';
 import { TeamManage } from '@/pages/Team/Manage';
-// import { TeamContainer } from '@/pages/Team/Container';
 import { TeamDeployInformation } from '@/pages/Team/deploy/Information';
 import { TeamDeploy } from '@/pages/Team/deploy';
 import { TeamDeployCreate } from '@/pages/Team/deploy/Create';
@@ -37,7 +36,6 @@ export const Router = createBrowserRouter([
             children: [
               { index: true, element: <Error /> },
               { path: 'manage', element: <TeamManage /> },
-              // { path: 'container', element: <TeamContainer /> },
               {
                 path: 'deploy',
                 children: [
