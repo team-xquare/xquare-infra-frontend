@@ -71,11 +71,12 @@ export const TeamDeployContainerTraces = () => {
       });
 
       getContainerRequest(deployUUID, env).then((res) => {
-        setRequest(res.data);
+        setRequest(res.data['0']);
+        console.log(res.data['0']);
       });
 
       getContainerError(deployUUID, env).then((res) => {
-        setError(res.data);
+        setError(res.data['0']);
       });
 
       Promise.all([
@@ -87,11 +88,11 @@ export const TeamDeployContainerTraces = () => {
       ])
         .then(([res99, res95, res90, res75, res50]) => {
           setLatency({
-            99: res99.data[1],
-            95: res95.data[1],
-            90: res90.data[1],
-            75: res75.data[1],
-            50: res50.data[1],
+            99: res99.data['0'],
+            95: res95.data['0'],
+            90: res90.data['0'],
+            75: res75.data['0'],
+            50: res50.data['0'],
           });
         })
         .catch((error) => {

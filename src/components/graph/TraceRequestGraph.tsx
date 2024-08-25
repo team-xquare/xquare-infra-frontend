@@ -17,9 +17,9 @@ export const TraceRequestGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
   const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (chartRef.current && jsonData['1']) {
-      const timestamps = Object.keys(jsonData['1']).map((ts) => ts.substring(11, 16));
-      const values = Object.values(jsonData['1']).map(Number);
+    if (chartRef.current && jsonData) {
+      const timestamps = Object.keys(jsonData).map((ts) => ts.substring(11, 16));
+      const values = Object.values(jsonData).map(Number);
 
       const trace = {
         x: timestamps,
