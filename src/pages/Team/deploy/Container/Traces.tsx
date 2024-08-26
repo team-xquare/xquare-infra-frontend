@@ -167,7 +167,7 @@ export const TeamDeployContainerTraces = () => {
                   <DateItem>{currentTime}</DateItem>
                   <ResourceItem>{trace.rootTraceName ?? ''}</ResourceItem>
                   <DurationItem>{trace.durationMs ?? ''}ms</DurationItem>
-                  <MethodItem>{trace.rootTraceName.split(' ')[0] ?? ''}</MethodItem>
+                  <MethodItem>{trace.rootTraceName?.split(' ')[0] ?? ''}</MethodItem>
                   <StatusCodeItem>
                     {
                       trace.spanSet.spans[0].attributes.filter((attr) => attr.key === 'http.status_code')[0].value
