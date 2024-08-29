@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { theme } from '@/style/theme';
 import styled from '@emotion/styled';
 import { useResizable } from '@/hooks/useResizable';
+import { getDetailTrace } from '@/utils/apis/trace';
+import { SpanType } from '@/utils/types/traceType';
 
 type PropsType = {
   selectedTrace: string | null;
@@ -10,17 +12,28 @@ type PropsType = {
 
 export const TraceInformation = ({ selectedTrace, setSelectedTrace }: PropsType) => {
   const { width, boxRef, handleMouseDown } = useResizable(400, 300, window.innerWidth - 280);
+  const [data, setData] = useState<SpanType[]>();
+
+  useEffect(() => {
+    if (selectedTrace) {
+      getDetailTrace(selectedTrace).then((res) => {
+        setData(res.data.spans);
+      });
+    }
+  }, [selectedTrace]);
 
   return (
     <Wrapper selectedTrace={selectedTrace} width={width} ref={boxRef}>
       <Resizer onMouseDown={handleMouseDown} />
-      <Content>
-        <ColorBox />
-        <TitleContainer>
-          <h2>Trace View</h2>
-          <b onClick={() => setSelectedTrace(null)}>닫기</b>
-        </TitleContainer>
-      </Content>
+      {data && (
+        <Content>
+          <ColorBox />
+          <TitleContainer>
+            <h2>Trace View</h2>
+            <b onClick={() => setSelectedTrace(null)}>닫기</b>
+          </TitleContainer>
+        </Content>
+      )}
     </Wrapper>
   );
 };
