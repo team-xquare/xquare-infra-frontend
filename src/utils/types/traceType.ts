@@ -17,3 +17,7 @@ export type SpanType = {
     [key: string]: string;
   };
 };
+
+export type SpansType = {
+  spans: SpanType[]
+}
