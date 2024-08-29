@@ -14,6 +14,15 @@ export const TeamDeployContainerHistoryLog = () => {
         setData(res.data);
       });
     }
+    const interval = setInterval(() => {
+      if (pipelineName && pipelineCounter && stageName) {
+        getStageLog(pipelineName, pipelineCounter, stageName).then((res) => {
+          setData(res.data);
+        });
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [pipelineName, pipelineCounter, stageName]);
 
   return (
