@@ -32,6 +32,17 @@ export const TeamDeployContainerTraces = () => {
   const [error, setError] = useState<JsonData>();
   const [latency, setLatency] = useState<JsonData>();
   const { deployUUID, env } = useParams();
+  const bodySelector = document.querySelector('body');
+
+  useEffect(() => {
+    if (selectedTrace) {
+      if (!bodySelector) return;
+      bodySelector.style.overflowY = 'hidden';
+    } else {
+      if (!bodySelector) return;
+      bodySelector.style.overflowY = 'auto';
+    }
+  }, [selectedTrace]);
 
   useEffect(() => {
     if (deployUUID && env) {
