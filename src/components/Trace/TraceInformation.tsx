@@ -15,8 +15,6 @@ export const TraceInformation = ({ selectedTrace, setSelectedTrace }: PropsType)
   const { width, boxRef, handleMouseDown } = useResizable(800, 300, window.innerWidth - 280);
   const [data, setData] = useState<SpanType[]>();
 
-  console.log(data);
-
   useEffect(() => {
     if (selectedTrace) {
       getDetailTrace(selectedTrace).then((res) => {
