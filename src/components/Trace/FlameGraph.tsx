@@ -3,20 +3,15 @@ import '@pyroscope/flamegraph/dist/index.css';
 import { FlamegraphRenderer } from '@pyroscope/flamegraph';
 import { SpansType, SpanType } from '@/utils/types/traceType.ts';
 
-export const FlameGraph = ({ spans } : SpansType) => {
-  const flamegraphData = useMemo(() => convertTraceToFlamegraph(spans.spans), [spans]);
+export const FlameGraph = ({ spans }: SpansType) => {
+  const flamegraphData = useMemo(() => convertTraceToFlamegraph(spans), [spans]);
 
   if (!flamegraphData) {
     return <div>No valid flamegraph data available</div>;
   }
 
   return (
-    <FlamegraphRenderer
-      profile={flamegraphData}
-      onlyDisplay="flamegraph"
-      showToolbar={false}
-      showCredit={false}
-    />
+    <FlamegraphRenderer profile={flamegraphData} onlyDisplay="flamegraph" showToolbar={false} showCredit={false} />
   );
 };
 
@@ -27,7 +22,7 @@ function convertTraceToFlamegraph(spans: SpanType[]) {
   const nameMap: { [key: string]: number } = {};
   const levels: number[][] = [];
 
-  if(!spans[0]) return;
+  if (!spans[0]) return;
 
   const traceStartTime = spans[0].start_time_unix_nano;
   const traceEndTime = spans[0].end_time_unix_nano;
@@ -70,7 +65,7 @@ function convertTraceToFlamegraph(spans: SpanType[]) {
       format: 'single' as const,
       sampleRate: 1000000000,
       spyName: 'opentelemetry' as const,
-      units: 'trace_samples' as const,  // 'milliseconds' 대신 'samples' 사용
+      units: 'trace_samples' as const, // 'milliseconds' 대신 'samples' 사용
     },
   };
 }
