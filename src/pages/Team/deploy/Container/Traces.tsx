@@ -82,8 +82,7 @@ export const TeamDeployContainerTraces = () => {
   }, []);
 
   useEffect(() => {
-    let currentTime = Math.floor(Date.now() / 1000) - 5;
-    const oneHourAgo = currentTime - 1800;
+    const oneHourAgo = 3600;
 
     if (deployUUID && env) {
       getTrace(deployUUID, env, oneHourAgo).then((res) => {
