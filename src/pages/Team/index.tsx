@@ -64,10 +64,10 @@ export const Team = () => {
         <VStack gap={14}>
           <TeamListWrapper
             data={teamList}
+            isLoading={teamList === undefined}
             emptyFunction={() => {
               return filteredTeamList.length === 0;
             }}
-            isLoading={teamList === undefined}
             renderComponent={
               <Render>
                 {filteredTeamList.slice(selected * 3, selected * 3 + 3).map((element: any, index: number) => (
@@ -86,17 +86,17 @@ export const Team = () => {
                 ))}
               </Render>
             }
-            emptyComponent={
-              <Empty>
-                <TipBox>검색 결과가 없거나, 속한 팀이 없습니다!</TipBox>
-              </Empty>
-            }
             loadingComponent={
               <Loading>
                 {Array.from({ length: 3 }).map((_, i) => (
                   <Skeleton radius={6} height={134} key={i} />
                 ))}
               </Loading>
+            }
+            emptyComponent={
+              <Empty>
+                <TipBox>검색 결과가 없거나, 속한 팀이 없습니다!</TipBox>
+              </Empty>
             }
           />
         </VStack>
