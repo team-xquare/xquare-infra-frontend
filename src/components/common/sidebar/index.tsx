@@ -45,21 +45,20 @@ export const Sidebar: React.FC<PropType> = ({ isOpen, setOpen }) => {
   const [data, setData] = useState<ContainerDetailType | null | undefined>(undefined);
 
   useEffect(() => {
-    if (navigationType !== NavigationType.Pop) {
-      setData(undefined);
-      if (deployUUID && env) {
-        getDetailContainer(deployUUID, env)
-          .then((res) => {
-            setData(res.data);
-          })
-          .catch(() => {
-            setData(null);
-          });
-      } else {
-        setData(null);
-      }
+    setData(undefined);
+
+    if (deployUUID && env) {
+      getDetailContainer(deployUUID, env)
+        .then((res) => {
+          setData(res.data);
+        })
+        .catch(() => {
+          setData(null);
+        });
+    } else {
+      setData(null);
     }
-  }, [deployUUID, env, navigationType]);
+  }, [deployUUID, env]);
 
   const isContainerDetail = (data: ContainerDetailType | null | undefined): data is ContainerDetailType => {
     return data !== null && data !== undefined;
