@@ -16,6 +16,23 @@ interface PlotlyChartProps {
 export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [chartWidth, setChartWidth] = useState(360);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (chartRef.current) {
+        const containerWidth = chartRef.current.offsetWidth;
+        setChartWidth(containerWidth);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (chartRef.current) {
@@ -61,8 +78,8 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
         }));
 
         const layout: Partial<Plotly.Layout> = {
-          width: 380,
-          height: 180,
+          width: chartWidth,
+          height: Math.max(180, chartWidth * 0.5),
           margin: { l: 30, r: 30, t: 20, b: 50 },
           xaxis: {
             title: '',
@@ -91,6 +108,7 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
           displayModeBar: false,
           staticPlot: true,
           scrollZoom: false,
+          responsive: true,
         };
 
         Plotly.newPlot(chartRef.current, traces, layout, config).catch((plotError) => {
@@ -102,11 +120,11 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       }
     }
-  }, [jsonData]);
+  }, [jsonData, chartWidth]);
 
   if (error) {
     return <div>Error: {error}</div>;
   }
 
-  return <div ref={chartRef} style={{ position: 'relative', zIndex: '0' }} />;
+  return <div ref={chartRef} style={{ position: 'relative', zIndex: '0', width: '100%' }} />;
 };

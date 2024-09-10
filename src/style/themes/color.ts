@@ -26,4 +26,9 @@ export const color = {
   errorLight: '#FFD3D3',
   errorDark1: '#C23535',
   errorDark2: '#852424',
+
+  // trace
+  green: '#41C464',
+  brown: '#F99D02',
+  red: '#E3554C'
 } as const;

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Plotly from 'plotly.js-dist-min';
 
 interface DataPoint {
@@ -15,6 +15,23 @@ interface PlotlyChartProps {
 
 export const TraceRequestGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
   const chartRef = useRef<HTMLDivElement>(null);
+  const [chartWidth, setChartWidth] = useState(360);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (chartRef.current) {
+        const containerWidth = chartRef.current.offsetWidth;
+        setChartWidth(containerWidth);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (chartRef.current && jsonData) {
@@ -31,8 +48,8 @@ export const TraceRequestGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
       };
 
       const layout: Partial<Plotly.Layout> = {
-        width: 380,
-        height: 180,
+        width: chartWidth,
+        height: Math.max(180, chartWidth * 0.5),
         margin: {
           l: 30,
           r: 30,
@@ -57,11 +74,12 @@ export const TraceRequestGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
         displayModeBar: false,
         staticPlot: true,
         scrollZoom: false,
+        responsive: true,
       };
 
       Plotly.newPlot(chartRef.current, [trace], layout, config);
     }
-  }, [jsonData]);
+  }, [jsonData, chartWidth]);
 
-  return <div ref={chartRef} style={{ position: 'relative', zIndex: '0' }} />;
+  return <div ref={chartRef} style={{ position: 'relative', zIndex: '0', width: '100%' }} />;
 };
