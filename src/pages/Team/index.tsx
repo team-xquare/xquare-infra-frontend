@@ -18,7 +18,7 @@ export const Team = () => {
   const [selected, setSelected] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const { Wrapper: TeamListWrapper, Render, Loading, Empty } = Conditional();
-  const { data: teamList } = teamCheck();
+  const { data: teamList, isLoading } = teamCheck();
 
   const filteredTeamList = useMemo(() => {
     if (!teamList) return [];
@@ -57,7 +57,7 @@ export const Team = () => {
         <VStack gap={14}>
           <TeamListWrapper
             data={teamList}
-            isLoading={teamList === undefined}
+            isLoading={isLoading}
             emptyFunction={() => {
               return filteredTeamList.length === 0;
             }}
