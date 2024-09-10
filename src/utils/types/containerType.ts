@@ -14,6 +14,7 @@ export type ContainerDetailType = {
   team_name_en: string;
   team_name_ko: string;
   deploy_name: string;
+  deploy_type: 'be' | 'fe';
   repository: string;
   domain: string;
   last_deploy: string;

@@ -1,9 +1,12 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigationType, useParams, NavigationType } from 'react-router-dom';
 import { default as styled } from '@emotion/styled';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { menu as menuList } from './menus';
 import { Icon } from '@iconify/react';
 import { Menu } from './Menu';
+import { ContainerDetailType } from '@/utils/types/containerType';
+import { getDetailContainer } from '@/utils/apis/container';
+import Skeleton from '../Skeleton';
 
 interface PropType {
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -28,13 +31,39 @@ const replaceIDs = (url: string, params: any) =>
     .replaceAll('-container-', params?.containerUUID)
     .replaceAll('-env-', params?.env);
 
-export const Sidebar = ({ isOpen, setOpen }: PropType) => {
-  const { pathname }: any = useLocation();
-  const params: any = useParams();
+export const Sidebar: React.FC<PropType> = ({ isOpen, setOpen }) => {
+  const { pathname } = useLocation();
+  const params = useParams();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
+
   const raw_pathname = rawPath(pathname);
   const menuData = menuList[raw_pathname] || { back: undefined, menu: [] };
   const { back, menu: menus } = menuData;
+  const { deployUUID, env } = useParams();
+
+  const [data, setData] = useState<ContainerDetailType | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (navigationType !== NavigationType.Pop) {
+      setData(undefined);
+      if (deployUUID && env) {
+        getDetailContainer(deployUUID, env)
+          .then((res) => {
+            setData(res.data);
+          })
+          .catch(() => {
+            setData(null);
+          });
+      } else {
+        setData(null);
+      }
+    }
+  }, [deployUUID, env, navigationType]);
+
+  const isContainerDetail = (data: ContainerDetailType | null | undefined): data is ContainerDetailType => {
+    return data !== null && data !== undefined;
+  };
 
   return (
     <Wrapper isOpen={isOpen}>
@@ -48,17 +77,28 @@ export const Sidebar = ({ isOpen, setOpen }: PropType) => {
       )}
       <ContentContainer>
         <MenuContainer>
-          {menus?.map((item: any, index: number) => {
-            return (
-              <Menu
-                key={index}
-                icon={item.icon}
-                text={item.name}
-                isOpen={isOpen}
-                onClick={() => navigate(replaceIDs(item.link, params))}
-              />
-            );
-          })}
+          {data !== undefined
+            ? menus?.map((item, index) => {
+                if (
+                  isContainerDetail(data) &&
+                  data.deploy_type === 'fe' &&
+                  (item.name === 'Traces' || item.name === 'Alert')
+                ) {
+                  return null;
+                }
+                return (
+                  <Menu
+                    key={index}
+                    icon={item.icon}
+                    text={item.name}
+                    isOpen={isOpen}
+                    onClick={() => navigate(replaceIDs(item.link, params))}
+                  />
+                );
+              })
+            : Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton width={isOpen ? 235 : 60} height={60} key={index} />
+              ))}
         </MenuContainer>
         <Menu icon="ep:d-arrow-left" text="사이드바 축소" rotate isOpen={isOpen} onClick={() => setOpen(!isOpen)} />
       </ContentContainer>
