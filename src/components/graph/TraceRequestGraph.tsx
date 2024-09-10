@@ -35,7 +35,7 @@ export const TraceRequestGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
 
   useEffect(() => {
     if (chartRef.current && jsonData) {
-      const timestamps = Object.keys(jsonData).map((ts) => ts.substring(11, 16));
+      const timestamps = Object.keys(jsonData).map((ts) => ts);
       const values = Object.values(jsonData).map(Number);
 
       const trace = {
@@ -45,6 +45,8 @@ export const TraceRequestGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
         marker: {
           color: 'rgba(147, 203, 255, 1)',
         },
+        hoverinfo: 'x+y' as const,
+        hovertemplate: '%{x}<br>Value: %{y}<extra></extra>',
       };
 
       const layout: Partial<Plotly.Layout> = {
@@ -60,19 +62,21 @@ export const TraceRequestGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
           title: '',
           fixedrange: true,
           tickvals: timestamps.filter((_, i) => i % Math.ceil(timestamps.length / 4) === 0),
-          ticktext: timestamps.filter((_, i) => i % Math.ceil(timestamps.length / 4) === 0),
+          ticktext: timestamps
+            .filter((_, i) => i % Math.ceil(timestamps.length / 4) === 0)
+            .map((ts) => ts.substring(11, 16)),
         },
         yaxis: {
           title: '',
           fixedrange: true,
         },
         dragmode: false as const,
-        hovermode: false as const,
+        hovermode: 'closest' as const,
       };
 
       const config: Partial<Plotly.Config> = {
         displayModeBar: false,
-        staticPlot: true,
+        staticPlot: false,
         scrollZoom: false,
         responsive: true,
       };

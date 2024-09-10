@@ -46,7 +46,7 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
         }
 
         const firstKey = Object.keys(jsonData)[0];
-        const timestamps = Object.keys(jsonData[firstKey]).map((ts) => ts.substring(11, 16));
+        const timestamps = Object.keys(jsonData[firstKey]);
 
         if (timestamps.length === 0) {
           throw new Error('No timestamp data available');
@@ -75,6 +75,8 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
           },
           legendgroup: `group${key}`,
           showlegend: true,
+          hoverinfo: 'x+y+name' as const,
+          hovertemplate: '%{x}<br>%{name}: %{y:.2f}<extra></extra>',
         }));
 
         const layout: Partial<Plotly.Layout> = {
@@ -85,11 +87,13 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
             title: '',
             fixedrange: true,
             tickvals: timestamps.filter((_, i) => i % Math.ceil(timestamps.length / 4) === 0),
-            ticktext: timestamps.filter((_, i) => i % Math.ceil(timestamps.length / 4) === 0),
+            ticktext: timestamps
+              .filter((_, i) => i % Math.ceil(timestamps.length / 4) === 0)
+              .map((ts) => ts.substring(11, 16)),
           },
           yaxis: { title: '', fixedrange: true },
           dragmode: false,
-          hovermode: false,
+          hovermode: 'closest' as const,
           showlegend: true,
           legend: {
             orientation: 'h',
@@ -106,7 +110,7 @@ export const TraceLatencyGraph: React.FC<PlotlyChartProps> = ({ jsonData }) => {
 
         const config: Partial<Plotly.Config> = {
           displayModeBar: false,
-          staticPlot: true,
+          staticPlot: false,
           scrollZoom: false,
           responsive: true,
         };
