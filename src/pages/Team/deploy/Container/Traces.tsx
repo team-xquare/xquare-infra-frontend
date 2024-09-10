@@ -4,13 +4,7 @@ import { TraceType } from '@/utils/types/traceType';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  getDetailContainer,
-  getContainerRequest,
-  getContainerError,
-  getContainerLatency,
-} from '@/utils/apis/container';
-import { ContainerDetailType } from '@/utils/types/containerType';
+import { getContainerRequest, getContainerError, getContainerLatency } from '@/utils/apis/container';
 import { TraceRequestGraph } from '@/components/graph/TraceRequestGraph';
 import { TraceErrorGraph } from '@/components/graph/TraceErrorGraph';
 import { TraceLatencyGraph } from '@/components/graph/TraceLatencyGraph';
@@ -26,7 +20,6 @@ interface JsonData {
 
 export const TeamDeployContainerTraces = () => {
   const [selectedTrace, setSelectedTrace] = useState<string | null>(null);
-  const [container, setData] = useState<ContainerDetailType>();
   const [traces, setTraces] = useState<TraceType[]>();
   const [request, setRequest] = useState<JsonData>();
   const [error, setError] = useState<JsonData>();
@@ -46,40 +39,44 @@ export const TeamDeployContainerTraces = () => {
 
   useEffect(() => {
     if (deployUUID && env) {
-      getDetailContainer(deployUUID, env).then((res) => {
-        setData(res.data);
-      });
-
-      getContainerRequest(deployUUID, env).then((res) => {
-        setRequest(res.data['0']);
-        console.log(res.data['0']);
-      });
-
-      getContainerError(deployUUID, env).then((res) => {
-        setError(res.data['0']);
-      });
-
-      Promise.all([
-        getContainerLatency(99, deployUUID, env),
-        getContainerLatency(95, deployUUID, env),
-        getContainerLatency(90, deployUUID, env),
-        getContainerLatency(75, deployUUID, env),
-        getContainerLatency(50, deployUUID, env),
-      ])
-        .then(([res99, res95, res90, res75, res50]) => {
-          setLatency({
-            99: res99.data['0'],
-            95: res95.data['0'],
-            90: res90.data['0'],
-            75: res75.data['0'],
-            50: res50.data['0'],
-          });
-        })
-        .catch((error) => {
-          console.error('Error fetching latency data:', error);
+      const fetchData = () => {
+        getContainerRequest(deployUUID, env).then((res) => {
+          setRequest(res.data['0']);
+          console.log(res.data['0']);
         });
+
+        getContainerError(deployUUID, env).then((res) => {
+          setError(res.data['0']);
+        });
+
+        Promise.all([
+          getContainerLatency(99, deployUUID, env),
+          getContainerLatency(95, deployUUID, env),
+          getContainerLatency(90, deployUUID, env),
+          getContainerLatency(75, deployUUID, env),
+          getContainerLatency(50, deployUUID, env),
+        ])
+          .then(([res99, res95, res90, res75, res50]) => {
+            setLatency({
+              99: res99.data['0'],
+              95: res95.data['0'],
+              90: res90.data['0'],
+              75: res75.data['0'],
+              50: res50.data['0'],
+            });
+          })
+          .catch((error) => {
+            console.error('Error fetching latency data:', error);
+          });
+      };
+
+      fetchData();
+
+      const intervalId = setInterval(fetchData, 60000);
+
+      return () => clearInterval(intervalId);
     }
-  }, []);
+  }, [deployUUID, env]);
 
   useEffect(() => {
     const oneHourAgo = 3600;
@@ -103,7 +100,7 @@ export const TeamDeployContainerTraces = () => {
 
       return () => clearInterval(interval);
     }
-  }, [container]);
+  }, [deployUUID, env]);
 
   return (
     <>
@@ -141,9 +138,7 @@ export const TeamDeployContainerTraces = () => {
                       setSelectedTrace(trace.trace_id === selectedTrace ? null : trace.trace_id);
                     }}
                   >
-                    {trace.status_code && (
-                      <RodItem status={trace.status_code}></RodItem>
-                    )}
+                    {trace.status_code && <RodItem status={trace.status_code}></RodItem>}
                     <DateItem>{trace.date}</DateItem>
                     <ResourceItem>{trace.resource ?? ''}</ResourceItem>
                     <DurationItem>{trace.duration_ms ?? ''}ms</DurationItem>
@@ -278,18 +273,18 @@ const ResourceItem = styled.div`
 `;
 
 const RodItem = styled.div<{ status: number }>`
-    width: 8px;
-    padding-left: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-variant-numeric: tabular-nums;
-    background-color: ${props => {
-        if (props.status < 300) return theme.color.green;
-        if (props.status < 400) return theme.color.infoDark1;
-        if (props.status < 500) return theme.color.brown;
-        return theme.color.red;
-    }};
+  width: 8px;
+  padding-left: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  background-color: ${(props) => {
+    if (props.status < 300) return theme.color.green;
+    if (props.status < 400) return theme.color.infoDark1;
+    if (props.status < 500) return theme.color.brown;
+    return theme.color.red;
+  }};
 `;
 
 const DurationItem = styled.div`
