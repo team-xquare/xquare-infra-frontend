@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useNavigationType, useParams, NavigationType } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { default as styled } from '@emotion/styled';
 import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { menu as menuList } from './menus';
@@ -35,7 +35,6 @@ export const Sidebar: React.FC<PropType> = ({ isOpen, setOpen }) => {
   const { pathname } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
-  const navigationType = useNavigationType();
 
   const raw_pathname = rawPath(pathname);
   const menuData = menuList[raw_pathname] || { back: undefined, menu: [] };
