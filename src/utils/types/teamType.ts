@@ -11,7 +11,7 @@ export type TeamListType = {
 };
 
 export type TeamCheckType = {
-  data: TeamListType[];
+  team_list: TeamListType[];
 };
 
 export type TeamCreateType = {

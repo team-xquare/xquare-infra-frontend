@@ -1,10 +1,16 @@
-import { TeamCreateType } from '../types/teamType';
+import { useQuery } from '@tanstack/react-query';
+import { TeamCheckType, TeamCreateType } from '../types/teamType';
 import { instance } from './axios';
 
 const router = 'v1/team';
 
-export const teamCheck = async () => {
-  return await instance.get(`${router}/my-team`);
+export const teamCheck = () => {
+  const response = async () => {
+    const { data } = await instance.get<TeamCheckType>(`${router}/my-team`);
+    return data.team_list;
+  };
+
+  return useQuery({ queryKey: ['my-team'], queryFn: response });
 };
 
 export const teamCreate = async (data: TeamCreateType) => {

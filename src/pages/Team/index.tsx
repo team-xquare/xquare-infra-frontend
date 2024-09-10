@@ -5,27 +5,20 @@ import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
 import { SearchBar } from '@/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
-import { TeamCheckType } from '@/utils/types/teamType';
-import { useCustomQuery } from '@/hooks/useCustomQueries';
 import { useMemo, useState } from 'react';
 import Skeleton from '@/components/common/Skeleton';
 import { LimitBox } from '@/components/Layouts/LimitBox';
 import { Text } from '@/components/Elements/Text';
 import { VStack } from '@/components/Layouts/VStack';
 import { Conditional } from '@/components/Headless/Conditional';
+import { teamCheck } from '@/utils/apis/team';
 
 export const Team = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-
   const { Wrapper: TeamListWrapper, Render, Loading, Empty } = Conditional();
-
-  const { data: teamList }: TeamCheckType = useCustomQuery({
-    queryKey: ['team-list'],
-    url: '/v1/team/my-team',
-    select: (res) => res?.data.team_list,
-  });
+  const { data: teamList } = teamCheck();
 
   const filteredTeamList = useMemo(() => {
     if (!teamList) return [];
