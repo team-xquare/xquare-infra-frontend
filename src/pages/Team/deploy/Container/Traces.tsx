@@ -141,6 +141,9 @@ export const TeamDeployContainerTraces = () => {
                       setSelectedTrace(trace.trace_id === selectedTrace ? null : trace.trace_id);
                     }}
                   >
+                    {trace.status_code && (
+                      <RodItem status={trace.status_code}></RodItem>
+                    )}
                     <DateItem>{trace.date}</DateItem>
                     <ResourceItem>{trace.resource ?? ''}</ResourceItem>
                     <DurationItem>{trace.duration_ms ?? ''}ms</DurationItem>
@@ -272,6 +275,21 @@ const ResourceItem = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+const RodItem = styled.div<{ status: number }>`
+    width: 8px;
+    padding-left: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+    background-color: ${props => {
+        if (props.status < 300) return theme.color.green;
+        if (props.status < 400) return theme.color.infoDark1;
+        if (props.status < 500) return theme.color.brown;
+        return theme.color.red;
+    }};
 `;
 
 const DurationItem = styled.div`
