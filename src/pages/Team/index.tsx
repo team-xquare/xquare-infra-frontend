@@ -35,12 +35,14 @@ export const Team = () => {
   return (
     <Wrapper>
       <LimitBox>
-        <Text size={30} weight={600} color={theme.color.gray8}>
-          팀
-        </Text>
-        <Text size={24} weight={100} color={theme.color.gray8}>
-          프로젝트를 개발하고 관리할 팀을 정의해보세요.
-        </Text>
+        <VStack gap={4} justify="left">
+          <Text size={30} weight={600} color={theme.color.gray8}>
+            팀
+          </Text>
+          <Text size={24} weight={100} color={theme.color.gray8}>
+            프로젝트를 개발하고 관리할 팀을 정의해보세요.
+          </Text>
+        </VStack>
       </LimitBox>
       <UtilContainer>
         <SearchBar
