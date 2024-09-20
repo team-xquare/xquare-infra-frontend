@@ -5,27 +5,35 @@ import { XButton } from '@/components/common/XButton';
 import { Icon } from '@iconify/react';
 import { Tag } from '@/components/Team/Tag';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCustomQuery } from '@/hooks/useCustomQueries';
 import { useState } from 'react';
+import { Conditional } from '@/components/Headless/Conditional';
+import Skeleton from '@/components/common/Skeleton';
+import { getAllDeploy } from '@/utils/apis/deploy';
+import { Text } from '@/components/Elements/Text';
 
 export const TeamDeploy = () => {
   const [selected, setSelected] = useState(0);
-  const { teamUUID } = useParams();
   const link = useNavigate();
+  const { Wrapper: DeployListWrapper, Render, Loading, Empty } = Conditional();
+  const { teamUUID } = useParams();
+  const { data } = getAllDeploy(teamUUID as string);
 
-  const { data } = useCustomQuery({
-    queryKey: ['teamUUID'],
-    url: `/v1/deploy/all?teamId=${teamUUID}`,
-    select: (res) => res.data,
-  });
-  const count = Math.ceil(data?.deploy_list.length / 4) || 1;
+  const deploy_list = data?.deploy_list ?? [];
+
+  const count = Math.ceil(deploy_list?.length / 4) || 1;
 
   return (
     <Wrapper>
       <TitleContainer>
-        <TeamName>{data?.team_name_ko}</TeamName>
-        <Title>배포</Title>
-        <Describtion>프로젝트를 등록하고 해당 프로젝트에 대한 배포 액션을 설정할 수 있습니다.</Describtion>
+        <Text size={20} weight={500} color={theme.color.gray5}>
+          {data?.team_name_ko as string}
+        </Text>
+        <Text size={30} weight={600} color={theme.color.gray8}>
+          배포
+        </Text>
+        <Text size={24} weight={100} color={theme.color.gray8}>
+          프로젝트를 등록하고 해당 프로젝트에 대한 배포 액션을 설정할 수 있습니다.
+        </Text>
         <UtilContainer>
           <SearchBar width={312} placeholder="프로젝트 검색" />
           <XButton width={138} height={50} buttonStyle="solid" onClick={() => link(`/team/${teamUUID}/deploy/create`)}>
@@ -35,15 +43,34 @@ export const TeamDeploy = () => {
         </UtilContainer>
       </TitleContainer>
       <DeployBoxContainer>
-        {data?.deploy_list?.slice(selected * 4, selected * 4 + 4).map((item: any, index: number) => (
-          <DeployBox key={index} onClick={() => link(`/team/${teamUUID}/deploy/${item.deploy_id}`)}>
-            <div>
-              {item.deploy_name}
-              <Tag tag={item.deploy_status} />
-            </div>
-            <div>{item.repository}</div>
-          </DeployBox>
-        ))}
+        <DeployListWrapper
+          data={data}
+          isLoading={data === undefined}
+          emptyFunction={() => {
+            return deploy_list.length === 0;
+          }}
+          renderComponent={
+            <Render>
+              {data?.deploy_list?.slice(selected * 4, selected * 4 + 4).map((item: any, index: number) => (
+                <DeployBox key={index} onClick={() => link(`/team/${teamUUID}/deploy/${item.deploy_id}`)}>
+                  <div>
+                    {item.deploy_name}
+                    <Tag tag={item.deploy_status} />
+                  </div>
+                  <div>{item.repository}</div>
+                </DeployBox>
+              ))}
+            </Render>
+          }
+          loadingComponent={
+            <Loading>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton radius={6} height={100} key={i} />
+              ))}
+            </Loading>
+          }
+          emptyComponent={<Empty>배포된 프로젝트가 없습니다!</Empty>}
+        />
       </DeployBoxContainer>
       <PaginationContainer>
         {Array.from(new Array(count).keys()).map((i) => (
@@ -82,24 +109,6 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-`;
-
-const TeamName = styled.div`
-  font-size: 20px;
-  font-weight: 500;
-  color: ${theme.color.gray5};
-`;
-
-const Title = styled.div`
-  font-size: 30px;
-  font-weight: 600;
-  color: ${theme.color.gray8};
-`;
-
-const Describtion = styled.div`
-  font-size: 24px;
-  font-weight: 100;
-  color: ${theme.color.gray8};
 `;
 
 const UtilContainer = styled.div`
