@@ -12,7 +12,9 @@ export type SpanType = {
   span_id: string;
   name: string;
   start_time_unix_nano: number;
+  parent_span_id?: string;
   end_time_unix_nano: number;
+  service_name: string;
   attributes: {
     [key: string]: string;
   };
