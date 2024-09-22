@@ -14,6 +14,7 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
   const [timelineWidth, setTimelineWidth] = useState<number>(0);
   const [scaleX, setScaleX] = useState<number>(1);
   const [scaleY, setScaleY] = useState<number>(1);
+  const [selectedSpan, setSelectedSpan] = useState<SpanType | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -45,7 +46,7 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
 
   const traceStartTime = Math.min(...processedSpans.map((span) => span.start_time_unix_nano));
   const traceEndTime = Math.max(...processedSpans.map((span) => span.end_time_unix_nano));
-  const traceDuration = (traceEndTime - traceStartTime) / 1e6;
+  const traceDuration = (traceEndTime - traceStartTime) / 1e6; // Convert nanoseconds to milliseconds
 
   const maxLevel = processedSpans.reduce((max, span) => (span.level > max ? span.level : max), 0);
 
@@ -136,65 +137,129 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
     }
   };
 
+  const handleSpanClick = (span: SpanType) => {
+    setSelectedSpan(span);
+    if (onSpanClick) {
+      onSpanClick(span);
+    }
+  };
+
   return (
-    <div
-      className="trace-timeline-container"
-      ref={containerRef}
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: `${(maxLevel + 1) * (scaledSpanHeight + scaledSpanSpacing) + 30}px`,
-        border: '1px solid #ccc',
-        backgroundColor: '#f9f9f9',
-        overflowX: 'auto',
-        cursor: 'grab',
-        userSelect: 'none',
-      }}
-    >
-      {processedSpans.map((span) => (
-        <div
-          key={span.span_id}
-          className="trace-span"
-          style={{
-            position: 'absolute',
-            left: `${span.relativeStart * scaledScaleX}px`,
-            top: `${span.level * (scaledSpanHeight + scaledSpanSpacing)}px`, // 수직 스케일 적용
-            width: `${span.duration * scaledScaleX}px`,
-            height: `${scaledSpanHeight}px`, // 수직 스케일 적용
-            backgroundColor: serviceColors[span.service_name || 'Unknown Service'] || '#87ceeb',
-            border: '1px solid #1e90ff',
-            cursor: 'pointer',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            transition: 'left 0.2s ease, width 0.2s ease, top 0.2s ease, height 0.2s ease',
-          }}
-          title={`스팬 이름: ${span.name}\n서비스: ${span.service_name || 'Unknown Service'}\n기간: ${span.duration.toFixed(2)} ms`}
-          onClick={() => onSpanClick && onSpanClick(span)}
-        >
-          <span className="trace-span-label">{span.name}</span>
-        </div>
-      ))}
-      {/* 시간 축 */}
+    <div className="trace-timeline-wrapper">
       <div
-        className="trace-timeline-axis"
+        className="trace-timeline-container"
+        ref={containerRef}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
         style={{
-          position: 'absolute',
-          top: `${(maxLevel + 1) * (scaledSpanHeight + scaledSpanSpacing)}px`,
-          left: '0',
-          width: `${traceDuration * scaledScaleX}px`,
-          height: '20px',
-          borderTop: '1px solid #ccc',
-          transition: 'width 0.2s ease, top 0.2s ease',
+          position: 'relative',
+          width: '100%',
+          height: `${(maxLevel + 1) * (scaledSpanHeight + scaledSpanSpacing) + 30}px`,
+          border: '1px solid #ccc',
+          backgroundColor: '#f9f9f9',
+          overflow: 'auto', // Changed to 'auto' to allow both scrollX and scrollY
+          cursor: 'grab',
+          userSelect: 'none',
         }}
       >
-        {generateTimeLabels()}
+        {processedSpans.map((span) => {
+          const hasExceptionEvent = span.events?.some(event => event.name === 'exception');
+
+          return (
+            <div
+              key={span.span_id}
+              className={`trace-span ${selectedSpan?.span_id === span.span_id ? 'selected' : ''}`}
+              style={{
+                position: 'absolute',
+                left: `${span.relativeStart * scaledScaleX}px`,
+                top: `${span.level * (scaledSpanHeight + scaledSpanSpacing)}px`,
+                width: `${span.duration * scaledScaleX}px`,
+                height: `${scaledSpanHeight}px`,
+                backgroundColor: serviceColors[span.service_name || 'Unknown Service'] || '#87ceeb',
+                border: hasExceptionEvent ? '2px solid red' : '1px solid #1e90ff', // Red border for spans with exception events
+                cursor: 'pointer',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                transition: 'left 0.2s ease, width 0.2s ease, top 0.2s ease, height 0.2s ease',
+                zIndex: selectedSpan?.span_id === span.span_id ? 2 : 1, // Bring selected span to front
+              }}
+              title={`Span Name: ${span.name}\nService: ${span.service_name || 'Unknown Service'}\nDuration: ${span.duration.toFixed(2)} ms`}
+              onClick={() => handleSpanClick(span)}
+            >
+              <span className="trace-span-label">{span.name}</span>
+            </div>
+          );
+        })}
+        {/* Time Axis */}
+        <div
+          className="trace-timeline-axis"
+          style={{
+            position: 'absolute',
+            top: `${(maxLevel + 1) * (scaledSpanHeight + scaledSpanSpacing)}px`,
+            left: '0',
+            width: `${traceDuration * scaledScaleX}px`,
+            height: '20px',
+            borderTop: '1px solid #ccc',
+            transition: 'width 0.2s ease, top 0.2s ease',
+          }}
+        >
+          {generateTimeLabels()}
+        </div>
       </div>
+
+      {/* Details Panel */}
+      {selectedSpan && (
+        <div className="trace-details-panel">
+          <h3>Span Details</h3>
+          <div className="trace-details-section">
+            <h4>Attributes</h4>
+            <table>
+              <tbody>
+              {selectedSpan.attributes && Object.entries(selectedSpan.attributes).map(([key, value]) => (
+                <tr key={key}>
+                  <td><strong>{key}</strong></td>
+                  <td>{String(value)}</td>
+                </tr>
+              ))}
+              {!selectedSpan.attributes || Object.keys(selectedSpan.attributes).length === 0 ? (
+                <tr>
+                  <td colSpan={2}>No attributes available.</td>
+                </tr>
+              ) : null}
+              </tbody>
+            </table>
+          </div>
+          <div className="trace-details-section">
+            <h4>Logs/Events</h4>
+            {selectedSpan.events && selectedSpan.events.length > 0 ? (
+              <div className="trace-events-list">
+                {selectedSpan.events.map((event, index) => (
+                  <div key={index} className="trace-event-item">
+                    <div className="trace-event-header">
+                    </div>
+                    <div className="trace-event-attributes">
+                      {Object.entries(event.attributes).map(([attrKey, attrValue]) => (
+                        <div key={attrKey} className="trace-event-attribute">
+                          <strong>{attrKey}:</strong> {attrValue}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No events available.</p>
+            )}
+          </div>
+          <button className="trace-details-close" onClick={() => setSelectedSpan(null)}>
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 };

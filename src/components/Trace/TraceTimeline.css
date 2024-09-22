@@ -43,3 +43,30 @@
     transform: translateX(-50%);
     white-space: nowrap;
 }
+
+.trace-details-section {
+    margin-bottom: 15px;
+}
+
+.trace-details-section h4 {
+    margin-bottom: 5px;
+}
+
+.trace-details-panel {
+    padding: 12px;
+}
+
+.trace-details-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.trace-details-section td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.trace-details-section ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}

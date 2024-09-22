@@ -18,7 +18,14 @@ export type SpanType = {
   attributes: {
     [key: string]: string;
   };
+  events: SpanEventResponse[];
 };
+
+interface SpanEventResponse {
+  timeUnixNano: number;
+  name: string;
+  attributes: { [key: string]: string };
+}
 
 export type SpansType = {
   spans: SpanType[]
