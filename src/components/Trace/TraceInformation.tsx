@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { useResizable } from '@/hooks/useResizable';
 import { getDetailTrace } from '@/utils/apis/trace';
 import { SpanType } from '@/utils/types/traceType';
-import { FlameGraph } from '@/components/Trace/FlameGraph.tsx';
+import { TraceTimeline } from '@/components/Trace/TraceTimeline.tsx';
 
 type PropsType = {
   selectedTrace: string | null;
@@ -33,7 +33,7 @@ export const TraceInformation = ({ selectedTrace, setSelectedTrace }: PropsType)
             <h2>Trace View</h2>
             <b onClick={() => setSelectedTrace(null)}>닫기</b>
           </TitleContainer>
-          <div>{selectedTrace && <FlameGraph spans={data} />}</div>
+          <div>{selectedTrace && <TraceTimeline spans={data} />}</div>
         </Content>
       )}
     </Wrapper>
