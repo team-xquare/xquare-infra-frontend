@@ -29,11 +29,20 @@ interface FilterState {
   Error: boolean;
 }
 
-const CustomCheckbox = ({ label, checked, onChange, count }: { label: string; checked: boolean; onChange: () => void; count: number }) => (
+const CustomCheckbox = ({
+  label,
+  checked,
+  onChange,
+  count,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+  count: number;
+}) => (
   <CheckboxContainer onClick={onChange}>
     <HiddenCheckbox type="checkbox" checked={checked} onChange={onChange} />
-    <StyledCheckbox checked={checked}>
-    </StyledCheckbox>
+    <StyledCheckbox checked={checked}></StyledCheckbox>
     <CheckboxLabel>{label}</CheckboxLabel>
     <CountLabel>({count})</CountLabel>
   </CheckboxContainer>
@@ -127,8 +136,8 @@ export const TeamDeployContainerTraces = () => {
 
   useEffect(() => {
     if (traces) {
-      const okCount = traces.filter(trace => trace.status_code && trace.status_code < 500).length;
-      const errorCount = traces.filter(trace => trace.status_code && trace.status_code >= 500).length;
+      const okCount = traces.filter((trace) => trace.status_code && trace.status_code < 500).length;
+      const errorCount = traces.filter((trace) => trace.status_code && trace.status_code >= 500).length;
       setTraceCounts({ OK: okCount, Error: errorCount });
 
       if (!filter.OK && !filter.Error) {
@@ -137,20 +146,20 @@ export const TeamDeployContainerTraces = () => {
         setFilteredTraces(
           traces.filter((trace) => {
             const statusCode = trace.status_code;
-            if(!statusCode) return false;
+            if (!statusCode) return false;
             if (filter.OK && statusCode < 500) return true;
             if (filter.Error && statusCode >= 500) return true;
             return false;
-          })
+          }),
         );
       }
     }
   }, [traces, filter]);
 
   const handleFilterChange = (category: keyof FilterState) => {
-    setFilter(prevFilter => ({
+    setFilter((prevFilter) => ({
       ...prevFilter,
-      [category]: !prevFilter[category]
+      [category]: !prevFilter[category],
     }));
   };
 
@@ -206,9 +215,7 @@ export const TeamDeployContainerTraces = () => {
                         setSelectedTrace(trace.trace_id === selectedTrace ? null : trace.trace_id);
                       }}
                     >
-                      {trace.status_code && (
-                        <RodItem status={trace.status_code}></RodItem>
-                      )}
+                      {trace.status_code && <RodItem status={trace.status_code}></RodItem>}
                       <DateItem>{trace.date}</DateItem>
                       <ResourceItem>{trace.resource ?? ''}</ResourceItem>
                       <DurationItem>{trace.duration_ms ?? ''}ms</DurationItem>
@@ -230,225 +237,228 @@ export const TeamDeployContainerTraces = () => {
 };
 
 const Wrapper = styled.div`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
 `;
 
 const TracesContainer = styled.div`
-    width: 100%;
-    max-width: 1100px;
-    border-radius: 8px;
-    border: 1px solid ${theme.color.gray4};
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+  width: 100%;
+  max-width: 1100px;
+  border-radius: 8px;
+  border: 1px solid ${theme.color.gray4};
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 `;
 
 const ContentContainer = styled.div`
-    width: 100%;
-    max-width: 1300px;
-    display: flex;
-    gap: 20px;
-    margin-top: 30px;
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
 `;
 
 const OptionContainer = styled.div`
-    width: 100%;
-    max-width: 200px;
-    border-radius: 8px;
-    border: 1px solid ${theme.color.gray4};
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 14px;
-    > span {
-        font-size: 20px;
-        font-weight: 400;
-        color: ${theme.color.gray8};
-        margin-bottom: 10px;
-    }
+  width: 100%;
+  max-width: 200px;
+  height: 120px;
+  border-radius: 8px;
+  border: 1px solid ${theme.color.gray4};
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 14px;
+  position: sticky;
+  top: 100px;
+  > span {
+    font-size: 20px;
+    font-weight: 400;
+    color: ${theme.color.gray8};
+    margin-bottom: 10px;
+  }
 `;
 
 const CheckboxContainer = styled.div`
-    vertical-align: middle;
-    cursor: pointer;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
+  vertical-align: middle;
+  cursor: pointer;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
 `;
 
 const HiddenCheckbox = styled.input`
-    border: 0;
-    clip: rect(0 0 0 0);
-    clippath: inset(50%);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clippath: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 `;
 
 const StyledCheckbox = styled.div<{ checked: boolean }>`
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    background: ${props => (props.checked ? theme.color.main : theme.color.gray1)};
-    border: 1px solid ${theme.color.gray4};
-    border-radius: 3px;
-    transition: all 150ms;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: ${(props) => (props.checked ? theme.color.main : theme.color.gray1)};
+  border: 1px solid ${theme.color.gray4};
+  border-radius: 3px;
+  transition: all 150ms;
 `;
 
 const CheckboxLabel = styled.span`
-    margin-left: 8px;
+  margin-left: 8px;
 `;
 
 const CountLabel = styled.span`
-    margin-left: 5px;
-    color: ${theme.color.gray6};
-    font-size: 14px;
+  margin-left: 5px;
+  color: ${theme.color.gray6};
+  font-size: 14px;
 `;
 
 const TraceLabel = styled.div`
-    width: 100%;
-    color: ${theme.color.gray8};
-    font-size: 16px;
-    font-weight: 600;
-    display: flex;
-    height: 52px;
-    background-color: ${theme.color.gray2};
-    border-bottom: 1px solid ${theme.color.gray4};
+  width: 100%;
+  color: ${theme.color.gray8};
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  height: 52px;
+  background-color: ${theme.color.gray2};
+  border-bottom: 1px solid ${theme.color.gray4};
 `;
 
 const ScrollableTraceItems = styled.div`
-    max-height: calc(100vh - 300px);
+  /* max-height: calc(100vh - 300px);
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: hidden; */
 `;
 
 const TraceItem = styled.div`
-    width: 100%;
-    color: ${theme.color.gray8};
-    font-size: 16px;
-    font-weight: 300;
-    display: flex;
-    height: 30px;
-    border-bottom: 1px solid ${theme.color.gray4};
-    background-color: ${theme.color.gray1};
-    transition: 0.1s linear;
-    cursor: pointer;
-    &:last-child {
-        border-bottom: none;
-    }
-    &:hover {
-        background-color: #eaf6fc;
-    }
+  width: 100%;
+  color: ${theme.color.gray8};
+  font-size: 16px;
+  font-weight: 300;
+  display: flex;
+  height: 30px;
+  border-bottom: 1px solid ${theme.color.gray4};
+  background-color: ${theme.color.gray1};
+  transition: 0.1s linear;
+  cursor: pointer;
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    background-color: #eaf6fc;
+  }
 `;
 
 const DateLabel = styled.div`
-    width: 25%;
-    min-width: 200px;
-    padding-left: 20px;
-    display: flex;
-    align-items: center;
+  width: 25%;
+  min-width: 200px;
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
 `;
 
 const ResourceLabel = styled.div`
-    width: 35%;
-    min-width: 250px;
-    display: flex;
-    align-items: center;
+  width: 35%;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
 `;
 
 const DurationLabel = styled.div`
-    width: 10%;
-    min-width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 10%;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const MethodLabel = styled.div`
-    width: 10%;
-    min-width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 10%;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StatusCodeLabel = styled.div`
-    width: 20%;
-    min-width: 150px;
-    padding-right: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 20%;
+  min-width: 150px;
+  padding-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const DateItem = styled.div`
-    width: 25%;
-    min-width: 200px;
-    padding-left: 20px;
-    display: flex;
-    align-items: center;
-    font-variant-numeric: tabular-nums;
+  width: 25%;
+  min-width: 200px;
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
 `;
 
 const ResourceItem = styled.div`
-    width: 35%;
-    min-width: 250px;
-    display: flex;
-    align-items: center;
-    font-variant-numeric: tabular-nums;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  width: 35%;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const RodItem = styled.div<{ status: number }>`
-    width: 8px;
-    padding-left: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-variant-numeric: tabular-nums;
-    background-color: ${props => {
-        if (props.status < 300) return theme.color.green;
-        if (props.status < 400) return theme.color.infoDark1;
-        if (props.status < 500) return theme.color.brown;
-        return theme.color.red;
-    }};
+  width: 8px;
+  padding-left: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  background-color: ${(props) => {
+    if (props.status < 300) return theme.color.green;
+    if (props.status < 400) return theme.color.infoDark1;
+    if (props.status < 500) return theme.color.brown;
+    return theme.color.red;
+  }};
 `;
 
 const DurationItem = styled.div`
-    width: 10%;
-    min-width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-variant-numeric: tabular-nums;
+  width: 10%;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
 `;
 
 const MethodItem = styled.div`
-    width: 10%;
-    min-width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 10%;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StatusCodeItem = styled.div`
-    width: 20%;
-    min-width: 150px;
-    padding-right: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-variant-numeric: tabular-nums;
+  width: 20%;
+  min-width: 150px;
+  padding-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
 `;
 
 const GraphContainer = styled.div`
@@ -492,5 +502,5 @@ const StatusCodeBox = styled.div<{ status: number }>`
   border-radius: 4px;
   font-weight: 220;
   color: ${theme.color.gray1};
-  background-color: ${(props) => props.status >= 500 ? theme.color.red : theme.color.green};
+  background-color: ${(props) => (props.status >= 500 ? theme.color.red : theme.color.green)};
 `;
