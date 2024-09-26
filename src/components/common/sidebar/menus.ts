@@ -21,6 +21,7 @@ const deploy = {
   menu: [
     { icon: 'ph:circles-four-light', name: '팀 관리', link: '/team/-team-/manage' },
     { icon: 'f7:shippingbox', name: '배포', link: `/team/-team-/deploy` },
+    { icon: 'ph:monitor', name: 'APM', link: `/team/-team-/apm` },
   ],
 };
 
@@ -29,6 +30,22 @@ const deploy_inside = {
   menu: [
     { icon: 'material-symbols:file-copy-outline', name: '배포 관리', link: '/team/-team-/deploy/-deploy-' },
     { icon: 'f7:shippingbox', name: '컨테이너', link: `/team/-team-/deploy/-deploy-/container` },
+  ],
+};
+
+const apm = {
+  back: '/team/-team-/manage',
+  menu: [
+    {
+      icon: 'ic:outline-cloud',
+      name: 'Traces',
+      link: `/team/-team-/apm`,
+    },
+    {
+      icon: 'ph:share-network',
+      name: 'Service Map',
+      link: `/team/-team-/apm/service`,
+    },
   ],
 };
 
@@ -75,6 +92,8 @@ export const menu: MenusType = {
   '/team/:id/deploy': deploy,
   '/team/:id/deploy/create': deploy,
   // '/team/:id/container': deploy,
+  '/team/:id/apm': apm,
+  '/team/:id/apm/service': apm,
   '/team/:id/deploy/:id': deploy_inside,
   '/team/:id/deploy/:id/container': deploy_inside,
   '/team/:id/deploy/:id/container/:env': container_inside,

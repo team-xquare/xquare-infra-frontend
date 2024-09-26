@@ -37,6 +37,13 @@ export const Router = createBrowserRouter([
               { index: true, element: <Error /> },
               { path: 'manage', element: <TeamManage /> },
               {
+                path: 'apm',
+                children: [
+                  { index: true, element: <>개발 중</> },
+                  { path: 'service', element: <>개발 중</> },
+                ],
+              },
+              {
                 path: 'deploy',
                 children: [
                   { index: true, element: <TeamDeploy /> },
