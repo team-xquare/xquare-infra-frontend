@@ -5,13 +5,14 @@ import { theme } from '@/style/theme';
 import { TeamContainer } from '@/components/Team/TeamContainer';
 import { SearchBar } from '@/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Skeleton from '@/components/common/Skeleton';
 import { LimitBox } from '@/components/Layouts/LimitBox';
 import { Text } from '@/components/Elements/Text';
 import { VStack } from '@/components/Layouts/VStack';
 import { Conditional } from '@/components/Headless/Conditional';
 import { teamCheck } from '@/utils/apis/team';
+import { Cookie } from '@/utils/cookie';
 
 export const Team = () => {
   const navigate = useNavigate();
@@ -19,6 +20,12 @@ export const Team = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { Wrapper: TeamListWrapper, Render, Loading, Empty } = Conditional();
   const { data: teamList, isLoading } = teamCheck();
+
+  useEffect(() => {
+    const cookie = Cookie.get('accessToken');
+
+    if (cookie === null || cookie === undefined) navigate('/');
+  }, []);
 
   const filteredTeamList = useMemo(() => {
     if (!teamList) return [];
