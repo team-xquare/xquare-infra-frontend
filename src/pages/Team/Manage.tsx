@@ -10,35 +10,33 @@ import { Tag } from '@/components/Team/Tag';
 import * as MemberAddModal from '@/components/Team/TeamManage/MemberAddModal';
 import * as MemberManageModal from '@/components/Team/TeamManage/MemberManageModal';
 import * as ThreeDotMenu from '@/components/Team/TeamManage/ThreeDotMenu';
-import { TeamDetailType } from '@/utils/types/teamType';
 import { useParams } from 'react-router-dom';
-import { teamDetailCheck, teamMemberDelete, teamMemberPut } from '@/utils/apis/team';
+import { teamMemberDelete, teamMemberPut, teamDetailCheck } from '@/utils/apis/team';
 import { getUser } from '@/utils/apis/user';
 import { UserType } from '@/utils/types/userType';
+import Spinner from '@/components/spinner';
+import { Conditional } from '@/components/Headless/Conditional';
 
 export const TeamManage = () => {
   const { teamUUID } = useParams();
   const [isOpen, setIsOpen] = useState<number | boolean>(false);
-  const [data, setData] = useState<TeamDetailType>();
   const [users, setUsers] = useState<UserType[]>();
   const [userNames, setUserNames] = useState<string[]>();
   const [teamMember, setTeamMember] = useState<string[]>();
   const [selectedMamberName, setSelectedMemberName] = useState<string>();
   const [selectedMemberUUID, setSelectedMemberUUID] = useState<string>();
   const [selectedStudent, setSelectedStudent] = useState<string[]>([]);
+  const { data, isLoading, refetch } = teamDetailCheck(teamUUID);
   const ref = useOutsideClick(() => {
     setIsOpen(false);
   });
   const { isVisible, onShow, ModalWrapper, onClose } = useModal();
+  const { Wrapper: ManageWrapper, Render, Loading, Empty } = Conditional();
 
   useEffect(() => {
-    if (!teamUUID) return;
-
-    teamDetailCheck(teamUUID).then((res) => {
-      setData(res.data);
-      setTeamMember(res.data.member_list.map((item: any) => `${item.member_number} ${item.member_name}`));
-    });
-  }, []);
+    if (!data) return;
+    setTeamMember(data.member_list.map((item: any) => `${item.member_number} ${item.member_name}`));
+  }, [data]);
 
   useEffect(() => {
     getUser().then((res) => {
@@ -56,10 +54,7 @@ export const TeamManage = () => {
 
     teamMemberDelete(teamUUID, selectedMemberUUID)
       .then(() => {
-        teamDetailCheck(teamUUID).then((res) => {
-          setData(res.data);
-          onClose();
-        });
+        refetch().finally(onClose);
       })
       .catch(() => {
         onClose();
@@ -75,231 +70,247 @@ export const TeamManage = () => {
         return user.user_id;
       });
 
-    teamMemberPut(teamUUID, newArr).then(() => {
-      teamDetailCheck(teamUUID)
-        .then((res) => {
-          setData(res.data);
-          setTeamMember(res.data.member_list.map((item: any) => `${item.member_number} ${item.member_name}`));
-          onClose();
-        })
-        .catch(() => {
-          onClose();
-        });
-    });
+    teamMemberPut(teamUUID, newArr)
+      .then(() => {
+        refetch().finally(onClose);
+      })
+      .catch(onClose);
   };
 
   return (
-    <>
-      {data && (
-        <>
-          {isVisible === 'memberAdd' && (
-            <ModalWrapper width={548} height={648}>
-              <MemberAddModal.Wrapper>
-                <MemberAddModal.TopContainer>
-                  <div>
-                    팀원 추가
-                    <Icon
-                      icon={'bitcoin-icons:cross-filled'}
-                      width={24}
-                      height={24}
-                      color="#343434"
-                      cursor={'pointer'}
-                      onClick={onClose}
-                    />
-                  </div>
-                  <SearchBar width={214} placeholder="학생 검색" />
-                </MemberAddModal.TopContainer>
-                <MemberAddModal.MiddleContainer>
-                  {userNames &&
-                    teamMember &&
-                    userNames
-                      .filter((member) => !teamMember.includes(member))
-                      .map((member, index) => {
-                        return (
-                          <MemberBox
-                            key={index}
-                            style={{ cursor: 'pointer' }}
-                            isSelected={selectedStudent.includes(member)}
-                            onClick={() => {
-                              if (selectedStudent.includes(member)) {
-                                const newArr = selectedStudent.filter((student) => student !== member);
-                                setSelectedStudent(newArr);
-                              } else {
-                                setSelectedStudent([...selectedStudent, member]);
-                              }
-                            }}
-                          >
-                            {member}
-                          </MemberBox>
-                        );
-                      })}
-                </MemberAddModal.MiddleContainer>
-                <MemberAddModal.BottomContainer>
-                  <div>
-                    {selectedStudent &&
-                      selectedStudent.map((student, index) => {
-                        return (
-                          <>
-                            {index <= 2 && <>{student.split(' ')[1]}</>}
-                            {index < selectedStudent.length - 1 && index <= 1 && <>, </>}
-                          </>
-                        );
-                      })}
-                    {selectedStudent.length > 3 && <> 등 {selectedStudent.length - 3}명</>}
-                  </div>
-                  <XButton buttonStyle="solid" width={100} height={50} onClick={onMemberAdd}>
-                    팀원 추가
-                  </XButton>
-                </MemberAddModal.BottomContainer>
-              </MemberAddModal.Wrapper>
-            </ModalWrapper>
-          )}
-          {isVisible === 'managerChange' && (
-            <ModalWrapper width={538} height={200}>
-              <MemberManageModal.Wrapper>
-                <div>담당자 변경</div>
-                <div>담당자를 김은빈 학생에서 홍길동 학생으로 변경하시겠습니까?</div>
-                <div>
-                  <XButton
-                    width={58}
-                    height={50}
-                    buttonStyle="ghost"
-                    onClick={() => {
-                      onClose();
-                    }}
-                  >
-                    취소
-                  </XButton>
-                  <XButton width={100} height={50} buttonStyle="solid">
-                    담당자 변경
-                  </XButton>
-                </div>
-              </MemberManageModal.Wrapper>
-            </ModalWrapper>
-          )}
-          {isVisible === 'memberDel' && (
-            <ModalWrapper width={538} height={200}>
-              <MemberManageModal.Wrapper>
-                <div>팀원 삭제</div>
-                <div>{selectedMamberName} 학생을 팀에서 삭제하시겠습니까?</div>
-                <div>
-                  <XButton
-                    width={58}
-                    height={50}
-                    buttonStyle="ghost"
-                    onClick={() => {
-                      onClose();
-                    }}
-                  >
-                    취소
-                  </XButton>
-                  <XButton
-                    width={100}
-                    height={50}
-                    buttonStyle="solid"
-                    onClick={() => {
-                      onMemberDelete();
-                    }}
-                  >
-                    팀원 삭제
-                  </XButton>
-                </div>
-              </MemberManageModal.Wrapper>
-            </ModalWrapper>
-          )}
-          <Wrapper>
-            <TitleContainer>
-              <TeamName>{data.team_name_ko}</TeamName>
-              <Title>팀 관리</Title>
-              <Describtion>팀 정보를 관리해보세요</Describtion>
-            </TitleContainer>
-            <InformationContainer>
-              <div>
-                <div>{data.team_name_ko}</div>
-                <div>{data.team_name_en}</div>
-              </div>
-              <div>
-                <div>팀원 수 : {data.member_count}</div>
-                <div>생성자 : {data.admin_name}</div>
-                <div>생성일 : {data.created_at.split('T')[0]}</div>
-              </div>
-            </InformationContainer>
-            <MemberContainer>
-              <div>팀원</div>
-              <div>
-                <SearchBar width={336} placeholder="팀원 검색" />
-                {data.is_admin && (
-                  <XButton
-                    width={88}
-                    height={50}
-                    buttonStyle="solid"
-                    onClick={() => {
-                      onShow('memberAdd');
-                    }}
-                  >
-                    팀원 추가
-                  </XButton>
-                )}
-              </div>
-              <MemberBoxContainer>
-                {data.member_list.map((member, index) => {
-                  return (
-                    <MemberBox key={index} isSelected={false}>
-                      <div>
-                        <div>
-                          {member.member_number} {member.member_name}
-                        </div>
-                        {member.member_role === 'ADMINISTRATOR' && <Tag tag="manage" />}
-                      </div>
-                      <MemberBoxInRightContainer ref={ref}>
-                        <>
-                          {data.is_admin && (
+    <ManageWrapper
+      data={data}
+      isLoading={isLoading}
+      emptyFunction={(data) => data === undefined}
+      renderComponent={
+        <Render>
+          <>
+            {isVisible === 'memberAdd' && (
+              <ModalWrapper width={548} height={648}>
+                <MemberAddModal.Wrapper>
+                  <MemberAddModal.TopContainer>
+                    <div>
+                      팀원 추가
+                      <Icon
+                        icon={'bitcoin-icons:cross-filled'}
+                        width={24}
+                        height={24}
+                        color="#343434"
+                        cursor={'pointer'}
+                        onClick={onClose}
+                      />
+                    </div>
+                    <SearchBar width={214} placeholder="학생 검색" />
+                  </MemberAddModal.TopContainer>
+                  <MemberAddModal.MiddleContainer>
+                    {userNames &&
+                      teamMember &&
+                      userNames
+                        .filter((member) => !teamMember.includes(member))
+                        .map((member, index) => {
+                          return (
+                            <MemberBox
+                              key={index}
+                              style={{ cursor: 'pointer' }}
+                              isSelected={selectedStudent.includes(member)}
+                              onClick={() => {
+                                if (selectedStudent.includes(member)) {
+                                  const newArr = selectedStudent.filter((student) => student !== member);
+                                  setSelectedStudent(newArr);
+                                } else {
+                                  setSelectedStudent([...selectedStudent, member]);
+                                }
+                              }}
+                            >
+                              {member}
+                            </MemberBox>
+                          );
+                        })}
+                  </MemberAddModal.MiddleContainer>
+                  <MemberAddModal.BottomContainer>
+                    <div>
+                      {selectedStudent &&
+                        selectedStudent.map((student, index) => {
+                          return (
                             <>
-                              <Icon
-                                icon={'bi:three-dots-vertical'}
-                                color="#999999"
-                                width={20}
-                                height={20}
-                                cursor={'pointer'}
-                                onClick={() => {
-                                  onOpen(index);
-                                  setSelectedMemberUUID(member.user_id);
-                                  setSelectedMemberName(`${member.member_number} ${member.member_name}`);
-                                }}
-                              />
-                              {isOpen === index && (
-                                <ThreeDotMenu.Wrapper>
-                                  <ThreeDotMenu.Box
-                                    isLast={'false'}
-                                    onMouseDown={() => {
-                                      onShow('managerChange');
-                                    }}
-                                  >
-                                    담당자 지정
-                                  </ThreeDotMenu.Box>
-                                  <ThreeDotMenu.Box
-                                    isLast={'true'}
-                                    onMouseDown={() => {
-                                      onShow('memberDel');
-                                    }}
-                                  >
-                                    팀원 삭제
-                                  </ThreeDotMenu.Box>
-                                </ThreeDotMenu.Wrapper>
-                              )}
+                              {index <= 2 && <>{student.split(' ')[1]}</>}
+                              {index < selectedStudent.length - 1 && index <= 1 && <>, </>}
                             </>
-                          )}
-                        </>
-                      </MemberBoxInRightContainer>
-                    </MemberBox>
-                  );
-                })}
-              </MemberBoxContainer>
-            </MemberContainer>
-          </Wrapper>
-        </>
-      )}
-    </>
+                          );
+                        })}
+                      {selectedStudent.length > 3 && <> 등 {selectedStudent.length - 3}명</>}
+                    </div>
+                    <XButton buttonStyle="solid" width={100} height={50} onClick={onMemberAdd}>
+                      팀원 추가
+                    </XButton>
+                  </MemberAddModal.BottomContainer>
+                </MemberAddModal.Wrapper>
+              </ModalWrapper>
+            )}
+            {isVisible === 'managerChange' && (
+              <ModalWrapper width={538} height={200}>
+                <MemberManageModal.Wrapper>
+                  <div>담당자 변경</div>
+                  <div>담당자를 김은빈 학생에서 홍길동 학생으로 변경하시겠습니까?</div>
+                  <div>
+                    <XButton
+                      width={58}
+                      height={50}
+                      buttonStyle="ghost"
+                      onClick={() => {
+                        onClose();
+                      }}
+                    >
+                      취소
+                    </XButton>
+                    <XButton width={100} height={50} buttonStyle="solid">
+                      담당자 변경
+                    </XButton>
+                  </div>
+                </MemberManageModal.Wrapper>
+              </ModalWrapper>
+            )}
+            {isVisible === 'memberDel' && (
+              <ModalWrapper width={538} height={200}>
+                <MemberManageModal.Wrapper>
+                  <div>팀원 삭제</div>
+                  <div>{selectedMamberName} 학생을 팀에서 삭제하시겠습니까?</div>
+                  <div>
+                    <XButton
+                      width={58}
+                      height={50}
+                      buttonStyle="ghost"
+                      onClick={() => {
+                        onClose();
+                      }}
+                    >
+                      취소
+                    </XButton>
+                    <XButton
+                      width={100}
+                      height={50}
+                      buttonStyle="solid"
+                      onClick={() => {
+                        onMemberDelete();
+                      }}
+                    >
+                      팀원 삭제
+                    </XButton>
+                  </div>
+                </MemberManageModal.Wrapper>
+              </ModalWrapper>
+            )}
+            <Wrapper>
+              <TitleContainer>
+                <TeamName>{data?.team_name_ko}</TeamName>
+                <Title>팀 관리</Title>
+                <Describtion>팀 정보를 관리해보세요</Describtion>
+              </TitleContainer>
+              <InformationContainer>
+                <div>
+                  <div>{data?.team_name_ko}</div>
+                  <div>{data?.team_name_en}</div>
+                </div>
+                <div>
+                  <div>팀원 수 : {data?.member_count}</div>
+                  <div>생성자 : {data?.admin_name}</div>
+                  <div>생성일 : {data?.created_at.split('T')[0]}</div>
+                </div>
+              </InformationContainer>
+              <MemberContainer>
+                <div>팀원</div>
+                <div>
+                  <SearchBar width={336} placeholder="팀원 검색" />
+                  {data?.is_admin && (
+                    <XButton
+                      width={88}
+                      height={50}
+                      buttonStyle="solid"
+                      onClick={() => {
+                        onShow('memberAdd');
+                      }}
+                    >
+                      팀원 추가
+                    </XButton>
+                  )}
+                </div>
+                <MemberBoxContainer>
+                  {data?.member_list.map((member, index) => {
+                    return (
+                      <MemberBox key={index} isSelected={false}>
+                        <div>
+                          <div>
+                            {member.member_number} {member.member_name}
+                          </div>
+                          {member.member_role === 'ADMINISTRATOR' && <Tag tag="manage" />}
+                        </div>
+                        <MemberBoxInRightContainer ref={ref}>
+                          <>
+                            {data.is_admin && (
+                              <>
+                                <Icon
+                                  icon={'bi:three-dots-vertical'}
+                                  color="#999999"
+                                  width={20}
+                                  height={20}
+                                  cursor={'pointer'}
+                                  onClick={() => {
+                                    onOpen(index);
+                                    setSelectedMemberUUID(member.user_id);
+                                    setSelectedMemberName(`${member.member_number} ${member.member_name}`);
+                                  }}
+                                />
+                                {isOpen === index && (
+                                  <ThreeDotMenu.Wrapper>
+                                    <ThreeDotMenu.Box
+                                      isLast={'false'}
+                                      onMouseDown={() => {
+                                        onShow('managerChange');
+                                      }}
+                                    >
+                                      담당자 지정
+                                    </ThreeDotMenu.Box>
+                                    <ThreeDotMenu.Box
+                                      isLast={'true'}
+                                      onMouseDown={() => {
+                                        onShow('memberDel');
+                                      }}
+                                    >
+                                      팀원 삭제
+                                    </ThreeDotMenu.Box>
+                                  </ThreeDotMenu.Wrapper>
+                                )}
+                              </>
+                            )}
+                          </>
+                        </MemberBoxInRightContainer>
+                      </MemberBox>
+                    );
+                  })}
+                </MemberBoxContainer>
+              </MemberContainer>
+            </Wrapper>
+          </>
+        </Render>
+      }
+      emptyComponent={<Empty>not rendered</Empty>}
+      loadingComponent={
+        <Loading>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingBottom: '240px',
+            }}
+          >
+            <Spinner />
+          </div>
+        </Loading>
+      }
+    />
   );
 };
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { TeamCheckType, TeamCreateType } from '../types/teamType';
+import { TeamCheckType, TeamCreateType, TeamDetailType } from '../types/teamType';
 import { instance } from './axios';
 
 const router = 'v1/team';
@@ -17,8 +17,17 @@ export const teamCreate = async (data: TeamCreateType) => {
   return await instance.post(`${router}`, data);
 };
 
-export const teamDetailCheck = async (uuid: string) => {
-  return await instance.get(`${router}/detail/${uuid}`);
+export const teamDetailCheck = (uuid: string | undefined) => {
+  const respones = async () => {
+    const { data } = await instance.get<TeamDetailType>(`${router}/detail/${uuid}`);
+    return data;
+  };
+
+  return useQuery({
+    queryKey: [uuid, 'team-detail'],
+    queryFn: () => respones(),
+    enabled: !!uuid,
+  });
 };
 
 export const teamMemberPut = async (uuid: string, user_ids: string[]) => {
