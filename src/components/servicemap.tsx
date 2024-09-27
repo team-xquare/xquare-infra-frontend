@@ -109,34 +109,62 @@ const ServiceMap: React.FC = () => {
   const edges = metrics.edges;
 
   const calculateReferences = () => {
-    const references: Record<string, number> = {};
+    const references = nodes.reduce(
+      (acc, node) => {
+        acc[node.node_id] = { incoming: 0, outgoing: 0 }; // 초기화
+        return acc;
+      },
+      {} as Record<string, { incoming: number; outgoing: number }>,
+    );
+
+    const uniqueEdgesMap = new Map<string, Edge>();
+
     edges.forEach((edge) => {
-      references[edge.target] = (references[edge.target] || 0) + edge.calls;
+      const key = `${edge.source}-${edge.target}`;
+      if (uniqueEdgesMap.has(key)) {
+        // 중복된 Edge의 경우 calls 값을 합산
+        const existingEdge = uniqueEdgesMap.get(key)!;
+        existingEdge.calls += edge.calls;
+      } else {
+        uniqueEdgesMap.set(key, { ...edge });
+      }
     });
-    return references;
+
+    uniqueEdgesMap.forEach((edge) => {
+      // 참조되는 수 (incoming)
+      references[edge.target].incoming += edge.calls;
+
+      // 참조하는 수 (outgoing)
+      references[edge.source].outgoing += edge.calls;
+    });
+
+    return { references, uniqueEdges: Array.from(uniqueEdgesMap.values()) };
   };
 
+  const { references, uniqueEdges } = calculateReferences();
+
   const layoutNodes = () => {
-    const centerX = 600;
+    const centerX = 800;
     const centerY = 400;
-    const maxRadius = 300;
-    const minRadius = 100;
     const positions: Record<string, { x: number; y: number }> = {};
-    const references = calculateReferences();
+    const referenceCounts = references;
 
     // Find max reference count for normalization
-    const maxReferences = Math.max(...Object.values(references));
+    const maxIncoming = Math.max(...Object.values(referenceCounts).map((ref) => ref.incoming));
+    const maxOutgoing = Math.max(...Object.values(referenceCounts).map((ref) => ref.outgoing));
 
     nodes.forEach((node, index) => {
       const angle = (index / nodes.length) * 2 * Math.PI;
-      const referenceCount = references[node.node_id] || 0;
+      const incomingCount = referenceCounts[node.node_id].incoming || 0;
+      const outgoingCount = referenceCounts[node.node_id].outgoing || 0;
 
-      // Normalize radius based on reference count (more references = smaller radius)
-      const normalizedRadius = maxRadius - (referenceCount / maxReferences) * (maxRadius - minRadius);
+      // Normalize the x position based on incoming and outgoing counts
+      const normalizedX = centerX + (incomingCount / maxIncoming) * 200 - (outgoingCount / maxOutgoing) * 700;
+      const normalizedY = centerY + 300 * Math.sin(angle);
 
       positions[node.node_id] = {
-        x: centerX + normalizedRadius * Math.cos(angle),
-        y: centerY + normalizedRadius * Math.sin(angle),
+        x: normalizedX,
+        y: normalizedY,
       };
     });
     return positions;
@@ -152,7 +180,7 @@ const ServiceMap: React.FC = () => {
     <div className="w-full h-screen flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">Datadog APM Service Map</h1>
       <svg width="1200" height="800">
-        {edges.map((edge, index) => (
+        {uniqueEdges.map((edge, index) => (
           <ServiceLink
             key={index}
             source={nodePositions[edge.source] || { x: 0, y: 0 }}
@@ -178,6 +206,18 @@ const ServiceMap: React.FC = () => {
           <p>Successes: {selectedNode.successes}</p>
           <p>Failures: {selectedNode.failures}</p>
           <p>Avg Latency: {selectedNode.latency_avg_ms.toFixed(2)}ms</p>
+          <p>참조되는 수: {references[selectedNode.node_id].incoming}</p>
+          <p>참조하는 수: {references[selectedNode.node_id].outgoing}</p>
+          <h3 className="mt-2 font-bold">중복 제거된 Edge 호출 수:</h3>
+          <ul>
+            {uniqueEdges
+              .filter((edge) => edge.source === selectedNode.node_id || edge.target === selectedNode.node_id)
+              .map((edge, index) => (
+                <li key={index}>
+                  {edge.source} → {edge.target}: {edge.calls} calls
+                </li>
+              ))}
+          </ul>
         </div>
       )}
     </div>
