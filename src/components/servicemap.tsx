@@ -110,35 +110,49 @@ const ServiceMap: React.FC = () => {
 
   const calculateReferences = () => {
     const references: Record<string, number> = {};
+    const callers: Record<string, number> = {};
+
     edges.forEach((edge) => {
-      references[edge.target] = (references[edge.target] || 0) + edge.calls;
+      references[edge.target] = (references[edge.target] || 0) + edge.calls; // 참조를 당하는 노드
+      callers[edge.source] = (callers[edge.source] || 0) + edge.calls; // 참조를 하는 노드
     });
-    return references;
+
+    return { references, callers };
   };
 
   const layoutNodes = () => {
     const centerX = 600;
     const centerY = 400;
-    const maxRadius = 300;
+    const maxRadius = 400; // 최대 반경 증가
     const minRadius = 100;
     const positions: Record<string, { x: number; y: number }> = {};
-    const references = calculateReferences();
+    const { references, callers } = calculateReferences();
 
     // Find max reference count for normalization
     const maxReferences = Math.max(...Object.values(references));
+    const maxCallers = Math.max(...Object.values(callers));
 
     nodes.forEach((node, index) => {
-      const angle = (index / nodes.length) * 2 * Math.PI;
       const referenceCount = references[node.node_id] || 0;
+      const callerCount = callers[node.node_id] || 0;
 
-      // Normalize radius based on reference count (more references = smaller radius)
-      const normalizedRadius = maxRadius - (referenceCount / maxReferences) * (maxRadius - minRadius);
+      // Normalized positions based on reference and caller counts
+      const normalizedX = (callerCount / maxCallers) * (maxRadius - minRadius) + minRadius; // 왼쪽
+      const normalizedXRight = (referenceCount / maxReferences) * (maxRadius - minRadius) + minRadius; // 오른쪽
+
+      // x 좌표는 참조를 하는 노드와 참조를 당하는 노드에 따라 조정
+      const x = centerX - normalizedX + normalizedXRight; // 왼쪽과 오른쪽 배치 조합
+
+      // y 좌표를 각 노드의 인덱스에 따라 조정하여 분산
+      const angle = (index / nodes.length) * 2 * Math.PI; // 원형 배치
+      const radius = minRadius + (maxRadius - minRadius) * (Math.random() * 0.5); // 랜덤하게 반경 조정
 
       positions[node.node_id] = {
-        x: centerX + normalizedRadius * Math.cos(angle),
-        y: centerY + normalizedRadius * Math.sin(angle),
+        x: x + radius * Math.cos(angle), // 분산된 x 좌표
+        y: centerY + radius * Math.sin(angle), // 분산된 y 좌표
       };
     });
+
     return positions;
   };
 
