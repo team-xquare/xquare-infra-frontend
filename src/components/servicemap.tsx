@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { data } from './data';
+
+interface RelationshipMap {
+  [key: string]: string[];
+}
 
 interface Node {
   node_id: string;
@@ -101,72 +105,66 @@ const ServiceLink: React.FC<ServiceLinkProps> = ({ source, target, edge }) => {
 
 const ServiceMap: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [relationshipMap, setRelationshipMap] = useState<RelationshipMap>({});
 
   const jsonData: JsonData = data;
-
   const metrics = jsonData.data.metrics[0];
   const nodes = metrics.nodes;
   const edges = metrics.edges;
 
-  const calculateReferences = () => {
-    const references = nodes.reduce(
-      (acc, node) => {
-        acc[node.node_id] = { incoming: 0, outgoing: 0 }; // 초기화
-        return acc;
-      },
-      {} as Record<string, { incoming: number; outgoing: number }>,
-    );
-
-    const uniqueEdgesMap = new Map<string, Edge>();
-
+  useEffect(() => {
+    const newRelationshipMap: RelationshipMap = {};
     edges.forEach((edge) => {
-      const key = `${edge.source}-${edge.target}`;
-      if (uniqueEdgesMap.has(key)) {
-        // 중복된 Edge의 경우 calls 값을 합산
-        const existingEdge = uniqueEdgesMap.get(key)!;
-        existingEdge.calls += edge.calls;
-      } else {
-        uniqueEdgesMap.set(key, { ...edge });
+      if (!newRelationshipMap[edge.source]) {
+        newRelationshipMap[edge.source] = [];
+      }
+      newRelationshipMap[edge.source].push(edge.target);
+    });
+    setRelationshipMap(newRelationshipMap);
+  }, [edges]);
+
+  const layoutNodes = () => {
+    const centerX = 450;
+    const centerY = 400;
+    const positions: Record<string, { x: number; y: number }> = {};
+    const visited: Set<string> = new Set();
+
+    const dfs = (nodeId: string, depth: number, angle: number, radius: number) => {
+      if (visited.has(nodeId)) return;
+      visited.add(nodeId);
+
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+      positions[nodeId] = { x, y };
+
+      const children = relationshipMap[nodeId] || [];
+      const childAngleStep = (2 * Math.PI) / (children.length || 1);
+      children.forEach((childId, index) => {
+        const childAngle = angle + childAngleStep * index;
+        dfs(childId, depth + 1, childAngle, radius + 150);
+      });
+    };
+
+    // Find root nodes (nodes with no incoming edges)
+    const rootNodes = nodes.filter((node) => !Object.values(relationshipMap).flat().includes(node.node_id));
+
+    rootNodes.forEach((rootNode, index) => {
+      const angle = (index / rootNodes.length) * 2 * Math.PI;
+      dfs(rootNode.node_id, 0, angle, 200);
+    });
+
+    // Position any remaining nodes
+    nodes.forEach((node) => {
+      if (!positions[node.node_id]) {
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = 300 + Math.random() * 100;
+        positions[node.node_id] = {
+          x: centerX + radius * Math.cos(angle),
+          y: centerY + radius * Math.sin(angle),
+        };
       }
     });
 
-    uniqueEdgesMap.forEach((edge) => {
-      // 참조되는 수 (incoming)
-      references[edge.target].incoming += edge.calls;
-
-      // 참조하는 수 (outgoing)
-      references[edge.source].outgoing += edge.calls;
-    });
-
-    return { references, uniqueEdges: Array.from(uniqueEdgesMap.values()) };
-  };
-
-  const { references, uniqueEdges } = calculateReferences();
-
-  const layoutNodes = () => {
-    const centerX = 800;
-    const centerY = 400;
-    const positions: Record<string, { x: number; y: number }> = {};
-    const referenceCounts = references;
-
-    // Find max reference count for normalization
-    const maxIncoming = Math.max(...Object.values(referenceCounts).map((ref) => ref.incoming));
-    const maxOutgoing = Math.max(...Object.values(referenceCounts).map((ref) => ref.outgoing));
-
-    nodes.forEach((node, index) => {
-      const angle = (index / nodes.length) * 2 * Math.PI;
-      const incomingCount = referenceCounts[node.node_id].incoming || 0;
-      const outgoingCount = referenceCounts[node.node_id].outgoing || 0;
-
-      // Normalize the x position based on incoming and outgoing counts
-      const normalizedX = centerX + (incomingCount / maxIncoming) * 200 - (outgoingCount / maxOutgoing) * 700;
-      const normalizedY = centerY + 300 * Math.sin(angle);
-
-      positions[node.node_id] = {
-        x: normalizedX,
-        y: normalizedY,
-      };
-    });
     return positions;
   };
 
@@ -178,9 +176,8 @@ const ServiceMap: React.FC = () => {
 
   return (
     <div className="w-full h-screen flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">Datadog APM Service Map</h1>
       <svg width="1200" height="800">
-        {uniqueEdges.map((edge, index) => (
+        {edges.map((edge, index) => (
           <ServiceLink
             key={index}
             source={nodePositions[edge.source] || { x: 0, y: 0 }}
@@ -206,18 +203,8 @@ const ServiceMap: React.FC = () => {
           <p>Successes: {selectedNode.successes}</p>
           <p>Failures: {selectedNode.failures}</p>
           <p>Avg Latency: {selectedNode.latency_avg_ms.toFixed(2)}ms</p>
-          <p>참조되는 수: {references[selectedNode.node_id].incoming}</p>
-          <p>참조하는 수: {references[selectedNode.node_id].outgoing}</p>
-          <h3 className="mt-2 font-bold">중복 제거된 Edge 호출 수:</h3>
-          <ul>
-            {uniqueEdges
-              .filter((edge) => edge.source === selectedNode.node_id || edge.target === selectedNode.node_id)
-              .map((edge, index) => (
-                <li key={index}>
-                  {edge.source} → {edge.target}: {edge.calls} calls
-                </li>
-              ))}
-          </ul>
+          <h3 className="mt-2 font-bold">Related Services:</h3>
+          <ul>{relationshipMap[selectedNode.node_id]?.map((targetId, index) => <li key={index}>{targetId}</li>)}</ul>
         </div>
       )}
     </div>
