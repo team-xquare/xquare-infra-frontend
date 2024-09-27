@@ -11,10 +11,26 @@ interface TraceTimelineProps {
 
 // Predefined color palette (pastel and visually pleasing colors)
 const colorPalette = [
-  '#FFB6C1', '#87CEEB', '#98FB98', '#FFD700', '#DA70D6', '#FFA07A',
-  '#20B2AA', '#9370DB', '#FF4500', '#40E0D0', '#8B4513', '#7B68EE',
-  '#6495ED', '#FF69B4', '#B0C4DE', '#FFDAB9', '#E6E6FA', '#F5DEB3',
-  '#D2B48C', '#ADD8E6'
+  '#FFB6C1',
+  '#87CEEB',
+  '#98FB98',
+  '#FFD700',
+  '#DA70D6',
+  '#FFA07A',
+  '#20B2AA',
+  '#9370DB',
+  '#FF4500',
+  '#40E0D0',
+  '#8B4513',
+  '#7B68EE',
+  '#6495ED',
+  '#FF69B4',
+  '#B0C4DE',
+  '#FFDAB9',
+  '#E6E6FA',
+  '#F5DEB3',
+  '#D2B48C',
+  '#ADD8E6',
 ];
 
 const serviceColorMap: { [key: string]: string } = {}; // Cache to store the assigned colors
@@ -32,7 +48,6 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [timelineWidth, setTimelineWidth] = useState<number>(0);
   const [scaleX, setScaleX] = useState<number>(1);
-  const [scaleY, setScaleY] = useState<number>(1);
   const [selectedSpan, setSelectedSpan] = useState<SpanType | null>(null);
 
   useEffect(() => {
@@ -75,8 +90,8 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
   const baseSpanHeight = 30;
   const baseSpanSpacing = 2;
 
-  const scaledSpanHeight = baseSpanHeight * scaleY;
-  const scaledSpanSpacing = baseSpanSpacing * scaleY;
+  const scaledSpanHeight = baseSpanHeight;
+  const scaledSpanSpacing = baseSpanSpacing;
 
   const generateTimeLabels = () => {
     const labels = [];
@@ -93,7 +108,7 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
           }}
         >
           {time.toFixed(0)} ms
-        </span>
+        </span>,
       );
     }
     return labels;
@@ -101,22 +116,15 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
 
   const handleWheel = (e: WheelEvent) => {
     e.preventDefault();
-    const { deltaY, ctrlKey, shiftKey } = e;
+    const { deltaY } = e;
 
     const zoomIntensity = 0.001;
     const zoomAmount = 1 - deltaY * zoomIntensity;
 
-    if (ctrlKey) {
-      setScaleX((prev) => {
-        const newScale = prev * zoomAmount;
-        return Math.min(Math.max(newScale, 0.5), 5);
-      });
-    } else if (shiftKey) {
-      setScaleY((prev) => {
-        const newScale = prev * zoomAmount;
-        return Math.min(Math.max(newScale, 0.5), 3);
-      });
-    }
+    setScaleX((prev) => {
+      const newScale = prev * zoomAmount;
+      return Math.min(Math.max(newScale, 0.2), 14);
+    });
   };
 
   const isDragging = useRef(false);
@@ -187,9 +195,7 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
         {processedSpans.map((span) => {
           const hasExceptionEvent = span.events?.some((event) => event.name === 'exception');
           const serviceName = span.service_name || 'Unknown Service';
-          const serviceColor =
-            serviceColors[serviceName] ||
-            assignColorToService(serviceName); // Use serviceColors or assign from predefined palette
+          const serviceColor = serviceColors[serviceName] || assignColorToService(serviceName); // Use serviceColors or assign from predefined palette
 
           return (
             <div
@@ -242,20 +248,20 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
             <h4>Attributes</h4>
             <table>
               <tbody>
-              {selectedSpan.attributes &&
-                Object.entries(selectedSpan.attributes).map(([key, value]) => (
-                  <tr key={key}>
-                    <td>
-                      <strong>{key}</strong>
-                    </td>
-                    <td>{String(value)}</td>
+                {selectedSpan.attributes &&
+                  Object.entries(selectedSpan.attributes).map(([key, value]) => (
+                    <tr key={key}>
+                      <td>
+                        <strong>{key}</strong>
+                      </td>
+                      <td>{String(value)}</td>
+                    </tr>
+                  ))}
+                {!selectedSpan.attributes || Object.keys(selectedSpan.attributes).length === 0 ? (
+                  <tr>
+                    <td colSpan={2}>No attributes available.</td>
                   </tr>
-                ))}
-              {!selectedSpan.attributes || Object.keys(selectedSpan.attributes).length === 0 ? (
-                <tr>
-                  <td colSpan={2}>No attributes available.</td>
-                </tr>
-              ) : null}
+                ) : null}
               </tbody>
             </table>
           </div>
