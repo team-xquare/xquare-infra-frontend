@@ -9,6 +9,25 @@ interface TraceTimelineProps {
   serviceColors?: { [key: string]: string };
 }
 
+// Predefined color palette (pastel and visually pleasing colors)
+const colorPalette = [
+  '#FFB6C1', '#87CEEB', '#98FB98', '#FFD700', '#DA70D6', '#FFA07A',
+  '#20B2AA', '#9370DB', '#FF4500', '#40E0D0', '#8B4513', '#7B68EE',
+  '#6495ED', '#FF69B4', '#B0C4DE', '#FFDAB9', '#E6E6FA', '#F5DEB3',
+  '#D2B48C', '#ADD8E6'
+];
+
+const serviceColorMap: { [key: string]: string } = {}; // Cache to store the assigned colors
+
+// Function to assign a color to a service based on its name
+const assignColorToService = (serviceName: string): string => {
+  if (!serviceColorMap[serviceName]) {
+    const colorIndex = Object.keys(serviceColorMap).length % colorPalette.length;
+    serviceColorMap[serviceName] = colorPalette[colorIndex];
+  }
+  return serviceColorMap[serviceName];
+};
+
 export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick, serviceColors = {} }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [timelineWidth, setTimelineWidth] = useState<number>(0);
@@ -160,13 +179,17 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
           height: `${(maxLevel + 1) * (scaledSpanHeight + scaledSpanSpacing) + 30}px`,
           border: '1px solid #ccc',
           backgroundColor: '#f9f9f9',
-          overflow: 'auto', // Changed to 'auto' to allow both scrollX and scrollY
+          overflow: 'auto',
           cursor: 'grab',
           userSelect: 'none',
         }}
       >
         {processedSpans.map((span) => {
-          const hasExceptionEvent = span.events?.some(event => event.name === 'exception');
+          const hasExceptionEvent = span.events?.some((event) => event.name === 'exception');
+          const serviceName = span.service_name || 'Unknown Service';
+          const serviceColor =
+            serviceColors[serviceName] ||
+            assignColorToService(serviceName); // Use serviceColors or assign from predefined palette
 
           return (
             <div
@@ -178,16 +201,16 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
                 top: `${span.level * (scaledSpanHeight + scaledSpanSpacing)}px`,
                 width: `${span.duration * scaledScaleX}px`,
                 height: `${scaledSpanHeight}px`,
-                backgroundColor: serviceColors[span.service_name || 'Unknown Service'] || '#87ceeb',
-                border: hasExceptionEvent ? '2px solid red' : '1px solid #1e90ff', // Red border for spans with exception events
+                backgroundColor: serviceColor,
+                border: hasExceptionEvent ? '2px solid red' : '1px solid #1e90ff',
                 cursor: 'pointer',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 transition: 'left 0.2s ease, width 0.2s ease, top 0.2s ease, height 0.2s ease',
-                zIndex: selectedSpan?.span_id === span.span_id ? 2 : 1, // Bring selected span to front
+                zIndex: selectedSpan?.span_id === span.span_id ? 2 : 1,
               }}
-              title={`Span Name: ${span.name}\nService: ${span.service_name || 'Unknown Service'}\nDuration: ${span.duration.toFixed(2)} ms`}
+              title={`Span Name: ${span.name}\nService: ${serviceName}\nDuration: ${span.duration.toFixed(2)} ms`}
               onClick={() => handleSpanClick(span)}
             >
               <span className="trace-span-label">{span.name}</span>
@@ -219,12 +242,15 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
             <h4>Attributes</h4>
             <table>
               <tbody>
-              {selectedSpan.attributes && Object.entries(selectedSpan.attributes).map(([key, value]) => (
-                <tr key={key}>
-                  <td><strong>{key}</strong></td>
-                  <td>{String(value)}</td>
-                </tr>
-              ))}
+              {selectedSpan.attributes &&
+                Object.entries(selectedSpan.attributes).map(([key, value]) => (
+                  <tr key={key}>
+                    <td>
+                      <strong>{key}</strong>
+                    </td>
+                    <td>{String(value)}</td>
+                  </tr>
+                ))}
               {!selectedSpan.attributes || Object.keys(selectedSpan.attributes).length === 0 ? (
                 <tr>
                   <td colSpan={2}>No attributes available.</td>
@@ -239,8 +265,6 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
               <div className="trace-events-list">
                 {selectedSpan.events.map((event, index) => (
                   <div key={index} className="trace-event-item">
-                    <div className="trace-event-header">
-                    </div>
                     <div className="trace-event-attributes">
                       {Object.entries(event.attributes).map(([attrKey, attrValue]) => (
                         <div key={attrKey} className="trace-event-attribute">
