@@ -76,26 +76,23 @@ const ServiceLink: React.FC<{
   const endX = target.x - targetRadius * Math.cos(angle);
   const endY = target.y - targetRadius * Math.sin(angle);
 
+  // Calculate control points for a curved line
+  const midX = (startX + endX) / 2;
+  const midY = (startY + endY) / 2;
+  const curveFactor = 0.2;
+  const controlX = midX - curveFactor * (endY - startY);
+  const controlY = midY + curveFactor * (endX - startX);
+
   return (
     <g>
-      <line
-        x1={startX}
-        y1={startY}
-        x2={endX}
-        y2={endY}
+      <path
+        d={`M${startX},${startY} Q${controlX},${controlY} ${endX},${endY}`}
+        fill="none"
         stroke="rgba(0,0,0,0.2)"
         strokeWidth="2"
         markerEnd="url(#arrow)"
       />
-      <text
-        x={(startX + endX) / 2}
-        y={(startY + endY) / 2}
-        fill="#666"
-        fontSize="10"
-        textAnchor="middle"
-        dy="-5"
-        style={{ pointerEvents: 'none' }}
-      >
+      <text x={midX} y={midY} fill="#666" fontSize="10" textAnchor="middle" dy="-5" style={{ pointerEvents: 'none' }}>
         {edge.calls} calls
       </text>
     </g>
@@ -133,7 +130,7 @@ const ServiceMap: React.FC = () => {
         return bDiff - aDiff;
       });
 
-      // Position nodes in layers
+      // Assign nodes to layers
       const layers: string[][] = [];
       sortedNodes.forEach((node) => {
         let layerIndex = 0;
@@ -150,7 +147,40 @@ const ServiceMap: React.FC = () => {
         }
       });
 
-      // Calculate positions based on layers
+      // Barycentric method to reduce edge crossings
+      const optimizeLayers = (layers: string[][]) => {
+        for (let i = 1; i < layers.length; i++) {
+          const currentLayer = layers[i];
+          const prevLayer = layers[i - 1];
+
+          const nodeOrder: Record<string, number> = {};
+          prevLayer.forEach((node, index) => {
+            nodeOrder[node] = index;
+          });
+
+          const barycenters = currentLayer.map((node) => {
+            const connectedNodes = edges
+              .filter((e) => e.source === node || e.target === node)
+              .map((e) => (e.source === node ? e.target : e.source))
+              .filter((n) => prevLayer.includes(n));
+            if (connectedNodes.length === 0) return 0;
+            return connectedNodes.reduce((sum, n) => sum + nodeOrder[n], 0) / connectedNodes.length;
+          });
+
+          currentLayer.sort((a, b) => {
+            const indexA = currentLayer.indexOf(a);
+            const indexB = currentLayer.indexOf(b);
+            return barycenters[indexA] - barycenters[indexB];
+          });
+        }
+      };
+
+      // Apply barycentric method multiple times
+      for (let i = 0; i < 3; i++) {
+        optimizeLayers(layers);
+      }
+
+      // Calculate positions based on optimized layers
       layers.forEach((layer, layerIndex) => {
         const layerX = horizontalPadding + (svgWidth - 2 * horizontalPadding) * (layerIndex / (layers.length - 1));
         layer.forEach((nodeId, nodeIndex) => {
@@ -171,7 +201,7 @@ const ServiceMap: React.FC = () => {
 
   return (
     <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Hierarchical Service Map</h1>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Optimized Hierarchical Service Map</h1>
       <svg width="1200" height="800" style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
         <defs>
           <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
