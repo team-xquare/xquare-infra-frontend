@@ -53,7 +53,8 @@ const ServiceNode: React.FC<{
         fontSize="12"
         style={{ pointerEvents: 'none' }}
       >
-        {node.node_id.split('-').slice(0, -1).join('-')}
+        {/* {node.node_id.split('-').slice(0, -1).join('-')} */}
+        {node.node_id}
       </text>
     </g>
   );
