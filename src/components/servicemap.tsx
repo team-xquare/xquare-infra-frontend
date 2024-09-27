@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { data } from './data';
 
-interface RelationshipMap {
-  [key: string]: string[];
-}
-
 interface Node {
   node_id: string;
   type: string;
@@ -24,32 +20,16 @@ interface Edge {
   latency_avg_ms: number;
 }
 
-interface Metrics {
-  timestamp: string;
-  nodes: Node[];
-  edges: Edge[];
-}
-
-interface JsonData {
-  data: {
-    metrics: Metrics[];
-  };
-}
-
-interface ServiceNodeProps {
+interface NodePosition {
   x: number;
   y: number;
+}
+
+const ServiceNode: React.FC<{
   node: Node;
-  onNodeClick: (node: Node) => void;
-}
-
-interface ServiceLinkProps {
-  source: { x: number; y: number };
-  target: { x: number; y: number };
-  edge: Edge;
-}
-
-const ServiceNode: React.FC<ServiceNodeProps> = ({ x, y, node, onNodeClick }) => {
+  position: NodePosition;
+  onClick: (node: Node) => void;
+}> = ({ node, position, onClick }) => {
   const getColor = (type: string) => {
     switch (type) {
       case 'SERVICE':
@@ -62,42 +42,61 @@ const ServiceNode: React.FC<ServiceNodeProps> = ({ x, y, node, onNodeClick }) =>
   };
 
   return (
-    <g transform={`translate(${x},${y})`} onClick={() => onNodeClick(node)}>
+    <g transform={`translate(${position.x},${position.y})`} onClick={() => onClick(node)}>
       <circle r="30" fill={getColor(node.type)} />
-      <text textAnchor="middle" dy=".3em" fill="#000" stroke="#fff" strokeWidth="0.1" fontSize="16">
-        {node.node_id}
+      <text
+        textAnchor="middle"
+        dy=".3em"
+        fill="#000"
+        stroke="#fff"
+        strokeWidth="0.5"
+        fontSize="12"
+        style={{ pointerEvents: 'none' }}
+      >
+        {node.node_id.split('-').slice(0, -1).join('-')}
       </text>
     </g>
   );
 };
 
-const ServiceLink: React.FC<ServiceLinkProps> = ({ source, target, edge }) => {
-  const offset = 54;
-  const arrowOffset = -0;
+const ServiceLink: React.FC<{
+  source: NodePosition;
+  target: NodePosition;
+  edge: Edge;
+}> = ({ source, target, edge }) => {
+  const dx = target.x - source.x;
+  const dy = target.y - source.y;
+  const angle = Math.atan2(dy, dx);
 
-  const startX = source.x;
-  const startY = source.y;
-  const endX = target.x - ((target.x - source.x) * offset) / Math.hypot(target.x - source.x, target.y - source.y);
-  const endY = target.y - ((target.y - source.y) * offset) / Math.hypot(target.x - source.x, target.y - source.y);
+  const sourceRadius = 30;
+  const targetRadius = 30;
+
+  const startX = source.x + sourceRadius * Math.cos(angle);
+  const startY = source.y + sourceRadius * Math.sin(angle);
+  const endX = target.x - targetRadius * Math.cos(angle);
+  const endY = target.y - targetRadius * Math.sin(angle);
 
   return (
     <g>
-      <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="7" refX={arrowOffset} refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="rgba(0,0,0,0.1)" />
-        </marker>
-      </defs>
       <line
         x1={startX}
         y1={startY}
         x2={endX}
         y2={endY}
-        stroke="rgba(0,0,0,0.1)"
+        stroke="rgba(0,0,0,0.2)"
         strokeWidth="2"
         markerEnd="url(#arrow)"
       />
-      <text x={(startX + endX) / 2} y={(startY + endY) / 2} fill="#666" fontSize="10">
-        {edge.calls} calls, {edge.latency_avg_ms.toFixed(2)}ms
+      <text
+        x={(startX + endX) / 2}
+        y={(startY + endY) / 2}
+        fill="#666"
+        fontSize="10"
+        textAnchor="middle"
+        dy="-5"
+        style={{ pointerEvents: 'none' }}
+      >
+        {edge.calls} calls
       </text>
     </g>
   );
@@ -105,78 +104,80 @@ const ServiceLink: React.FC<ServiceLinkProps> = ({ source, target, edge }) => {
 
 const ServiceMap: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-  const [relationshipMap, setRelationshipMap] = useState<RelationshipMap>({});
+  const [nodePositions, setNodePositions] = useState<Record<string, NodePosition>>({});
 
-  const jsonData: JsonData = data;
-  const metrics = jsonData.data.metrics[0];
+  const metrics = data.data.metrics[0];
   const nodes = metrics.nodes;
   const edges = metrics.edges;
 
   useEffect(() => {
-    const newRelationshipMap: RelationshipMap = {};
-    edges.forEach((edge) => {
-      if (!newRelationshipMap[edge.source]) {
-        newRelationshipMap[edge.source] = [];
-      }
-      newRelationshipMap[edge.source].push(edge.target);
-    });
-    setRelationshipMap(newRelationshipMap);
-  }, [edges]);
+    const calculateNodePositions = () => {
+      const positions: Record<string, NodePosition> = {};
+      const svgWidth = 1200;
+      const svgHeight = 800;
+      const horizontalPadding = 100;
+      const verticalPadding = 50;
 
-  const layoutNodes = () => {
-    const centerX = 450;
-    const centerY = 400;
-    const positions: Record<string, { x: number; y: number }> = {};
-    const visited: Set<string> = new Set();
-
-    const dfs = (nodeId: string, depth: number, angle: number, radius: number) => {
-      if (visited.has(nodeId)) return;
-      visited.add(nodeId);
-
-      const x = centerX + radius * Math.cos(angle);
-      const y = centerY + radius * Math.sin(angle);
-      positions[nodeId] = { x, y };
-
-      const children = relationshipMap[nodeId] || [];
-      const childAngleStep = (2 * Math.PI) / (children.length || 1);
-      children.forEach((childId, index) => {
-        const childAngle = angle + childAngleStep * index;
-        dfs(childId, depth + 1, childAngle, radius + 150);
+      // Calculate in-degree and out-degree for each node
+      const inDegree: Record<string, number> = {};
+      const outDegree: Record<string, number> = {};
+      edges.forEach((edge) => {
+        inDegree[edge.target] = (inDegree[edge.target] || 0) + 1;
+        outDegree[edge.source] = (outDegree[edge.source] || 0) + 1;
       });
+
+      // Sort nodes based on the difference between out-degree and in-degree
+      const sortedNodes = [...nodes].sort((a, b) => {
+        const aDiff = (outDegree[a.node_id] || 0) - (inDegree[a.node_id] || 0);
+        const bDiff = (outDegree[b.node_id] || 0) - (inDegree[b.node_id] || 0);
+        return bDiff - aDiff;
+      });
+
+      // Position nodes in layers
+      const layers: string[][] = [];
+      sortedNodes.forEach((node) => {
+        let layerIndex = 0;
+        while (true) {
+          if (!layers[layerIndex]) {
+            layers[layerIndex] = [];
+          }
+          if (layers[layerIndex].length < 5) {
+            // Limit 5 nodes per layer
+            layers[layerIndex].push(node.node_id);
+            break;
+          }
+          layerIndex++;
+        }
+      });
+
+      // Calculate positions based on layers
+      layers.forEach((layer, layerIndex) => {
+        const layerX = horizontalPadding + (svgWidth - 2 * horizontalPadding) * (layerIndex / (layers.length - 1));
+        layer.forEach((nodeId, nodeIndex) => {
+          const layerY = verticalPadding + (svgHeight - 2 * verticalPadding) * (nodeIndex / (layer.length - 1));
+          positions[nodeId] = { x: layerX, y: layerY };
+        });
+      });
+
+      setNodePositions(positions);
     };
 
-    // Find root nodes (nodes with no incoming edges)
-    const rootNodes = nodes.filter((node) => !Object.values(relationshipMap).flat().includes(node.node_id));
-
-    rootNodes.forEach((rootNode, index) => {
-      const angle = (index / rootNodes.length) * 2 * Math.PI;
-      dfs(rootNode.node_id, 0, angle, 200);
-    });
-
-    // Position any remaining nodes
-    nodes.forEach((node) => {
-      if (!positions[node.node_id]) {
-        const angle = Math.random() * 2 * Math.PI;
-        const radius = 300 + Math.random() * 100;
-        positions[node.node_id] = {
-          x: centerX + radius * Math.cos(angle),
-          y: centerY + radius * Math.sin(angle),
-        };
-      }
-    });
-
-    return positions;
-  };
-
-  const nodePositions = layoutNodes();
+    calculateNodePositions();
+  }, [nodes, edges]);
 
   const handleNodeClick = (node: Node) => {
     setSelectedNode(node);
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center">
-      <svg width="1200" height="800">
+    <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Hierarchical Service Map</h1>
+      <svg width="1200" height="800" style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="rgba(0,0,0,0.2)" />
+          </marker>
+        </defs>
         {edges.map((edge, index) => (
           <ServiceLink
             key={index}
@@ -188,23 +189,28 @@ const ServiceMap: React.FC = () => {
         {nodes.map((node) => (
           <ServiceNode
             key={node.node_id}
-            x={nodePositions[node.node_id].x}
-            y={nodePositions[node.node_id].y}
             node={node}
-            onNodeClick={handleNodeClick}
+            position={nodePositions[node.node_id] || { x: 0, y: 0 }}
+            onClick={handleNodeClick}
           />
         ))}
       </svg>
       {selectedNode && (
-        <div className="mt-4 p-4 border rounded">
-          <h2 className="text-lg font-bold">{selectedNode.node_id}</h2>
+        <div
+          style={{
+            marginTop: '16px',
+            padding: '16px',
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            backgroundColor: '#f9f9f9',
+          }}
+        >
+          <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>{selectedNode.node_id}</h2>
           <p>Type: {selectedNode.type}</p>
           <p>Calls: {selectedNode.calls}</p>
           <p>Successes: {selectedNode.successes}</p>
           <p>Failures: {selectedNode.failures}</p>
           <p>Avg Latency: {selectedNode.latency_avg_ms.toFixed(2)}ms</p>
-          <h3 className="mt-2 font-bold">Related Services:</h3>
-          <ul>{relationshipMap[selectedNode.node_id]?.map((targetId, index) => <li key={index}>{targetId}</li>)}</ul>
         </div>
       )}
     </div>
