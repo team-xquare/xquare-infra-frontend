@@ -123,7 +123,7 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
 
     setScaleX((prev) => {
       const newScale = prev * zoomAmount;
-      return Math.min(Math.max(newScale, 0.2), 14);
+      return Math.min(Math.max(newScale, 0.2), 20);
     });
   };
 
