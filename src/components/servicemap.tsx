@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { data } from './data';
 
 interface Node {
@@ -107,7 +107,14 @@ const ServiceLink: React.FC<ServiceLinkProps> = ({ source, target, edge, maxCall
   return (
     <g>
       <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="7" refX={arrowOffset} refY="3.5" orient="auto">
+        <marker
+          id={`arrow-${edge.source}-${edge.target}`}
+          markerWidth="10"
+          markerHeight="7"
+          refX={arrowOffset}
+          refY="3.5"
+          orient="auto"
+        >
           <polygon points="0 0, 10 3.5, 0 7" fill="rgba(0,0,0,0.1)" />
         </marker>
       </defs>
@@ -118,7 +125,7 @@ const ServiceLink: React.FC<ServiceLinkProps> = ({ source, target, edge, maxCall
         y2={endY}
         stroke="rgba(0,0,0,0.1)"
         strokeWidth={strokeWidth}
-        markerEnd="url(#arrow)"
+        markerEnd={`url(#arrow-${edge.source}-${edge.target})`}
         opacity={opacity}
       />
       <text x={(startX + endX) / 2} y={(startY + endY) / 2} fill="#666" fontSize="10" opacity={opacity}>
@@ -131,17 +138,25 @@ const ServiceLink: React.FC<ServiceLinkProps> = ({ source, target, edge, maxCall
 const ServiceMap: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [hoveredNode, setHoveredNode] = useState<Node | null>(null);
+  const [magnification, setMagnification] = useState<number>(1);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [offset, setOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const startPos = useRef<{ x: number; y: number } | null>(null);
 
   const jsonData: JsonData = data;
-
   const metrics = jsonData.data.metrics[0];
   const nodes = metrics.nodes;
   const edges = metrics.edges;
 
-  const calculateReferences = () => {
+  const { references, uniqueEdges } = useMemo(() => {
     const references = nodes.reduce(
       (acc, node) => {
-        acc[node.node_id] = { incoming: 0, outgoing: 0, uniqueTargets: new Set(), connectedNodes: new Set() };
+        acc[node.node_id] = {
+          incoming: 0,
+          outgoing: 0,
+          uniqueTargets: new Set<string>(),
+          connectedNodes: new Set<string>(),
+        };
         return acc;
       },
       {} as Record<
@@ -171,10 +186,9 @@ const ServiceMap: React.FC = () => {
     });
 
     return { references, uniqueEdges: Array.from(uniqueEdgesMap.values()) };
-  };
+  }, [nodes, edges]);
 
-  const { references, uniqueEdges } = calculateReferences();
-
+  // Updated nodePositions using the positioning system from the second file
   const nodePositions = useMemo(() => {
     const width = 1200;
     const height = 800;
@@ -194,7 +208,7 @@ const ServiceMap: React.FC = () => {
     });
 
     return positions;
-  }, []); // Empty dependency array ensures this calculation happens only once
+  }, [nodes, references]); // Ensure dependencies are included
 
   const handleNodeClick = (node: Node) => {
     setSelectedNode(node);
@@ -212,33 +226,103 @@ const ServiceMap: React.FC = () => {
     return hoveredNode.node_id === nodeId || references[hoveredNode.node_id].connectedNodes.has(nodeId);
   };
 
+  const onWheel = (event: React.WheelEvent<SVGSVGElement>) => {
+    event.preventDefault();
+
+    if (event.ctrlKey) {
+      // Ctrl key pressed: zoom in/out
+      const delta = event.deltaY * -0.001; // Adjust zoom sensitivity
+
+      const svg = event.currentTarget.getBoundingClientRect();
+      const mouseX = event.clientX - svg.left;
+      const mouseY = event.clientY - svg.top;
+
+      setMagnification((prevMagnification) => {
+        const newMagnification = Math.max(0.1, prevMagnification + delta);
+        const scaleFactor = newMagnification / prevMagnification;
+
+        setOffset((prevOffset) => ({
+          x: mouseX - (mouseX - prevOffset.x) * scaleFactor,
+          y: mouseY - (mouseY - prevOffset.y) * scaleFactor,
+        }));
+
+        return newMagnification;
+      });
+    } else {
+      // No Ctrl key: pan the map
+      let deltaX = event.deltaX;
+      let deltaY = event.deltaY;
+
+      // Shift key pressed: use vertical scroll for horizontal movement
+      if (event.shiftKey && deltaX === 0) {
+        deltaX = deltaY;
+        deltaY = 0;
+      }
+
+      setOffset((prevOffset) => ({
+        x: prevOffset.x - deltaX,
+        y: prevOffset.y - deltaY,
+      }));
+    }
+  };
+
+  const onMouseDown = (event: React.MouseEvent<SVGSVGElement>) => {
+    setIsDragging(true);
+    startPos.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const onMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (isDragging && startPos.current) {
+      const dx = event.clientX - startPos.current.x;
+      const dy = event.clientY - startPos.current.y;
+      setOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+      startPos.current = { x: event.clientX, y: event.clientY };
+    }
+  };
+
+  const onMouseUp = () => {
+    setIsDragging(false);
+    startPos.current = null;
+  };
+
   return (
     <div className="w-full h-screen flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">Datadog APM Service Map</h1>
-      <svg width="1200" height="800">
-        {uniqueEdges.map((edge, index) => (
-          <ServiceLink
-            key={index}
-            source={nodePositions[edge.source] || { x: 0, y: 0 }}
-            target={nodePositions[edge.target] || { x: 0, y: 0 }}
-            edge={edge}
-            maxCalls={maxEdgeCalls}
-            isConnected={!hoveredNode || isConnected(edge.source) || isConnected(edge.target)}
-          />
-        ))}
-        {nodes.map((node) => (
-          <ServiceNode
-            key={node.node_id}
-            x={nodePositions[node.node_id].x}
-            y={nodePositions[node.node_id].y}
-            node={node}
-            onNodeClick={handleNodeClick}
-            onNodeHover={handleNodeHover}
-            maxCalls={maxCalls}
-            isConnected={isConnected(node.node_id)}
-            isHovered={hoveredNode?.node_id === node.node_id}
-          />
-        ))}
+      <svg
+        width="1200"
+        height="800"
+        onWheel={onWheel}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      >
+        <g transform={`translate(${offset.x}, ${offset.y}) scale(${magnification})`}>
+          {uniqueEdges.map((edge, index) => (
+            <ServiceLink
+              key={index}
+              source={nodePositions[edge.source] || { x: 0, y: 0 }}
+              target={nodePositions[edge.target] || { x: 0, y: 0 }}
+              edge={edge}
+              maxCalls={maxEdgeCalls}
+              isConnected={!hoveredNode || isConnected(edge.source) || isConnected(edge.target)}
+            />
+          ))}
+          {nodes.map((node) => (
+            <ServiceNode
+              key={node.node_id}
+              x={nodePositions[node.node_id].x}
+              y={nodePositions[node.node_id].y}
+              node={node}
+              onNodeClick={handleNodeClick}
+              onNodeHover={handleNodeHover}
+              maxCalls={maxCalls}
+              isConnected={isConnected(node.node_id)}
+              isHovered={hoveredNode?.node_id === node.node_id}
+            />
+          ))}
+        </g>
       </svg>
       {selectedNode && (
         <div className="mt-4 p-4 border rounded">
