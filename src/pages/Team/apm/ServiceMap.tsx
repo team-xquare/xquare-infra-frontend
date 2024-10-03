@@ -1,6 +1,7 @@
 import ServiceMap from '@/components/servicemap';
 import { getServicemapData } from '@/utils/apis/apm';
 import styled from '@emotion/styled';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 export const ServiceMapPage = () => {
@@ -19,7 +20,14 @@ export const ServiceMapPage = () => {
   };
 
   const { startTime, endTime } = getCurrentAndOneMinuteAgo();
-  const { data, isSuccess } = getServicemapData(teamUUID, startTime, endTime);
+  const { data, isSuccess, refetch } = getServicemapData(teamUUID, startTime, endTime);
+
+  useEffect(() => {
+    refetch();
+    const interval = setInterval(refetch, 60000);
+
+    return () => clearInterval(interval);
+  }, [teamUUID]);
 
   return <Wrapper>{isSuccess && <ServiceMap data={data} />}</Wrapper>;
 };
