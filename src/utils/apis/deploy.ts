@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { DeployAllType, DeployCreateType } from '../types/deployType';
 import { instance } from './axios';
 
@@ -19,4 +19,10 @@ export const getAllDeploy = (teamUUID: string) => {
 
 export const getDetailDeploy = async (deployId: string) => {
   return await instance.get(`${router}/${deployId}`);
+};
+
+export const executionPipeline = async (deployUUID: string, env: 'prod' | 'stag') => {
+  const response = await instance.post(`/v2/container/pipelines/schedule?deployId=${deployUUID}&environment=${env}`);
+
+  return response;
 };

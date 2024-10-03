@@ -14,6 +14,9 @@ import { PassedIcon } from '@/assets/PassedIcon';
 import { FailedIcon } from '@/assets/FailedIcon';
 // import { BuildingIcon } from '@/assets/BuildingIcon';
 import { Loader } from '@/components/Loader';
+import { LimitBox } from '@/components/Layouts/LimitBox';
+import { XButton } from '@/components/common/XButton';
+import { executionPipeline } from '@/utils/apis/deploy';
 
 const Stage = ({ name, status }: StageType) => {
   const onIcon = () => {
@@ -65,13 +68,27 @@ export const TeamDeployContainerHistory = () => {
 
   return (
     <Wrapper>
-      <TitleContainer>
-        <TeamName>배포내역</TeamName>
-        <Title>
-          컨테이너 {data?.deploy_name}
-          <Tag tag="AVAILABLE" />
-        </Title>
-      </TitleContainer>
+      <LimitBox>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <TitleContainer>
+            <TeamName>배포내역</TeamName>
+            <Title>
+              컨테이너 {data?.deploy_name}
+              <Tag tag="AVAILABLE" />
+            </Title>
+          </TitleContainer>
+          <XButton
+            width={120}
+            height={40}
+            onClick={() => {
+              if (!deployUUID || !env) return;
+              executionPipeline(deployUUID, env as 'prod' | 'stag');
+            }}
+          >
+            배포
+          </XButton>
+        </div>
+      </LimitBox>
       <DeployContainerWrapper>
         {history &&
           history.length > 0 &&
