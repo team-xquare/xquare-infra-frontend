@@ -1,5 +1,4 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { data } from './data';
 
 interface Node {
   node_id: string;
@@ -30,6 +29,10 @@ interface JsonData {
   data: {
     metrics: Metrics[];
   };
+}
+
+interface ServiceMapProps {
+  data: JsonData;
 }
 
 interface ServiceNodeProps {
@@ -78,9 +81,18 @@ const ServiceNode: React.FC<ServiceNodeProps> = ({
   return (
     <g
       transform={`translate(${x},${y})`}
-      onClick={() => onNodeClick(node)}
-      onMouseEnter={() => onNodeHover(node)}
-      onMouseLeave={() => onNodeHover(null)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onNodeClick(node);
+      }}
+      onMouseEnter={(e) => {
+        e.stopPropagation();
+        onNodeHover(node);
+      }}
+      onMouseLeave={(e) => {
+        e.stopPropagation();
+        onNodeHover(null);
+      }}
       style={{ cursor: 'pointer' }}
     >
       <circle r={radius} fill={getColor(node.type)} opacity={opacity} />
@@ -135,16 +147,16 @@ const ServiceLink: React.FC<ServiceLinkProps> = ({ source, target, edge, maxCall
   );
 };
 
-const ServiceMap: React.FC = () => {
+const ServiceMap: React.FC<ServiceMapProps> = ({ data }) => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [hoveredNode, setHoveredNode] = useState<Node | null>(null);
   const [magnification, setMagnification] = useState<number>(1);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [offset, setOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const startPos = useRef<{ x: number; y: number } | null>(null);
+  const svgContainerRef = useRef<HTMLDivElement>(null);
 
-  const jsonData: JsonData = data;
-  const metrics = jsonData.data.metrics[0];
+  const metrics = data.data.metrics[0];
   const nodes = metrics.nodes;
   const edges = metrics.edges;
 
@@ -188,14 +200,12 @@ const ServiceMap: React.FC = () => {
     return { references, uniqueEdges: Array.from(uniqueEdgesMap.values()) };
   }, [nodes, edges]);
 
-  // Updated nodePositions using the positioning system from the second file
   const nodePositions = useMemo(() => {
     const width = 1200;
     const height = 800;
     const padding = 100;
     const positions: Record<string, { x: number; y: number }> = {};
 
-    // Sort nodes by the number of unique targets (descending order)
     const sortedNodes = [...nodes].sort(
       (a, b) => references[b.node_id].uniqueTargets.size - references[a.node_id].uniqueTargets.size,
     );
@@ -208,7 +218,7 @@ const ServiceMap: React.FC = () => {
     });
 
     return positions;
-  }, [nodes, references]); // Ensure dependencies are included
+  }, [nodes, references]);
 
   const handleNodeClick = (node: Node) => {
     setSelectedNode(node);
@@ -227,12 +237,12 @@ const ServiceMap: React.FC = () => {
   };
 
   const onWheel = (event: React.WheelEvent<SVGSVGElement>) => {
+    // 기본 스크롤 동작 방지
     event.preventDefault();
+    event.stopPropagation();
 
     if (event.ctrlKey) {
-      // Ctrl key pressed: zoom in/out
-      const delta = event.deltaY * -0.001; // Adjust zoom sensitivity
-
+      const delta = event.deltaY * -0.001;
       const svg = event.currentTarget.getBoundingClientRect();
       const mouseX = event.clientX - svg.left;
       const mouseY = event.clientY - svg.top;
@@ -248,30 +258,19 @@ const ServiceMap: React.FC = () => {
 
         return newMagnification;
       });
-    } else {
-      // No Ctrl key: pan the map
-      let deltaX = event.deltaX;
-      let deltaY = event.deltaY;
-
-      // Shift key pressed: use vertical scroll for horizontal movement
-      if (event.shiftKey && deltaX === 0) {
-        deltaX = deltaY;
-        deltaY = 0;
-      }
-
-      setOffset((prevOffset) => ({
-        x: prevOffset.x - deltaX,
-        y: prevOffset.y - deltaY,
-      }));
     }
   };
 
   const onMouseDown = (event: React.MouseEvent<SVGSVGElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     setIsDragging(true);
     startPos.current = { x: event.clientX, y: event.clientY };
   };
 
   const onMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (isDragging && startPos.current) {
       const dx = event.clientX - startPos.current.x;
       const dy = event.clientY - startPos.current.y;
@@ -280,53 +279,92 @@ const ServiceMap: React.FC = () => {
     }
   };
 
-  const onMouseUp = () => {
+  const onMouseUp = (event: React.MouseEvent<SVGSVGElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     setIsDragging(false);
     startPos.current = null;
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">Datadog APM Service Map</h1>
-      <svg
-        width="1200"
-        height="800"
-        onWheel={onWheel}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseUp}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+    <div
+      ref={svgContainerRef}
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: 'calc(100% - 200px)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
       >
-        <g transform={`translate(${offset.x}, ${offset.y}) scale(${magnification})`}>
-          {uniqueEdges.map((edge, index) => (
-            <ServiceLink
-              key={index}
-              source={nodePositions[edge.source] || { x: 0, y: 0 }}
-              target={nodePositions[edge.target] || { x: 0, y: 0 }}
-              edge={edge}
-              maxCalls={maxEdgeCalls}
-              isConnected={!hoveredNode || isConnected(edge.source) || isConnected(edge.target)}
-            />
-          ))}
-          {nodes.map((node) => (
-            <ServiceNode
-              key={node.node_id}
-              x={nodePositions[node.node_id].x}
-              y={nodePositions[node.node_id].y}
-              node={node}
-              onNodeClick={handleNodeClick}
-              onNodeHover={handleNodeHover}
-              maxCalls={maxCalls}
-              isConnected={isConnected(node.node_id)}
-              isHovered={hoveredNode?.node_id === node.node_id}
-            />
-          ))}
-        </g>
-      </svg>
+        <svg
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'block',
+          }}
+          preserveAspectRatio="xMidYMid meet"
+          viewBox="0 0 1200 800"
+          onWheel={onWheel}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={() => {
+            document.body.style.overflow = 'auto';
+          }}
+          onMouseEnter={() => {
+            document.body.style.overflow = 'hidden';
+          }}
+        >
+          <g transform={`translate(${offset.x}, ${offset.y}) scale(${magnification})`}>
+            {uniqueEdges.map((edge, index) => (
+              <ServiceLink
+                key={index}
+                source={nodePositions[edge.source] || { x: 0, y: 0 }}
+                target={nodePositions[edge.target] || { x: 0, y: 0 }}
+                edge={edge}
+                maxCalls={maxEdgeCalls}
+                isConnected={!hoveredNode || isConnected(edge.source) || isConnected(edge.target)}
+              />
+            ))}
+            {nodes.map((node) => (
+              <ServiceNode
+                key={node.node_id}
+                x={nodePositions[node.node_id].x}
+                y={nodePositions[node.node_id].y}
+                node={node}
+                onNodeClick={handleNodeClick}
+                onNodeHover={handleNodeHover}
+                maxCalls={maxCalls}
+                isConnected={isConnected(node.node_id)}
+                isHovered={hoveredNode?.node_id === node.node_id}
+              />
+            ))}
+          </g>
+        </svg>
+      </div>
       {selectedNode && (
-        <div className="mt-4 p-4 border rounded">
-          <h2 className="text-lg font-bold">{selectedNode.node_id}</h2>
+        <div
+          style={{
+            marginTop: '16px',
+            padding: '16px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            maxHeight: '200px',
+            overflow: 'auto',
+            width: '100%',
+          }}
+        >
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>{selectedNode.node_id}</h2>
           <p>Type: {selectedNode.type}</p>
           <p>Calls: {selectedNode.calls}</p>
           <p>Successes: {selectedNode.successes}</p>
@@ -335,7 +373,7 @@ const ServiceMap: React.FC = () => {
           <p>Referenced by: {references[selectedNode.node_id].incoming}</p>
           <p>References: {references[selectedNode.node_id].outgoing}</p>
           <p>Unique Targets: {references[selectedNode.node_id].uniqueTargets.size}</p>
-          <h3 className="mt-2 font-bold">Unique Edge Calls:</h3>
+          <h3 style={{ marginTop: '8px', fontWeight: 'bold' }}>Unique Edge Calls:</h3>
           <ul>
             {uniqueEdges
               .filter((edge) => edge.source === selectedNode.node_id || edge.target === selectedNode.node_id)

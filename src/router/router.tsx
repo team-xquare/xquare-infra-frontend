@@ -18,6 +18,7 @@ import { TeamDeployContainerHistory } from '@/pages/Team/deploy/Container/Histor
 import { TeamDeployContainerHistoryLog } from '@/pages/Team/deploy/Container/HistoryLog';
 import { TeamDeployContainerAlert } from '@/pages/Team/deploy/Container/Alert';
 import { TeamDeployContainerAlertActive } from '@/pages/Team/deploy/Container/AlertActive';
+import { ServiceMapPage } from '@/pages/Team/apm/ServiceMap';
 
 export const Router = createBrowserRouter([
   {
@@ -40,7 +41,7 @@ export const Router = createBrowserRouter([
                 path: 'apm',
                 children: [
                   { index: true, element: <>개발 중</> },
-                  { path: 'service', element: <>개발 중</> },
+                  { path: 'service', element: <ServiceMapPage /> },
                 ],
               },
               {
