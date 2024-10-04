@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { DeployAllType, DeployCreateType } from '../types/deployType';
 import { instance } from './axios';
 
