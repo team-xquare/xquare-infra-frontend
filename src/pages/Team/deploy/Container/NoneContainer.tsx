@@ -359,17 +359,17 @@ export const TeamDeployNoneContainer = () => {
                   onChange={(e) => setOutputDir(e.target.value)}
                 />
               )}
-              {(deployType === 'backend' && framework === 'node') ||
-                (deployType === 'frontend' && renderType === 'ssr' && (
-                  <Input
-                    width={328}
-                    height={46}
-                    placeholder="ex) npm start"
-                    label="실행 명령어를 설정해 주세요."
-                    value={command}
-                    onChange={(e) => setCommand(e.target.value)}
-                  />
-                ))}
+              {((deployType === 'backend' && framework === 'node') ||
+                (deployType === 'frontend' && renderType === 'ssr')) && (
+                <Input
+                  width={328}
+                  height={46}
+                  placeholder="ex) npm start"
+                  label="실행 명령어를 설정해 주세요."
+                  value={command}
+                  onChange={(e) => setCommand(e.target.value)}
+                />
+              )}
             </LayoutBox>
           </LayoutBox>
         </LayoutBox>
