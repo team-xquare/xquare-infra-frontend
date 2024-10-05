@@ -45,7 +45,7 @@ export const writeContainerNode = async (
     build_commands: string[];
   },
 ) => {
-  return await instance.post(`${v2Router}/gradle?deployId=${deployUUID}&environment=${env}`, data);
+  return await instance.post(`${v2Router}/node?deployId=${deployUUID}&environment=${env}`, data);
 };
 
 export const writeContainerNginx = async (
@@ -57,7 +57,7 @@ export const writeContainerNginx = async (
     build_commands: string[];
   },
 ) => {
-  return await instance.post(`${v2Router}/gradle?deployId=${deployUUID}&environment=${env}`, data);
+  return await instance.post(`${v2Router}/node-with-nginx?deployId=${deployUUID}&environment=${env}`, data);
 };
 
 export const getStageLog = async (pipelineName: string, pipelineCounter: string, stageName: string) => {

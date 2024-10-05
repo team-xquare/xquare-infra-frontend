@@ -336,17 +336,34 @@ export const TeamDeployNoneContainer = () => {
               <Input
                 width={328}
                 height={46}
-                placeholder={deployType === 'frontend' ? 'ex) yarn build' : 'ex) ./gradlew build -x test'}
+                placeholder={
+                  deployType === 'frontend'
+                    ? 'ex) yarn build'
+                    : framework === 'spring boot'
+                      ? 'ex) ./gradlew build -x test'
+                      : 'ex) npm build'
+                }
                 label="빌드 명령어를 입력해주세요"
                 value={buildCommand}
                 onChange={(e) => setBuildCommand(e.target.value)}
               />
-              {(deployType === 'backend' || (deployType === 'frontend' && renderType === 'csr')) && (
+              {((deployType === 'backend' && framework === 'spring boot') ||
+                (deployType === 'frontend' && renderType === 'csr')) && (
                 <Input
                   width={328}
                   height={46}
                   placeholder="ex) dist"
                   label="build output directory를 설정해 주세요."
+                  value={outputDir}
+                  onChange={(e) => setOutputDir(e.target.value)}
+                />
+              )}
+              {deployType === 'backend' && framework === 'node' && (
+                <Input
+                  width={328}
+                  height={46}
+                  placeholder="ex) npm start"
+                  label="실행 명령어를 설정해 주세요."
                   value={outputDir}
                   onChange={(e) => setOutputDir(e.target.value)}
                 />
