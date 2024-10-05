@@ -43,6 +43,7 @@ export const TeamDeployNoneContainer = () => {
   const [selectedJdkVersion, setSelectedJdkVersion] = useState<string>(jdkVersion[0]);
   const [buildCommand, setBuildCommand] = useState<string>('');
   const [outputDir, setOutputDir] = useState<string>('');
+  const [command, setCommand] = useState<string>('');
 
   useEffect(() => {
     if (!deployUUID) return;
@@ -83,12 +84,12 @@ export const TeamDeployNoneContainer = () => {
           ? {
               node_version: selectedNodeVersion,
               build_commands: [buildCommand],
-              command: 'yarn dev',
+              output_dir: outputDir,
             }
           : {
               node_version: selectedNodeVersion,
               build_commands: [buildCommand],
-              output_dir: outputDir,
+              command: command,
             };
     } else {
       // backend
@@ -103,7 +104,7 @@ export const TeamDeployNoneContainer = () => {
         specificData = {
           node_version: selectedNodeVersion,
           build_commands: [buildCommand],
-          command: 'yarn dev',
+          command: command,
         };
       }
     }
@@ -358,16 +359,17 @@ export const TeamDeployNoneContainer = () => {
                   onChange={(e) => setOutputDir(e.target.value)}
                 />
               )}
-              {deployType === 'backend' && framework === 'node' && (
-                <Input
-                  width={328}
-                  height={46}
-                  placeholder="ex) npm start"
-                  label="실행 명령어를 설정해 주세요."
-                  value={outputDir}
-                  onChange={(e) => setOutputDir(e.target.value)}
-                />
-              )}
+              {(deployType === 'backend' && framework === 'node') ||
+                (deployType === 'frontend' && renderType === 'ssr' && (
+                  <Input
+                    width={328}
+                    height={46}
+                    placeholder="ex) npm start"
+                    label="실행 명령어를 설정해 주세요."
+                    value={command}
+                    onChange={(e) => setCommand(e.target.value)}
+                  />
+                ))}
             </LayoutBox>
           </LayoutBox>
         </LayoutBox>
