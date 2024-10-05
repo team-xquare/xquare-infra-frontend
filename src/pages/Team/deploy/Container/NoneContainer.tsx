@@ -117,86 +117,99 @@ export const TeamDeployNoneContainer = () => {
 
     if (!deployUUID) return;
 
-    writeContainerConfig(deployUUID, {
-      prod: requestData.prod,
-      stag: requestData.stag,
-      language: requestData.language,
-      critical_service: Boolean(localStorage.getItem('critical')) ?? false,
-    }).then(() => {
-      alert('config 작성이 완료 되었습니다.');
-    });
+    const promises: Promise<any>[] = [];
 
-    setTimeout(() => {
-      if (
-        deployType === 'backend' &&
-        framework === 'spring boot' &&
-        requestData.build_commands &&
-        requestData.jdk_version &&
-        requestData.output_dir
-      ) {
+    // Add config promise
+    promises.push(
+      writeContainerConfig(deployUUID, {
+        prod: requestData.prod,
+        stag: requestData.stag,
+        language: requestData.language,
+        critical_service: Boolean(localStorage.getItem('critical')) ?? false,
+      }),
+    );
+
+    // Add specific container promises based on conditions
+    if (
+      deployType === 'backend' &&
+      framework === 'spring boot' &&
+      requestData.build_commands &&
+      requestData.jdk_version &&
+      requestData.output_dir
+    ) {
+      promises.push(
         writeContainerGradle(deployUUID, 'prod', {
           build_commands: requestData.build_commands,
           jdk_version: requestData.jdk_version,
           output_dir: requestData.output_dir,
-        }).then(() => {
-          alert('prod gradle 작성이 완료 되었습니다.');
-        });
+        }),
+      );
+      promises.push(
         writeContainerGradle(deployUUID, 'stag', {
           build_commands: requestData.build_commands,
           jdk_version: requestData.jdk_version,
           output_dir: requestData.output_dir,
-        }).then(() => {
-          alert('stag gradle 작성이 완료 되었습니다.');
-        });
-      } else if (
-        (deployType === 'backend' &&
-          framework === 'node' &&
-          requestData.build_commands &&
-          requestData.command &&
-          requestData.node_version) ||
-        (deployType === 'frontend' &&
-          renderType === 'ssr' &&
-          requestData.build_commands &&
-          requestData.command &&
-          requestData.node_version)
-      ) {
+        }),
+      );
+    } else if (
+      (deployType === 'backend' &&
+        framework === 'node' &&
+        requestData.build_commands &&
+        requestData.command &&
+        requestData.node_version) ||
+      (deployType === 'frontend' &&
+        renderType === 'ssr' &&
+        requestData.build_commands &&
+        requestData.command &&
+        requestData.node_version)
+    ) {
+      promises.push(
         writeContainerNode(deployUUID, 'prod', {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           command: requestData.command,
-        }).then(() => {
-          alert('prod node 작성이 완료 되었습니다.');
-        });
+        }),
+      );
+      promises.push(
         writeContainerNode(deployUUID, 'stag', {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           command: requestData.command,
-        }).then(() => {
-          alert('stag node 작성이 완료 되었습니다.');
-        });
-      } else if (
-        deployType === 'frontend' &&
-        renderType === 'csr' &&
-        requestData.build_commands &&
-        requestData.output_dir &&
-        requestData.node_version
-      ) {
+        }),
+      );
+    } else if (
+      deployType === 'frontend' &&
+      renderType === 'csr' &&
+      requestData.build_commands &&
+      requestData.output_dir &&
+      requestData.node_version
+    ) {
+      promises.push(
         writeContainerNginx(deployUUID, 'prod', {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           output_dir: requestData.output_dir,
-        }).then(() => {
-          alert('prod nginx 작성이 완료 되었습니다.');
-        });
+        }),
+      );
+      promises.push(
         writeContainerNginx(deployUUID, 'stag', {
           node_version: requestData.node_version,
           build_commands: requestData.build_commands,
           output_dir: requestData.output_dir,
-        }).then(() => {
-          alert('stag nginx 작성이 완료 되었습니다.');
-        });
-      }
-    }, 1500);
+        }),
+      );
+    }
+
+    // Wait for all promises to complete
+    Promise.all(promises)
+      .then(() => {
+        alert('모든 설정이 완료되었습니다.');
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error('Error during submission:', error);
+        alert('설정 중 오류가 발생했습니다.');
+      });
   };
 
   return (
