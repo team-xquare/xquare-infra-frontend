@@ -19,6 +19,7 @@ import { TeamDeployContainerHistoryLog } from '@/pages/Team/deploy/Container/His
 import { TeamDeployContainerAlert } from '@/pages/Team/deploy/Container/Alert';
 import { TeamDeployContainerAlertActive } from '@/pages/Team/deploy/Container/AlertActive';
 import { ServiceMapPage } from '@/pages/Team/apm/ServiceMap';
+import { TeamDeployNoneContainer } from '@/pages/Team/deploy/Container/NoneContainer';
 
 export const Router = createBrowserRouter([
   {
@@ -57,6 +58,7 @@ export const Router = createBrowserRouter([
                         path: 'container',
                         children: [
                           { index: true, element: <TeamDeployContainer /> },
+                          { path: 'edit', element: <TeamDeployNoneContainer /> },
                           {
                             path: ':env',
                             children: [
