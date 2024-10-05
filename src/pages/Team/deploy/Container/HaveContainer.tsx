@@ -5,10 +5,11 @@ import { Tag } from '@/components/Team/Tag';
 import { XButton } from '@/components/common/XButton';
 import { ContainerAllType } from '@/utils/types/containerType';
 import { getAllContainer, getCPU, getMemory } from '@/utils/apis/container';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ContainerGraph } from '@/components/graph/ContainerGraph';
 import { DeployDetailType } from '@/utils/types/deployType';
 import { getDetailDeploy } from '@/utils/apis/deploy';
+import { LimitBox } from '@/components/Layouts/LimitBox';
 
 type DateValueMap = {
   [dateString: string]: string;
@@ -80,16 +81,10 @@ export const TeamDeployHaveContainer = () => {
         <Describtion>프로젝트를 배포하기 위한 정보를 관리합니다.</Describtion>
       </TitleContainer>
       <UtilContainer>
-        <div>
-          <Label>배포 키</Label>
-          <SecretKey>*******************</SecretKey>
-        </div>
-        <XButton width={70} height={46} buttonStyle="solid">
-          재발급
-        </XButton>
+        <Link to={`/team/${teamUUID}/deploy/${deployUUID}/container/edit`}>Container Setting</Link>
       </UtilContainer>
       {containerData && containerData.length > 0 ? (
-        <>
+        <LimitBox>
           <Label>컨테이너</Label>
           <ContainerBoxContainer>
             {containerData.map((item, index) => {
@@ -142,7 +137,7 @@ export const TeamDeployHaveContainer = () => {
               );
             })}
           </ContainerBoxContainer>
-        </>
+        </LimitBox>
       ) : (
         <TipBox>
           아직 프로젝트에서 배포된 정보가 없습니다.
@@ -194,21 +189,17 @@ const Describtion = styled.div`
 const UtilContainer = styled.div`
   display: flex;
   gap: 10px;
-  align-items: end;
+  justify-content: end;
   width: 100%;
   max-width: 1120px;
-`;
-
-const SecretKey = styled.div`
-  width: 426px;
-  height: 46px;
-  border-radius: 4px;
-  border: 1px solid ${theme.color.gray5};
-  color: ${theme.color.gray7};
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  padding-left: 20px;
+  & > a {
+    color: ${theme.color.mainDark1};
+    cursor: pointer;
+    transition: 0.1s linear;
+    :hover {
+      color: ${theme.color.mainLight1};
+    }
+  }
 `;
 
 const Label = styled.label`

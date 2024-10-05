@@ -96,6 +96,7 @@ export const menu: MenusType = {
   '/team/:id/apm/service': apm,
   '/team/:id/deploy/:id': deploy_inside,
   '/team/:id/deploy/:id/container': deploy_inside,
+  '/team/:id/deploy/:id/container/edit': deploy_inside,
   '/team/:id/deploy/:id/container/:env': container_inside,
   '/team/:id/deploy/:id/container/:env/traces': container_inside,
   '/team/:id/deploy/:id/container/:env/env': container_inside,
