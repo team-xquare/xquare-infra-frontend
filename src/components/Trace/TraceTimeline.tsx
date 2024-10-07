@@ -116,15 +116,44 @@ export const TraceTimeline: React.FC<TraceTimelineProps> = ({ spans, onSpanClick
 
   const handleWheel = (e: WheelEvent) => {
     e.preventDefault();
-    const { deltaY } = e;
 
-    const zoomIntensity = 0.001;
-    const zoomAmount = 1 - deltaY * zoomIntensity;
+    if (!containerRef.current) return;
+    const container = containerRef.current;
 
-    setScaleX((prev) => {
-      const newScale = prev * zoomAmount;
-      return Math.min(Math.max(newScale, 0.2), 10000);
-    });
+    // 마우스 위치 계산
+    const mouseX = e.clientX - container.getBoundingClientRect().left + container.scrollLeft;
+
+    // 이전 스케일 저장
+    const prevScale = scaleX;
+
+    // 새로운 스케일 계산
+    let delta;
+    if (e.shiftKey) {
+      // 가로 스크롤인 경우 deltaX 사용
+      delta = -e.deltaX;
+    } else {
+      // 세로 스크롤인 경우 deltaY 사용
+      delta = -e.deltaY;
+    }
+
+    // 스크롤이 없는 경우 처리
+    if (delta === 0) return;
+
+    const zoomFactor = 0.999 ** delta;
+    const newScale = Math.min(Math.max(prevScale * zoomFactor, 0.2), 10000);
+
+    // 마우스 포인터 위치의 타임라인 상의 시간값 계산
+    const timeAtMouse = mouseX / (baseScaleX * prevScale) + traceStartTime / 1e6;
+
+    // 새로운 스크롤 위치 계산
+    const newMouseX = (timeAtMouse - traceStartTime / 1e6) * baseScaleX * newScale;
+    const newScrollLeft = newMouseX - (e.clientX - container.getBoundingClientRect().left);
+
+    // 스케일 업데이트
+    setScaleX(newScale);
+
+    // 스크롤 위치 업데이트
+    container.scrollLeft = newScrollLeft;
   };
 
   const isDragging = useRef(false);
