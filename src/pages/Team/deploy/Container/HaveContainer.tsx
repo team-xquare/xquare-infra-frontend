@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { theme } from '@/style/theme';
 import { Tag } from '@/components/Team/Tag';
-import { XButton } from '@/components/common/XButton';
 import { ContainerAllType } from '@/utils/types/containerType';
 import { getAllContainer, getCPU, getMemory } from '@/utils/apis/container';
 import { Link, useNavigate, useParams } from 'react-router-dom';
