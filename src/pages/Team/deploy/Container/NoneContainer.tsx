@@ -117,91 +117,95 @@ export const TeamDeployNoneContainer = () => {
 
     if (!deployUUID) return;
 
-    const promises: Promise<any>[] = [];
+    // First, execute writeContainerConfig
+    writeContainerConfig(deployUUID, {
+      prod: requestData.prod,
+      stag: requestData.stag,
+      language: requestData.language,
+      critical_service: Boolean(localStorage.getItem('critical')) ?? false,
+    })
+      .then((response) => {
+        // Only proceed if writeContainerConfig was successful
+        if (response.status === 200) {
+          const containerPromises: Promise<any>[] = [];
 
-    // Add config promise
-    promises.push(
-      writeContainerConfig(deployUUID, {
-        prod: requestData.prod,
-        stag: requestData.stag,
-        language: requestData.language,
-        critical_service: Boolean(localStorage.getItem('critical')) ?? false,
-      }),
-    );
+          // Add specific container promises based on conditions
+          if (
+            deployType === 'backend' &&
+            framework === 'spring boot' &&
+            requestData.build_commands &&
+            requestData.jdk_version &&
+            requestData.output_dir
+          ) {
+            containerPromises.push(
+              writeContainerGradle(deployUUID, 'prod', {
+                build_commands: requestData.build_commands,
+                jdk_version: requestData.jdk_version,
+                output_dir: requestData.output_dir,
+              }),
+            );
+            containerPromises.push(
+              writeContainerGradle(deployUUID, 'stag', {
+                build_commands: requestData.build_commands,
+                jdk_version: requestData.jdk_version,
+                output_dir: requestData.output_dir,
+              }),
+            );
+          } else if (
+            (deployType === 'backend' &&
+              framework === 'node' &&
+              requestData.build_commands &&
+              requestData.command &&
+              requestData.node_version) ||
+            (deployType === 'frontend' &&
+              renderType === 'ssr' &&
+              requestData.build_commands &&
+              requestData.command &&
+              requestData.node_version)
+          ) {
+            containerPromises.push(
+              writeContainerNode(deployUUID, 'prod', {
+                node_version: requestData.node_version,
+                build_commands: requestData.build_commands,
+                command: requestData.command,
+              }),
+            );
+            containerPromises.push(
+              writeContainerNode(deployUUID, 'stag', {
+                node_version: requestData.node_version,
+                build_commands: requestData.build_commands,
+                command: requestData.command,
+              }),
+            );
+          } else if (
+            deployType === 'frontend' &&
+            renderType === 'csr' &&
+            requestData.build_commands &&
+            requestData.output_dir &&
+            requestData.node_version
+          ) {
+            containerPromises.push(
+              writeContainerNginx(deployUUID, 'prod', {
+                node_version: requestData.node_version,
+                build_commands: requestData.build_commands,
+                output_dir: requestData.output_dir,
+              }),
+            );
+            containerPromises.push(
+              writeContainerNginx(deployUUID, 'stag', {
+                node_version: requestData.node_version,
+                build_commands: requestData.build_commands,
+                output_dir: requestData.output_dir,
+              }),
+            );
+          }
 
-    // Add specific container promises based on conditions
-    if (
-      deployType === 'backend' &&
-      framework === 'spring boot' &&
-      requestData.build_commands &&
-      requestData.jdk_version &&
-      requestData.output_dir
-    ) {
-      promises.push(
-        writeContainerGradle(deployUUID, 'prod', {
-          build_commands: requestData.build_commands,
-          jdk_version: requestData.jdk_version,
-          output_dir: requestData.output_dir,
-        }),
-      );
-      promises.push(
-        writeContainerGradle(deployUUID, 'stag', {
-          build_commands: requestData.build_commands,
-          jdk_version: requestData.jdk_version,
-          output_dir: requestData.output_dir,
-        }),
-      );
-    } else if (
-      (deployType === 'backend' &&
-        framework === 'node' &&
-        requestData.build_commands &&
-        requestData.command &&
-        requestData.node_version) ||
-      (deployType === 'frontend' &&
-        renderType === 'ssr' &&
-        requestData.build_commands &&
-        requestData.command &&
-        requestData.node_version)
-    ) {
-      promises.push(
-        writeContainerNode(deployUUID, 'prod', {
-          node_version: requestData.node_version,
-          build_commands: requestData.build_commands,
-          command: requestData.command,
-        }),
-      );
-      promises.push(
-        writeContainerNode(deployUUID, 'stag', {
-          node_version: requestData.node_version,
-          build_commands: requestData.build_commands,
-          command: requestData.command,
-        }),
-      );
-    } else if (
-      deployType === 'frontend' &&
-      renderType === 'csr' &&
-      requestData.build_commands &&
-      requestData.output_dir &&
-      requestData.node_version
-    ) {
-      promises.push(
-        writeContainerNginx(deployUUID, 'prod', {
-          node_version: requestData.node_version,
-          build_commands: requestData.build_commands,
-          output_dir: requestData.output_dir,
-        }),
-      );
-      promises.push(
-        writeContainerNginx(deployUUID, 'stag', {
-          node_version: requestData.node_version,
-          build_commands: requestData.build_commands,
-          output_dir: requestData.output_dir,
-        }),
-      );
-    }
-
-    // Wait for all promises to complete
-    Promise.all(promises)
+          // Execute remaining promises only after writeContainerConfig succeeds
+          return Promise.all(containerPromises);
+        } else {
+          throw new Error('Config 설정에 실패했습니다.');
+        }
+      })
       .then(() => {
         alert('모든 설정이 완료되었습니다.');
         window.location.reload();
