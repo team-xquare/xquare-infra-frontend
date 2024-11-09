@@ -5,9 +5,9 @@ FROM node:18.19-alpine AS builder
 WORKDIR /app
 
 # 필요한 시스템 패키지 설치
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat build-base python3
 
-# 환경 변수 설정 (빌드 시간 ARG로 전달받음)
+# 환경 변수 설정
 ARG VITE_SERVER_BASE_URL
 ARG VITE_SERVER_SOCKET_URL
 ARG CHANNEL_TALK_PLUGIN_KEY
@@ -18,7 +18,7 @@ ENV VITE_SERVER_BASE_URL=${VITE_SERVER_BASE_URL} \
     CHANNEL_TALK_PLUGIN_KEY=${CHANNEL_TALK_PLUGIN_KEY} \
     VITE_SERVER_GRAFANA_URL=${VITE_SERVER_GRAFANA_URL}
 
-# 패키지 관련 파일 복사 (캐싱 활용)
+# Zero Install 파일 복사
 COPY .yarn ./.yarn
 COPY .yarnrc.yml ./ 
 COPY .pnp.cjs ./ 
