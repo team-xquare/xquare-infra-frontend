@@ -26,7 +26,7 @@ COPY package.json ./
 
 # 의존성 설치
 COPY . .
-RUN yarn install --immutable && yarn build
+RUN yarn install && yarn build
 
 # 실행 단계
 FROM nginx:alpine AS runner
