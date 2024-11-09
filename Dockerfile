@@ -18,11 +18,18 @@ ENV VITE_SERVER_BASE_URL=${VITE_SERVER_BASE_URL} \
     CHANNEL_TALK_PLUGIN_KEY=${CHANNEL_TALK_PLUGIN_KEY} \
     VITE_SERVER_GRAFANA_URL=${VITE_SERVER_GRAFANA_URL}
 
-# 소스 코드 복사
-COPY . .
+# 패키지 관련 파일 복사 (캐싱 활용)
+COPY .yarn ./.yarn
+COPY .yarnrc.yml ./ 
+COPY .pnp.cjs ./ 
+COPY package.json ./ 
 
-# 의존성 설치 및 애플리케이션 빌드
-RUN yarn install --immutable && yarn build
+# 의존성 설치
+RUN yarn install
+
+# 소스 코드 복사 및 애플리케이션 빌드
+COPY . .
+RUN yarn build
 
 # 실행 단계
 FROM nginx:alpine AS runner
@@ -30,8 +37,10 @@ FROM nginx:alpine AS runner
 # 작업 디렉토리 설정
 WORKDIR /usr/share/nginx/html
 
+# 빌드된 결과물 복사
+COPY --from=builder /app/dist ./ 
+
 # Nginx 설정 복사 및 설정 최적화
-COPY --from=builder /app/dist ./
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
     listen 3000;
@@ -47,8 +56,8 @@ server {
 }
 EOF
 
-# 3000포트 노출
+# 포트 노출
 EXPOSE 3000
 
-# Nginx 시작
+# Nginx 실행
 CMD ["nginx", "-g", "daemon off;"]
