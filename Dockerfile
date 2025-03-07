@@ -5,7 +5,9 @@ FROM node:23.9-alpine AS builder
 WORKDIR /app
 
 # 필요한 시스템 패키지 설치
-RUN apk add --no-cache libc6-compat build-base python3
+RUN apk add --no-cache libc6-compat git curl unzip
+# Corepack 활성화 및 Yarn 설치
+RUN corepack enable && corepack prepare yarn@4.3.0 --activate
 
 # 환경 변수 설정
 ARG VITE_SERVER_BASE_URL
@@ -20,8 +22,8 @@ ENV VITE_SERVER_BASE_URL=${VITE_SERVER_BASE_URL} \
 
 COPY . .
 
-RUN yarn install && yarn build
-COPY . .
+RUN yarn install --immutable
+RUN yarn build
 
 # 실행 단계
 FROM nginx:alpine AS runner
