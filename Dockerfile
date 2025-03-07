@@ -4,11 +4,6 @@ FROM node:23.9-alpine AS builder
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 필요한 시스템 패키지 설치
-RUN apk add --no-cache libc6-compat git curl unzip
-# Corepack 활성화 및 Yarn 설치
-RUN corepack enable && corepack prepare yarn@4.3.0 --activate
-
 # 환경 변수 설정
 ARG VITE_SERVER_BASE_URL
 ARG VITE_SERVER_SOCKET_URL
@@ -23,35 +18,37 @@ ENV VITE_SERVER_BASE_URL=${VITE_SERVER_BASE_URL} \
 COPY . .
 
 RUN yarn install --immutable
-RUN yarn build
+#RUN yarn build
 
-# 실행 단계
-FROM nginx:alpine AS runner
+CMD ["yarn","start","--host"]
 
-# 작업 디렉토리 설정
-WORKDIR /usr/share/nginx/html
-
-# 빌드된 결과물 복사
-COPY --from=builder /app/dist ./ 
-
-# Nginx 설정 복사 및 설정 최적화
-COPY <<EOF /etc/nginx/conf.d/default.conf
-server {
-    listen 3000;
-    server_name localhost;
-
-    location / {
-        root   /usr/share/nginx/html;
-        index  index.html;
-        try_files \$uri /index.html;
-    }
-
-    error_page 404 /index.html;
-}
-EOF
-
-# 포트 노출
-EXPOSE 3000
-
-# Nginx 실행
-CMD ["nginx", "-g", "daemon off;"]
+## 실행 단계
+#FROM nginx:alpine AS runner
+#
+## 작업 디렉토리 설정
+#WORKDIR /usr/share/nginx/html
+#
+## 빌드된 결과물 복사
+#COPY --from=builder /app/dist ./
+#
+## Nginx 설정 복사 및 설정 최적화
+#COPY <<EOF /etc/nginx/conf.d/default.conf
+#server {
+#    listen 3000;
+#    server_name localhost;
+#
+#    location / {
+#        root   /usr/share/nginx/html;
+#        index  index.html;
+#        try_files \$uri /index.html;
+#    }
+#
+#    error_page 404 /index.html;
+#}
+#EOF
+#
+## 포트 노출
+#EXPOSE 3000
+#
+## Nginx 실행
+#CMD ["nginx", "-g", "daemon off;"]
