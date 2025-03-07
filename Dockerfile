@@ -18,10 +18,8 @@ ENV VITE_SERVER_BASE_URL=${VITE_SERVER_BASE_URL} \
     CHANNEL_TALK_PLUGIN_KEY=${CHANNEL_TALK_PLUGIN_KEY} \
     VITE_SERVER_GRAFANA_URL=${VITE_SERVER_GRAFANA_URL}
 
-RUN yarn install
-# 의존성 설치
+RUN yarn install && yarn build
 COPY . .
-RUN yarn build
 
 # 실행 단계
 FROM nginx:alpine AS runner
