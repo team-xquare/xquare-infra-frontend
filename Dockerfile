@@ -1,5 +1,5 @@
 # 빌드 단계
-FROM node:18.19-alpine AS builder
+FROM node:23.9-alpine AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
@@ -22,11 +22,12 @@ ENV VITE_SERVER_BASE_URL=${VITE_SERVER_BASE_URL} \
 COPY .yarn ./.yarn
 COPY .yarnrc.yml ./ 
 COPY .pnp.cjs ./ 
-COPY package.json ./ 
+COPY package.json ./
 
+RUN yarn
 # 의존성 설치
 COPY . .
-RUN yarn install && yarn build
+RUN yarn build
 
 # 실행 단계
 FROM nginx:alpine AS runner
