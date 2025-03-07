@@ -15,7 +15,7 @@ export const TeamDeployContainerTraces = () => {
         .then((res) => {
           // 반환되는 데이터 형식에 따라 적절히 접근합니다.
           // 예를 들어, res.data.url 형식으로 URL이 포함되어 있다고 가정합니다.
-          setDashboardUrl(res.data.url);
+          setDashboardUrl(res.data);
           setLoading(false);
         })
         .catch((err) => {
