@@ -18,13 +18,7 @@ ENV VITE_SERVER_BASE_URL=${VITE_SERVER_BASE_URL} \
     CHANNEL_TALK_PLUGIN_KEY=${CHANNEL_TALK_PLUGIN_KEY} \
     VITE_SERVER_GRAFANA_URL=${VITE_SERVER_GRAFANA_URL}
 
-# Zero Install 파일 복사
-COPY .yarn ./.yarn
-COPY .yarnrc.yml ./ 
-COPY .pnp.cjs ./ 
-COPY package.json ./
-
-RUN yarn
+RUN yarn install
 # 의존성 설치
 COPY . .
 RUN yarn build
