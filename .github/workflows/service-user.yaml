@@ -17,35 +17,12 @@ jobs:
       - name: Check Out The Repository
         uses: actions/checkout@v3
 
-      # 2. Node.js 환경 설정
-      - name: Set Up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      # 3. Yarn 캐시 설정
-      - name: Cache Yarn Files
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.yarn/cache
-            .pnp.cjs
-            .yarnrc.yml
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      # 4. Docker 빌드 및 배포
+      # 2. Docker 빌드 및 배포
       - name: Deploy to xquare
         uses: team-xquare/xquare-deployment-action@master
         with:
           environment: prod
           access_key: ${{ secrets.USER_ACCESS_KEY }}
-          github_token: ${{ secrets.GHP_TOKEN }}
-          base_url: .
-          config_file_path: ./.xquare/config.yaml
-          yarn_docker_build: false
-          yarn_workspace: .
           buildargs: |
             VITE_SERVER_BASE_URL=${{ secrets.VITE_SERVER_BASE_URL }}
             VITE_SERVER_SOCKET_URL=${{ secrets.VITE_SERVER_SOCKET_URL }}
