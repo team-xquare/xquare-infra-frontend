@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["vite-plugin-svgr/client", "vite/client", "node"],
+    "types": ["vite-plugin-svgr/client", "vite/client"],
     "typeRoots": ["./types", "./node_modules"],
     "target": "ESNext",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
